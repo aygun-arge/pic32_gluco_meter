@@ -2,3 +2,5 @@ build/
 dist/
 .*~
 *~
+Makefile
+nbproject
