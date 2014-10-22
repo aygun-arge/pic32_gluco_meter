@@ -1,0 +1,12 @@
+[submodule "esolid-base"]
+	path = esolid-base
+	url = /home/nenad/git/nradulovic/esolid-base.git/
+[submodule "esolid-eds"]
+	path = esolid-eds
+	url = /home/nenad/git/nradulovic/esolid-eds.git/
+[submodule "esolid-mem"]
+	path = esolid-mem
+	url = /home/nenad/git/nradulovic/esolid-mem.git/
+[submodule "esolid-vtimer"]
+	path = esolid-vtimer
+	url = /home/nenad/git/nradulovic/esolid-vtimer.git/
