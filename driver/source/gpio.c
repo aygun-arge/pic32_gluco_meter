@@ -13,6 +13,7 @@
 #include <xc.h>
 #include <sys/attribs.h>
 #include <stdbool.h>
+#include <p32xxxx.h>
 
 #include "driver/gpio.h"
 
@@ -50,18 +51,7 @@ static struct change_slot g_change_slot[CONFIG_MAX_CHANGE_HANDLERS];
 /*======================================================  GLOBAL VARIABLES  ==*/
 
 const struct gpio GpioA = {
-    .port     = &PORTA,
-    .tris     = &TRISA,
-    .lat      = &LATA,
-    .set      = &LATASET,
-    .clr      = &LATACLR,
-    .invert   = &LATAINV,
-    .od       = &ODCA,
-    .change   = &CNENA,
-    .status   = &CNSTATA,
-    .pullup   = &CNPUA,
-    .pulldown = &CNPDA,
-    .ansel    = &ANSELA
+    0
 };
 
 const struct gpio GpioB = {
@@ -72,11 +62,11 @@ const struct gpio GpioB = {
     .clr      = &LATBCLR,
     .invert   = &LATBINV,
     .od       = &ODCB,
-    .change   = &CNENB,
-    .status   = &CNSTATB,
-    .pullup   = &CNPUB,
-    .pulldown = &CNPDB,
-    .ansel    = &ANSELB
+    .change   = NULL,
+    .status   = NULL,
+    .pullup   = NULL,
+    .pulldown = NULL,
+    .ansel    = NULL
 };
 
 const struct gpio GpioC = {
@@ -87,11 +77,11 @@ const struct gpio GpioC = {
     .clr      = &LATCCLR,
     .invert   = &LATCINV,
     .od       = &ODCC,
-    .change   = &CNENC,
-    .status   = &CNSTATC,
-    .pullup   = &CNPUC,
-    .pulldown = &CNPDC,
-    .ansel    = &ANSELC
+    .change   = NULL,
+    .status   = NULL,
+    .pullup   = NULL,
+    .pulldown = NULL,
+    .ansel    = NULL
 };
 
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
@@ -117,6 +107,15 @@ static const struct gpio * port_no_to_gpio(uint32_t num)
         &GpioC
     };
     
+    return (num_to_gpio[num]);
+#elif (((__PIC32_FEATURE_SET__ >= 500) && (__PIC32_FEATURE_SET__ <= 700)))
+    static const struct gpio * num_to_gpio [] =
+    {
+        &GpioA,
+        &GpioB,
+        &GpioC
+    };
+
     return (num_to_gpio[num]);
 #endif
 }
@@ -205,6 +204,7 @@ void gpio_release_slot(struct change_slot * slot)
 
 void gpio_change_enable(struct change_slot * slot)
 {
+#if (((__PIC32_FEATURE_SET__ >= 100) && (__PIC32_FEATURE_SET__ <= 299)))
     esIntrCtx                   intr_ctx;
 
     slot->is_enabled = true;
@@ -246,10 +246,13 @@ void gpio_change_enable(struct change_slot * slot)
     }
     *(port_no_to_gpio(slot->port_no)->change) |= slot->bitwise_pin;
     ES_CRITICAL_LOCK_EXIT(intr_ctx);
+#endif
 }
 
 void gpio_change_disable(struct change_slot * slot)
 {
+#if (((__PIC32_FEATURE_SET__ >= 100) && (__PIC32_FEATURE_SET__ <= 299)))
+
     esIntrCtx                   intr_ctx;
 
     slot->is_enabled = false;
@@ -279,8 +282,10 @@ void gpio_change_disable(struct change_slot * slot)
         }
     }
     ES_CRITICAL_LOCK_EXIT(intr_ctx);
+#endif
 }
 
+#if (((__PIC32_FEATURE_SET__ >= 100) && (__PIC32_FEATURE_SET__ <= 299)))
 void __ISR(_CHANGE_NOTICE_VECTOR) changeNotice(void) {
     volatile uint32_t   port;
     uint32_t            intFlag;
@@ -305,6 +310,7 @@ void __ISR(_CHANGE_NOTICE_VECTOR) changeNotice(void) {
         IFS1CLR = CHANGE_INT_GPIOC;
     }
 }
+#endif
 
 /*================================*//** @cond *//*==  CONFIGURATION ERRORS  ==*/
 /** @endcond *//** @} *//******************************************************
