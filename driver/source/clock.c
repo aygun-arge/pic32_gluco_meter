@@ -67,7 +67,7 @@ void clockSetOutput(
     enum clockOutNum    outputNum,
     enum clockOutSource source,
     enum clockOutDivider divider) {
-
+#if (((__PIC32_FEATURE_SET__ >= 100) && (__PIC32_FEATURE_SET__ <= 299)))
     REFOCON = 0u;
 
     switch (outputNum) {
@@ -131,6 +131,7 @@ void clockSetOutput(
         }
     }
     REFOCONSET = REFOCON_ON | REFOCON_OE;
+#endif
 }
 
 /*================================*//** @cond *//*==  CONFIGURATION ERRORS  ==*/

@@ -17,7 +17,9 @@
 extern "C" {
 #endif
 
-struct rtcTime {
+struct i2c_bus;
+
+struct rtc_time {
     uint16_t            year;
     uint8_t             month;
     uint8_t             day;
@@ -26,11 +28,11 @@ struct rtcTime {
     uint8_t             second;
 };
 
-void initRtcDriver(void);
-void termRtcDriver(void);
-esError rtcSetTime(const struct rtcTime * time);
-esError rtcGetTime(struct rtcTime * time);
-bool isRtcActive(void);
+void rtc_init_driver(struct i2c_bus * i2c_bus);
+void rtc_term_driver(void);
+esError rtc_set_time(const struct rtc_time * time);
+esError rtc_get_time(struct rtc_time * time);
+bool rtc_is_active(void);
 
 #ifdef	__cplusplus
 }

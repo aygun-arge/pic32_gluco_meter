@@ -32,63 +32,63 @@ struct i2cConfig {
     uint32_t            isrPrio;
 };
 
-struct i2cHandle {
+struct i2c_bus {
     const struct i2cId *    id;
     uint32_t                flags;
 };
 
 struct i2cId {
-    void             (* open)(const struct i2cConfig *, struct i2cHandle *);
-    void             (* close)(struct i2cHandle *);
-    bool             (* write)(struct i2cHandle *, uint8_t);
-    uint8_t          (* read)(struct i2cHandle *);
-    void             (* start)(struct i2cHandle *);
-    void             (* restart)(struct i2cHandle *);
-    void             (* stop)(struct i2cHandle *);
-    void             (* ack)(struct i2cHandle *);
-    void             (* nack)(struct i2cHandle *);
+    void             (* open)(const struct i2cConfig *, struct i2c_bus *);
+    void             (* close)(struct i2c_bus *);
+    bool             (* write)(struct i2c_bus *, uint8_t);
+    uint8_t          (* read)(struct i2c_bus *);
+    void             (* start)(struct i2c_bus *);
+    void             (* restart)(struct i2c_bus *);
+    void             (* stop)(struct i2c_bus *);
+    void             (* ack)(struct i2c_bus *);
+    void             (* nack)(struct i2c_bus *);
 };
 
 void initI2cDriver(void);
 
 void i2cOpen(
-    struct i2cHandle *          handle,
+    struct i2c_bus *          handle,
     const struct i2cConfig *    config);
 
 void i2cClose(
-    struct i2cHandle *          handle);
+    struct i2c_bus *          handle);
 
 void i2cAck(
-    struct i2cHandle *          handle);
+    struct i2c_bus *          handle);
 
 void i2cNack(
-    struct i2cHandle *          handle);
+    struct i2c_bus *          handle);
 
 bool i2cWriteArray(
-    struct i2cHandle *          handle,
+    struct i2c_bus *          handle,
     const uint8_t *             data,
     size_t                      size);
 
 bool i2cWrite(
-    struct i2cHandle *          handle,
+    struct i2c_bus *          handle,
     uint8_t                     data);
 
 void i2cReadArray(
-    struct i2cHandle *          handle,
+    struct i2c_bus *          handle,
     uint8_t *                   data,
     size_t                      size);
 
 uint8_t i2cRead(
-    struct i2cHandle *          handle);
+    struct i2c_bus *          handle);
 
 void i2cStart(
-    struct i2cHandle *          handle);
+    struct i2c_bus *          handle);
 
 void i2cRestart(
-    struct i2cHandle *          handle);
+    struct i2c_bus *          handle);
 
 void i2cStop(
-    struct i2cHandle *          handle);
+    struct i2c_bus *          handle);
 
 #ifdef	__cplusplus
 }
