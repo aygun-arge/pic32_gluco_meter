@@ -6,7 +6,7 @@ void initI2cDriver(void) {
 }
 
 void i2cOpen(
-    struct i2cHandle *          handle,
+    struct i2c_bus *          handle,
     const struct i2cConfig *    config) {
 
     handle->id    = config->id;
@@ -15,25 +15,25 @@ void i2cOpen(
 }
 
 void i2cClose(
-    struct i2cHandle *  handle) {
+    struct i2c_bus *  handle) {
 
     handle->id->close(handle);
 }
 
 void i2cAck(
-    struct i2cHandle *          handle) {
+    struct i2c_bus *          handle) {
 
     handle->id->ack(handle);
 }
 
 void i2cNack(
-    struct i2cHandle *          handle) {
+    struct i2c_bus *          handle) {
 
     handle->id->nack(handle);
 }
 
 bool i2cWriteArray(
-    struct i2cHandle *          handle,
+    struct i2c_bus *          handle,
     const uint8_t *             data,
     size_t                      size) {
 
@@ -51,14 +51,14 @@ bool i2cWriteArray(
 }
 
 bool i2cWrite(
-    struct i2cHandle *          handle,
+    struct i2c_bus *          handle,
     uint8_t                     data) {
 
     return (handle->id->write(handle, data));
 }
 
 void i2cReadArray(
-    struct i2cHandle *          handle,
+    struct i2c_bus *          handle,
     uint8_t *                   data,
     size_t                      size) {
 
@@ -72,25 +72,25 @@ void i2cReadArray(
 }
 
 uint8_t i2cRead(
-    struct i2cHandle *          handle) {
+    struct i2c_bus *          handle) {
 
     return (handle->id->read(handle));
 }
 
 void i2cStart(
-    struct i2cHandle *          handle) {
+    struct i2c_bus *          handle) {
 
     handle->id->start(handle);
 }
 
 void i2cRestart(
-    struct i2cHandle *          handle) {
+    struct i2c_bus *          handle) {
 
     handle->id->restart(handle);
 }
 
 void i2cStop(
-    struct i2cHandle *          handle) {
+    struct i2c_bus *          handle) {
 
     handle->id->stop(handle);
 }

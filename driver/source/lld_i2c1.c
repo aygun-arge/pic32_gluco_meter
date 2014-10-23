@@ -7,7 +7,6 @@
 
 #include "driver/i2c.h"
 #include "driver/clock.h"
-#include "TimeDelay.h"
 #include "driver/gpio.h"
 
 /*=========================================================  LOCAL MACRO's  ==*/
@@ -26,21 +25,22 @@
 #define I2C_STAT_TBF                    (0x1u << 0)
 #define I2C_STAT_RBF                    (0x1u << 1)
 #define I2C_STAT_P                      (0x1u << 4)
+#define I2C_STAT_BCL                    (0x1u << 10)
 #define I2C_STAT_TRSTAT                 (0x1u << 14)
 #define I2C_STAT_ACKSTAT                (0x1u << 15)
 
 /*======================================================  LOCAL DATA TYPES  ==*/
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
 
-static void open(const struct i2cConfig *, struct i2cHandle *);
-static void close(struct i2cHandle *);
-static bool write(struct i2cHandle *, uint8_t);
-static uint8_t read(struct i2cHandle *);
-static void start(struct i2cHandle *);
-static void restart(struct i2cHandle *);
-static void stop(struct i2cHandle *);
-static void ack(struct i2cHandle *);
-static void nack(struct i2cHandle *);
+static void open(const struct i2cConfig *, struct i2c_bus *);
+static void close(struct i2c_bus *);
+static bool write(struct i2c_bus *, uint8_t);
+static uint8_t read(struct i2c_bus *);
+static void start(struct i2c_bus *);
+static void restart(struct i2c_bus *);
+static void stop(struct i2c_bus *);
+static void ack(struct i2c_bus *);
+static void nack(struct i2c_bus *);
 
 /*=======================================================  LOCAL VARIABLES  ==*/
 /*======================================================  GLOBAL VARIABLES  ==*/
@@ -59,11 +59,10 @@ const struct i2cId I2C1 = {
 
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
-static void open(const struct i2cConfig * config, struct i2cHandle * handle) {
+static void open(const struct i2cConfig * config, struct i2c_bus * handle) {
     uint32_t        pbclk;
 
     I2C1CON         = 0;
-    Delay10us(1);
     I2C1STAT        = 0;
 
     if (config->speed > 100000) {
@@ -79,7 +78,7 @@ static void open(const struct i2cConfig * config, struct i2cHandle * handle) {
     I2C1CONSET       = I2C_CON_ON;
 }
 
-static void close(struct i2cHandle * handle) {
+static void close(struct i2c_bus * handle) {
     (void)handle;
     
     while ((I2C1CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
@@ -87,7 +86,7 @@ static void close(struct i2cHandle * handle) {
     I2C1CON = 0;
 }
 
-static bool write(struct i2cHandle * handle, uint8_t data) {
+static bool write(struct i2c_bus * handle, uint8_t data) {
 
     while ((I2C1CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
 
@@ -95,7 +94,7 @@ static bool write(struct i2cHandle * handle, uint8_t data) {
 
     while (I2C1STAT & I2C_STAT_TRSTAT);
 
-    if (I2C1STAT & I2C_STAT_ACKSTAT) {
+    if (I2C1STAT & (I2C_STAT_ACKSTAT | I2C_STAT_BCL)) {
 
         return (false);
     } else {
@@ -104,7 +103,7 @@ static bool write(struct i2cHandle * handle, uint8_t data) {
     }
 }
 
-static uint8_t read(struct i2cHandle * handle) {
+static uint8_t read(struct i2c_bus * handle) {
 
     while ((I2C1CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
     I2C1CON |= I2C_CON_RCEN;
@@ -116,7 +115,7 @@ static uint8_t read(struct i2cHandle * handle) {
     return (I2C1RCV);
 }
 
-static void start(struct i2cHandle * handle) {
+static void start(struct i2c_bus * handle) {
     (void)handle;
 
     while ((I2C1CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
@@ -124,7 +123,7 @@ static void start(struct i2cHandle * handle) {
     I2C1CONSET = I2C_CON_SEN;
 }
 
-static void restart(struct i2cHandle * handle) {
+static void restart(struct i2c_bus * handle) {
     (void)handle;
     
     while ((I2C1CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
@@ -132,7 +131,7 @@ static void restart(struct i2cHandle * handle) {
     I2C1CONSET = I2C_CON_RSEN;
 }
 
-static void stop(struct i2cHandle * handle) {
+static void stop(struct i2c_bus * handle) {
     (void)handle;
 
     while ((I2C1CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
@@ -140,7 +139,7 @@ static void stop(struct i2cHandle * handle) {
     I2C1CONSET = I2C_CON_PEN;
 }
 
-static void ack(struct i2cHandle * handle) {
+static void ack(struct i2c_bus * handle) {
     (void)handle;
 
     while ((I2C1CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
@@ -149,7 +148,7 @@ static void ack(struct i2cHandle * handle) {
     I2C1CONSET = I2C_CON_ACKEN;
 }
 
-static void nack(struct i2cHandle * handle) {
+static void nack(struct i2c_bus * handle) {
     (void)handle;
 
     while ((I2C1CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
