@@ -62,6 +62,18 @@ const struct i2cId I2C1 = {
 static void open(const struct i2cConfig * config, struct i2c_bus * handle) {
     uint32_t        pbclk;
 
+    TRISD           &= ~(0x1u << 9);
+    TRISD           &= ~(0x1u << 10);
+
+    LATD            |=  (0x1u << 9);
+    LATD            &= ~(0x1u << 9);
+    LATD            |=  (0x1u << 9);
+    LATD            &= ~(0x1u << 9);
+
+    LATD            |=  (0x1u << 10);
+    LATD            &= ~(0x1u << 10);
+    LATD            |=  (0x1u << 10);
+    LATD            &= ~(0x1u << 10);
     I2C1CON         = 0;
     I2C1STAT        = 0;
 
@@ -71,10 +83,7 @@ static void open(const struct i2cConfig * config, struct i2c_bus * handle) {
     pbclk   = clockGetPeripheralClock();
     I2C1BRG =
         (pbclk / (2 * config->speed)) - ES_DIVISION_ROUND((CONFIG_PULSE_GOBBLER_NS * (pbclk / 1000)), 1000000) - 2;
-    *GpioB.tris     &= ~(0x1u << 8);
-    *GpioB.tris     &= ~(0x1u << 9);
-    *GpioB.od       |=  (0x1u << 8);
-    *GpioB.od       |=  (0x1u << 9);
+
     I2C1CONSET       = I2C_CON_ON;
 }
 

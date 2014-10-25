@@ -84,6 +84,23 @@ const struct gpio GpioC = {
     .ansel    = NULL
 };
 
+#if (((__PIC32_FEATURE_SET__ >= 500) && (__PIC32_FEATURE_SET__ <= 700)))
+const struct gpio GpioD = {
+    .port     = &PORTD,
+    .tris     = &TRISD,
+    .lat      = &LATD,
+    .set      = &LATDSET,
+    .clr      = &LATDCLR,
+    .invert   = &LATDINV,
+    .od       = &ODCD,
+    .change   = NULL,
+    .status   = NULL,
+    .pullup   = NULL,
+    .pulldown = NULL,
+    .ansel    = NULL
+};
+#endif
+
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
 static void initPort(const struct gpio * gpio) {
@@ -171,6 +188,9 @@ void initGpioDriver(
     initPort(&GpioA);
     initPort(&GpioB);
     initPort(&GpioC);
+#endif
+#if (((__PIC32_FEATURE_SET__ >= 500) && (__PIC32_FEATURE_SET__ <= 799)))
+    AD1PCFGSET = UINT32_MAX;
 #endif
 }
 

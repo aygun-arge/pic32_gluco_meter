@@ -4,10 +4,11 @@
     <logicalFolder name="application" displayName="application" projectFiles="true">
       <logicalFolder name="include" displayName="include" projectFiles="true">
         <itemPath>/home/nenad/workspace/mplabx/gluko_tester.X/application/include/main.h</itemPath>
+        <itemPath>/home/nenad/workspace/mplabx/gluko_tester.X/application/include/mcu_config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
         <itemPath>/home/nenad/workspace/mplabx/gluko_tester.X/application/source/main.c</itemPath>
-        <itemPath>/home/nenad/workspace/mplabx/gluko_tester.X/support.c</itemPath>
+        <itemPath>/home/nenad/workspace/mplabx/gluko_tester.X/application/source/support.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="driver" displayName="driver" projectFiles="true">
@@ -332,6 +333,7 @@
         <property key="UART5" value="true"/>
         <property key="UART6" value="true"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="false"/>

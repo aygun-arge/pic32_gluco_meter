@@ -137,7 +137,7 @@ FAILURE:
     return (ES_ERROR_DEVICE_FAIL);
 }
 
-static esError rtcWriteArray(uint8_t address, const uint8_t * data, size_t size) {
+static esError rtc_write_array(uint8_t address, const uint8_t * data, size_t size) {
     ES_REQUIRE(ES_API_RANGE, size < 8);
 
     i2cStart(g_i2c_rtc_bus);
@@ -167,9 +167,9 @@ static esError rtcRead(uint8_t address, uint8_t * data) {
     return (rtcReadArray(address, data, 1));
 }
 
-static esError rtcWrite(uint8_t address, uint8_t data) {
+static esError rtc_write(uint8_t address, uint8_t data) {
 
-    return (rtcWriteArray(address, &data, 1));
+    return (rtc_write_array(address, &data, 1));
 }
 
 static uint8_t bcdToBin(uint8_t data) {
@@ -227,7 +227,7 @@ static esError rtcPutTime(const struct rtc_time * time) {
     regs.minutes = binToBcd(time->minute);
     regs.seconds = binToBcd(time->second);
 
-    error = rtcWriteArray(REG_SECONDS, (const uint8_t *)&regs, sizeof(regs));
+    error = rtc_write_array(REG_SECONDS, (const uint8_t *)&regs, sizeof(regs));
 
     if (error != ES_ERROR_NONE) {
         goto FAILURE;
@@ -242,7 +242,7 @@ FAILURE:
 static void rtcTick(void) {
 
     if ((*(CONFIG_RTC_INT_PORT)->port & (0x1u << CONFIG_RTC_INT_PIN)) == 0) {
-        rtcWrite(REG_CONTROL_INT_FLAG, 0);
+        rtc_write(REG_CONTROL_INT_FLAG, 0);
         rtcFetchTime(&g_current_time);
     }
 }
@@ -260,7 +260,7 @@ void rtc_init_driver(struct i2c_bus * i2c_bus) {
     if (reg & CONTROL_STATUS_PON) {
         reg &= ~CONTROL_STATUS_PON;
 
-        if (rtcWrite(REG_CONTROL_STATUS, reg) != ES_ERROR_NONE) {
+        if (rtc_write(REG_CONTROL_STATUS, reg) != ES_ERROR_NONE) {
             goto FAILURE;
         }
         g_current_time.year   = CONFIG_DEFAULT_YEAR;
@@ -270,49 +270,49 @@ void rtc_init_driver(struct i2c_bus * i2c_bus) {
         g_current_time.minute = CONFIG_DEFAULT_MINUTE;
         g_current_time.second = CONFIG_DEFAULT_SECOND;
 
-        if (rtcSetTime(&g_current_time) != ES_ERROR_NONE) {
+        if (rtc_set_time(&g_current_time) != ES_ERROR_NONE) {
             goto FAILURE;
         }
     }
     memset(&regs, 0, sizeof(regs));
 
-    if (rtcWriteArray(REG_ALARM_SECONDS, (const uint8_t *)&regs, sizeof(regs)) != ES_ERROR_NONE) {
+    if (rtc_write_array(REG_ALARM_SECONDS, (const uint8_t *)&regs, sizeof(regs)) != ES_ERROR_NONE) {
         goto FAILURE;
     }
     
-    if (rtcWrite(REG_CONTROL_INT, 0) != ES_ERROR_NONE) {
+    if (rtc_write(REG_CONTROL_INT, 0) != ES_ERROR_NONE) {
         goto FAILURE;
     }
     reg = CONTROL_1_WE;
 
-    if (rtcWrite(REG_CONTROL_1, reg) != ES_ERROR_NONE) {
+    if (rtc_write(REG_CONTROL_1, reg) != ES_ERROR_NONE) {
         goto FAILURE;
     }
 
-    if (rtcWrite(REG_TIMER_LOW, 32) != ES_ERROR_NONE) {
+    if (rtc_write(REG_TIMER_LOW, 32) != ES_ERROR_NONE) {
         goto FAILURE;
     }
 
-    if (rtcWrite(REG_TIMER_HIGH, 0) != ES_ERROR_NONE) {
+    if (rtc_write(REG_TIMER_HIGH, 0) != ES_ERROR_NONE) {
         goto FAILURE;
     }
     reg |= CONTROL_1_TAR;
 
-    if (rtcWrite(REG_CONTROL_1, reg) != ES_ERROR_NONE) {
+    if (rtc_write(REG_CONTROL_1, reg) != ES_ERROR_NONE) {
         goto FAILURE;
     }
     reg |= CONTROL_1_TE;
 
-    if (rtcWrite(REG_CONTROL_1, reg) != ES_ERROR_NONE) {
+    if (rtc_write(REG_CONTROL_1, reg) != ES_ERROR_NONE) {
         goto FAILURE;
     }
 
 
-    if (rtcWrite(REG_CONTROL_INT_FLAG, 0) != ES_ERROR_NONE) {
+    if (rtc_write(REG_CONTROL_INT_FLAG, 0) != ES_ERROR_NONE) {
         goto FAILURE;
     }
 
-    if (rtcWrite(REG_CONTROL_INT, CONTROL_INT_TIE) != ES_ERROR_NONE) {
+    if (rtc_write(REG_CONTROL_INT, CONTROL_INT_TIE) != ES_ERROR_NONE) {
         goto FAILURE;
     }
     *(CONFIG_RTC_INT_PORT)->tris   |= (0x1u << CONFIG_RTC_INT_PIN);
@@ -332,7 +332,7 @@ FAILURE:
     return;
 }
 
-void termRtcDriver(void)
+void rtc_term_driver(void)
 {
     g_i2c_rtc_bus = NULL;
 }
@@ -341,7 +341,7 @@ bool isRtcActive(void) {
     return (true);
 }
 
-esError rtcSetTime(const struct rtc_time * time) {
+esError rtc_set_time(const struct rtc_time * time) {
     esError             error;
     esIntrCtx                   intr_ctx;
 

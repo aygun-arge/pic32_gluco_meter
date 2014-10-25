@@ -47,6 +47,7 @@ struct gpio {
 extern const struct gpio GpioA;
 extern const struct gpio GpioB;
 extern const struct gpio GpioC;
+extern const struct gpio GpioD;
 
 /*===================================================  FUNCTION PROTOTYPES  ==*/
 

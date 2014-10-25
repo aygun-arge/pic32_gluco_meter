@@ -30,13 +30,18 @@ static void board_init_clock(void)
     initClockDriver();
 }
 
+static void board_init_gpio(void)
+{
+    initGpioDriver();
+}
+
 static void board_init_i2c_bus(void)
 {
     struct i2cConfig i2c_bus_config =
     {
         &I2C1,
         I2C_ADDRESS_7BIT,
-        100000,
+        400000,
         CONFIG_INTR_MAX_ISR_PRIO
     };
 
@@ -58,6 +63,7 @@ int main(int argc, char** argv) {
 
     board_init_intr();
     board_init_clock();
+    board_init_gpio();
     board_init_i2c_bus();
 
     rtc_init_driver(&g_i2c1_bus);
