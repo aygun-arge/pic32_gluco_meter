@@ -127,7 +127,7 @@ static esError rtcReadArray(uint8_t address, uint8_t * data, size_t size) {
         i2cReadArray(g_i2c_rtc_bus, data, size);
     }
     data[size] = i2cRead(g_i2c_rtc_bus);
-    i2cNack(g_i2c_rtc_bus);
+    i2c_bus_nack(g_i2c_rtc_bus);
     i2cStop(g_i2c_rtc_bus);
 
     return (ES_ERROR_NONE);

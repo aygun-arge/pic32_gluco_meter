@@ -32,7 +32,7 @@
 /*======================================================  LOCAL DATA TYPES  ==*/
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
 
-static void open(const struct i2cConfig *, struct i2c_bus *);
+static void open(const struct i2c_config *, struct i2c_bus *);
 static void close(struct i2c_bus *);
 static bool write(struct i2c_bus *, uint8_t);
 static uint8_t read(struct i2c_bus *);
@@ -45,7 +45,7 @@ static void nack(struct i2c_bus *);
 /*=======================================================  LOCAL VARIABLES  ==*/
 /*======================================================  GLOBAL VARIABLES  ==*/
 
-const struct i2cId I2C1 = {
+const struct i2c_id I2C1 = {
     open,
     close,
     write,
@@ -59,7 +59,7 @@ const struct i2cId I2C1 = {
 
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
-static void open(const struct i2cConfig * config, struct i2c_bus * handle) {
+static void open(const struct i2c_config * config, struct i2c_bus * handle) {
     uint32_t        pbclk;
 
     TRISD           &= ~(0x1u << 9);

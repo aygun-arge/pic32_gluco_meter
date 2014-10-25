@@ -1,32 +1,32 @@
 
 #include "driver/i2c.h"
 
-void initI2cDriver(void) {
+void i2c_driver_init(void) {
     
 }
 
-void i2cOpen(
+void i2c_bus_open(
     struct i2c_bus *          handle,
-    const struct i2cConfig *    config) {
+    const struct i2c_config *    config) {
 
     handle->id    = config->id;
     handle->flags = config->flags;
     handle->id->open(config, handle);
 }
 
-void i2cClose(
+void i2c_close(
     struct i2c_bus *  handle) {
 
     handle->id->close(handle);
 }
 
-void i2cAck(
+void i2c_bus_ack(
     struct i2c_bus *          handle) {
 
     handle->id->ack(handle);
 }
 
-void i2cNack(
+void i2c_bus_nack(
     struct i2c_bus *          handle) {
 
     handle->id->nack(handle);

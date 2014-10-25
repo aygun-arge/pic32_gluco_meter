@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "mcu_config.h"
+
 #include "driver/adc.h"
 #include "driver/clock.h"
 #include "driver/gpio.h"
@@ -37,7 +39,7 @@ static void board_init_gpio(void)
 
 static void board_init_i2c_bus(void)
 {
-    struct i2cConfig i2c_bus_config =
+    struct i2c_config i2c_bus_config =
     {
         &I2C1,
         I2C_ADDRESS_7BIT,
@@ -45,9 +47,9 @@ static void board_init_i2c_bus(void)
         CONFIG_INTR_MAX_ISR_PRIO
     };
 
-    initI2cDriver();
+    i2c_driver_init();
     
-    i2cOpen(&g_i2c1_bus, &i2c_bus_config);
+    i2c_bus_open(&g_i2c1_bus, &i2c_bus_config);
 }
 
 #define DIG_POT_ADDR            0x58
