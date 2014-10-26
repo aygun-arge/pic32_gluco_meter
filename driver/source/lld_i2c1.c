@@ -64,16 +64,7 @@ static void open(const struct i2c_config * config, struct i2c_bus * handle) {
 
     TRISD           &= ~(0x1u << 9);
     TRISD           &= ~(0x1u << 10);
-
-    LATD            |=  (0x1u << 9);
-    LATD            &= ~(0x1u << 9);
-    LATD            |=  (0x1u << 9);
-    LATD            &= ~(0x1u << 9);
-
-    LATD            |=  (0x1u << 10);
-    LATD            &= ~(0x1u << 10);
-    LATD            |=  (0x1u << 10);
-    LATD            &= ~(0x1u << 10);
+    
     I2C1CON         = 0;
     I2C1STAT        = 0;
 
