@@ -3,9 +3,6 @@
 #include "driver/i2c.h"
 #include "base/error.h"
 #include "base/debug.h"
-#include "arch/intr.h"
-#include "driver/gpio.h"
-#include "plat/critical.h"
 #include <string.h>
 #include <xc.h>
 
@@ -15,9 +12,6 @@
 #define CONFIG_DEFAULT_HOUR             0
 #define CONFIG_DEFAULT_MINUTE           0
 #define CONFIG_DEFAULT_SECOND           0
-
-#define CONFIG_RTC_INT_PORT             &GpioA
-#define CONFIG_RTC_INT_PIN              7
 
 #define REG_CONTROL_1                   0x00
 #define REG_CONTROL_INT                 0x01
@@ -94,77 +88,75 @@ struct rtc_time_registers
     uint8_t             years;
 };
 
-static const ES_MODULE_INFO_CREATE("RTC", "Real Time Clock", "Nenad Radulovic");
-
 static struct i2c_bus * g_i2c_rtc_bus;
 
 static struct rtc_time   g_current_time;
 
-static struct change_slot * g_change_handle;
+const struct i2c_slave_config rtc_i2c_config =
+{
+    I2C_SLAVE_RD_START_STOP | I2C_SLAVE_RD_NACK,
+    RTC_SLAVE_ADDRESS
+};
 
-static esError rtcReadArray(uint8_t address, uint8_t * data, size_t size) {
-    ES_REQUIRE(ES_API_RANGE, size < 8);
-    ES_REQUIRE(ES_API_RANGE, size != 0);
+static esError rtc_read_array(uint8_t address, uint8_t * data, size_t size) {
+    i2c_bus_start(g_i2c_rtc_bus);
 
-    i2cStart(g_i2c_rtc_bus);
-
-    if (i2cWrite(g_i2c_rtc_bus, RTC_WRITE_CMD) == false) {
+    if (i2c_bus_write(g_i2c_rtc_bus, RTC_WRITE_CMD) == false) {
         goto FAILURE;
     }
 
-    if (i2cWrite(g_i2c_rtc_bus, address) == false) {
+    if (i2c_bus_write(g_i2c_rtc_bus, address) == false) {
         goto FAILURE;
     }
-    i2cStop(g_i2c_rtc_bus);
-    i2cStart(g_i2c_rtc_bus);
+    i2c_bus_stop(g_i2c_rtc_bus);
+    i2c_bus_start(g_i2c_rtc_bus);
 
-    if (i2cWrite(g_i2c_rtc_bus, RTC_READ_CMD) == false) {
+    if (i2c_bus_write(g_i2c_rtc_bus, RTC_READ_CMD) == false) {
         goto FAILURE;
     }
     size--;
 
     if (size != 0) {
-        i2cReadArray(g_i2c_rtc_bus, data, size);
+        i2c_bus_read_array(g_i2c_rtc_bus, data, size);
     }
-    data[size] = i2cRead(g_i2c_rtc_bus);
+    data[size] = i2c_bus_read(g_i2c_rtc_bus);
     i2c_bus_nack(g_i2c_rtc_bus);
-    i2cStop(g_i2c_rtc_bus);
+    i2c_bus_stop(g_i2c_rtc_bus);
 
     return (ES_ERROR_NONE);
 FAILURE:
-    i2cStop(g_i2c_rtc_bus);
+    i2c_bus_stop(g_i2c_rtc_bus);
 
     return (ES_ERROR_DEVICE_FAIL);
 }
 
 static esError rtc_write_array(uint8_t address, const uint8_t * data, size_t size) {
-    ES_REQUIRE(ES_API_RANGE, size < 8);
 
-    i2cStart(g_i2c_rtc_bus);
+    i2c_bus_start(g_i2c_rtc_bus);
 
-    if (i2cWrite(g_i2c_rtc_bus, RTC_WRITE_CMD) == false) {
+    if (i2c_bus_write(g_i2c_rtc_bus, RTC_WRITE_CMD) == false) {
         goto FAILURE;
     }
 
-    if (i2cWrite(g_i2c_rtc_bus, address) == false) {
+    if (i2c_bus_write(g_i2c_rtc_bus, address) == false) {
         goto FAILURE;
     }
 
-    if (i2cWriteArray(g_i2c_rtc_bus, data, size) == false) {
+    if (i2c_bus_write_array(g_i2c_rtc_bus, data, size) == false) {
         goto FAILURE;
     }
-    i2cStop(g_i2c_rtc_bus);
+    i2c_bus_stop(g_i2c_rtc_bus);
 
     return (ES_ERROR_NONE);
 FAILURE:
-    i2cStop(g_i2c_rtc_bus);
+    i2c_bus_stop(g_i2c_rtc_bus);
 
     return (ES_ERROR_DEVICE_FAIL);
 }
 
-static esError rtcRead(uint8_t address, uint8_t * data) {
+static esError rtc_read(uint8_t address, uint8_t * data) {
 
-    return (rtcReadArray(address, data, 1));
+    return (rtc_read_array(address, data, 1));
 }
 
 static esError rtc_write(uint8_t address, uint8_t data) {
@@ -190,11 +182,11 @@ static uint8_t binToBcd(uint8_t data) {
     return (retval);
 }
 
-static esError rtcFetchTime(struct rtc_time * time) {
+static esError rtc_fetch_time(struct rtc_time * time) {
 
     struct rtc_time_registers regs;
 
-    if (rtcReadArray(REG_SECONDS, (uint8_t *)&regs, sizeof(regs)) != ES_ERROR_NONE) {
+    if (rtc_read_array(REG_SECONDS, (uint8_t *)&regs, sizeof(regs)) != ES_ERROR_NONE) {
         goto FAILURE;
     }
     time->year   = (uint16_t)bcdToBin(regs.years) + 2000u;
@@ -216,7 +208,7 @@ FAILURE:
     return (ES_ERROR_DEVICE_FAIL);
 }
 
-static esError rtcPutTime(const struct rtc_time * time) {
+static esError rtc_put_time(const struct rtc_time * time) {
     struct rtc_time_registers regs;
     esError             error;
 
@@ -239,21 +231,13 @@ FAILURE:
     return (ES_ERROR_DEVICE_FAIL);
 }
 
-static void rtcTick(void) {
-
-    if ((*(CONFIG_RTC_INT_PORT)->port & (0x1u << CONFIG_RTC_INT_PIN)) == 0) {
-        rtc_write(REG_CONTROL_INT_FLAG, 0);
-        rtcFetchTime(&g_current_time);
-    }
-}
-
 void rtc_init_driver(struct i2c_bus * i2c_bus) {
     uint8_t             reg;
     struct rtc_time_registers regs;
 
     g_i2c_rtc_bus = i2c_bus;
 
-    if (rtcRead(REG_CONTROL_STATUS, &reg) != ES_ERROR_NONE) {
+    if (rtc_read(REG_CONTROL_STATUS, &reg) != ES_ERROR_NONE) {
         goto FAILURE;
     }
 
@@ -270,7 +254,7 @@ void rtc_init_driver(struct i2c_bus * i2c_bus) {
         g_current_time.minute = CONFIG_DEFAULT_MINUTE;
         g_current_time.second = CONFIG_DEFAULT_SECOND;
 
-        if (rtc_set_time(&g_current_time) != ES_ERROR_NONE) {
+        if (rtc_set_time_i(&g_current_time) != ES_ERROR_NONE) {
             goto FAILURE;
         }
     }
@@ -315,10 +299,6 @@ void rtc_init_driver(struct i2c_bus * i2c_bus) {
     if (rtc_write(REG_CONTROL_INT, CONTROL_INT_TIE) != ES_ERROR_NONE) {
         goto FAILURE;
     }
-    *(CONFIG_RTC_INT_PORT)->tris   |= (0x1u << CONFIG_RTC_INT_PIN);
-    g_change_handle = gpio_request_slot(CONFIG_RTC_INT_PORT, CONFIG_RTC_INT_PIN,
-        rtcTick);
-    gpio_change_enable(g_change_handle);
 
     return;
 FAILURE:
@@ -341,28 +321,28 @@ bool isRtcActive(void) {
     return (true);
 }
 
-esError rtc_set_time(const struct rtc_time * time) {
+esError rtc_set_time_i(const struct rtc_time * time) {
     esError             error;
-    esIntrCtx                   intr_ctx;
 
-    ES_CRITICAL_LOCK_ENTER(&intr_ctx);
-    error = rtcPutTime(time);
+    error = rtc_put_time(time);
 
     if (error == ES_ERROR_NONE) {
-        memcpy(&g_current_time, time, sizeof(g_current_time));
+        g_current_time = *time;
     }
-    ES_CRITICAL_LOCK_EXIT(intr_ctx);
 
     return (error);
 }
 
-esError rtcGetTime(struct rtc_time * time) {
-    esIntrCtx                   intr_ctx;
-
-    ES_CRITICAL_LOCK_ENTER(&intr_ctx);
-    memcpy(time, &g_current_time, sizeof(*time));
-    ES_CRITICAL_LOCK_EXIT(intr_ctx);
+esError rtc_get_time_i(struct rtc_time * time)
+{
+    *time = g_current_time;
 
     return (ES_ERROR_NONE);
+}
+
+void rtc_tick_i(void)
+{
+    rtc_write(REG_CONTROL_INT_FLAG, 0);
+    rtc_fetch_time(&g_current_time);
 }
 

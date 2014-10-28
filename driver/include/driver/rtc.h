@@ -12,12 +12,13 @@
 #include <stdbool.h>
 
 #include "base/error.h"
+#include "driver/i2c.h"
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-struct i2c_bus;
+extern const struct i2c_slave_config rtc_i2c_config;
 
 struct rtc_time {
     uint16_t            year;
@@ -30,8 +31,9 @@ struct rtc_time {
 
 void rtc_init_driver(struct i2c_bus * i2c_bus);
 void rtc_term_driver(void);
-esError rtc_set_time(const struct rtc_time * time);
-esError rtc_get_time(struct rtc_time * time);
+esError rtc_set_time_i(const struct rtc_time * time);
+esError rtc_get_time_i(struct rtc_time * time);
+void rtc_tick_i(void);
 bool rtc_is_active(void);
 
 #ifdef	__cplusplus

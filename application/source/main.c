@@ -39,10 +39,10 @@ static void board_init_gpio(void)
 
 static void board_init_i2c_bus(void)
 {
-    struct i2c_config i2c_bus_config =
+    struct i2c_bus_config i2c_bus_config =
     {
         &I2C1,
-        I2C_ADDRESS_7BIT,
+        I2C_BUS_ADDRESS_7BIT,
         400000,
         CONFIG_INTR_MAX_ISR_PRIO
     };
@@ -73,23 +73,23 @@ int main(int argc, char** argv) {
     TRISD |= (0x1u << 1u);
     PORTD |= (0x1u << 1u);
 
-    i2cStart(&g_i2c1_bus);
-    success = i2cWrite(&g_i2c1_bus, DIG_POT_WR_CMD);
+    i2c_bus_start(&g_i2c1_bus);
+    success = i2c_bus_write(&g_i2c1_bus, DIG_POT_WR_CMD);
 
     if (!success) {
         goto error_handler;
     }
-    success = i2cWrite(&g_i2c1_bus, 0);
+    success = i2c_bus_write(&g_i2c1_bus, 0);
 
     if (!success) {
         goto error_handler;
     }
-    success = i2cWrite(&g_i2c1_bus, 128);
+    success = i2c_bus_write(&g_i2c1_bus, 128);
 
     if (!success) {
         goto error_handler;
     }
-    i2cStop(&g_i2c1_bus);
+    i2c_bus_stop(&g_i2c1_bus);
 
     while (1);
 
