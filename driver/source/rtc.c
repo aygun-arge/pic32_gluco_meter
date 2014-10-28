@@ -315,10 +315,6 @@ void rtc_init_driver(struct i2c_bus * i2c_bus) {
     if (rtc_write(REG_CONTROL_INT, CONTROL_INT_TIE) != ES_ERROR_NONE) {
         goto FAILURE;
     }
-    *(CONFIG_RTC_INT_PORT)->tris   |= (0x1u << CONFIG_RTC_INT_PIN);
-    g_change_handle = gpio_request_slot(CONFIG_RTC_INT_PORT, CONFIG_RTC_INT_PIN,
-        rtcTick);
-    gpio_change_enable(g_change_handle);
 
     return;
 FAILURE:
