@@ -14,12 +14,10 @@
 extern "C" {
 #endif
 
-void ili9341_reset_active(void);
-void ili9341_reset_inactive(void);
-void ili9341_cmd_active(void);
-void ili9341_cmd_inactive(void);
-void ili9341_write_cmd(uint16_t cmd);
-void ili9341_write_data(uint16_t data);
+void ili9341_lld_init(void);
+void ili9341_lld_reset(void);
+void ili9341_lld_write_cmd(uint32_t cmd);
+void ili9341_lld_write_data(uint32_t data);
 
 #ifdef	__cplusplus
 }
