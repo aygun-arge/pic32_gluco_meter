@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+#define CONFIG_USE_INT_OSC              1
+   
 // DEVCFG3
 // USERID = No Setting
 #pragma config FSRSSEL = PRIORITY_7     // SRS Select (SRS Priority 7)
@@ -28,7 +30,11 @@ extern "C" {
 #pragma config FPLLODIV = DIV_1         // System PLL Output Clock Divider (PLL Divide by 1)
 
 // DEVCFG1
+#if (CONFIG_USE_INT_OSC == 1)
+#pragma config FNOSC = FRCPLL           // Oscillator Selection Bits (Fast RC Osc with PLL)
+#else
 #pragma config FNOSC = PRIPLL           // Oscillator Selection Bits (Primary Osc w/PLL (XT+,HS+,EC+PLL))
+#endif
 #pragma config FSOSCEN = OFF            // Secondary Oscillator Enable (Disabled)
 #pragma config IESO = OFF               // Internal/External Switch Over (Disabled)
 #pragma config POSCMOD = XT             // Primary Oscillator Configuration (XT osc mode)

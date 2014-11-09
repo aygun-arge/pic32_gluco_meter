@@ -103,7 +103,7 @@ const struct gpio GpioD = {
 
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
-static void initPort(const struct gpio * gpio) {
+static void init_port(const struct gpio * gpio) {
     *(gpio->port)     = 0u;
     *(gpio->tris)     = 0xffffffffu;
     *(gpio->lat)      = 0u;
@@ -185,9 +185,9 @@ void initGpioDriver(
     /*
      * Setup all pins as digital IO with push-pull mode
      */
-    initPort(&GpioA);
-    initPort(&GpioB);
-    initPort(&GpioC);
+    init_port(&GpioA);
+    init_port(&GpioB);
+    init_port(&GpioC);
 #endif
 #if (((__PIC32_FEATURE_SET__ >= 500) && (__PIC32_FEATURE_SET__ <= 799)))
     AD1PCFGSET = UINT32_MAX;
