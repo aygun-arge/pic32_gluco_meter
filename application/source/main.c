@@ -17,6 +17,7 @@
 #include "driver/intr.h"
 #include "driver/rtc.h"
 #include "driver/systick.h"
+#include "driver/lcd_ili9341.h"
 #include "arch/intr_config.h"
 #include "main.h"
 
@@ -52,24 +53,27 @@ static void board_init_i2c_bus(void)
     i2c_bus_open(&g_i2c1_bus, &i2c_bus_config);
 }
 
-#define DIG_POT_ADDR            0x58
-#define DIG_POT_RD_CMD          (DIG_POT_ADDR |  0x01u)
-#define DIG_POT_WR_CMD          (DIG_POT_ADDR & ~0x01u)
-
-#define INA_ADDR                0x80
-#define INA_RD_CMD              (INA_ADDR |  0x01u)
-#define INA_WR_CMD              (INA_ADDR & ~0x01u)
-#define INA_SHUNT_REG           0x01
-#define INA_BUS_REG             0x02
+static void board_init_lcd(void)
+{
+    lcd_init();
+}
 
 /*
  * 
  */
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
+    (void)argc;
+    (void)argv;
+
+    TRISD = ~(0x1u << 10);
+    LATD |= (0x1u << 10);
+    
     board_init_intr();
     board_init_clock();
     board_init_gpio();
-    board_init_i2c_bus();
+    //board_init_i2c_bus();
+    board_init_lcd();
 
     while (1);
     
