@@ -20,6 +20,7 @@
 #include "driver/lcd_ili9341.h"
 #include "arch/intr_config.h"
 #include "main.h"
+#include "voc_freq.h"
 
 struct i2c_bus g_i2c1_bus;
 
@@ -74,8 +75,13 @@ int main(int argc, char** argv)
     board_init_gpio();
     //board_init_i2c_bus();
     board_init_lcd();
+    voc_freq_init();
 
-    while (1);
+    while (1) {
+        static volatile uint32_t raw_value;
+
+        raw_value = voc_freq_raw();
+    }
     
     return (EXIT_SUCCESS);
 }

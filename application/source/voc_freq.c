@@ -7,11 +7,11 @@
 
 #define CONFIG_NUM_OF_SAMPLES           16
 
-#define VOC_FREQ_GPIO                   LATF
-#define VOC_FREQ_TRIS                   TRISF
-#define VOC_FREQ_PIN                    5
+#define VOC_FREQ_GPIO                   PORTD
+#define VOC_FREQ_TRIS                   TRISD
+#define VOC_FREQ_PIN                    7
 
-#define VOC_FREQ_CN_NO                  18
+#define VOC_FREQ_CN_NO                  16
 
 #define CNCON_ON                        (0x1u << 15)
 
@@ -51,9 +51,13 @@ void __ISR(_CHANGE_NOTICE_VECTOR) change_notice_isr(void)
     static bool     is_period_started = true;
     static uint32_t sample_no;
     static uint32_t acc_val;
+    uint32_t        port_state;
 
-    if (VOC_FREQ_GPIO & (0x1u << VOC_FREQ_PIN))
-    {
+    port_state  = VOC_FREQ_GPIO;
+    port_state &= (0x1u << VOC_FREQ_PIN);
+
+    if (port_state) {
+
         if (is_period_started) {
             timer_start();
             is_period_started = false;
@@ -71,6 +75,7 @@ void __ISR(_CHANGE_NOTICE_VECTOR) change_notice_isr(void)
             is_period_started = true;
         }
     }
+    IFS1bits.CNIF  = 0;
 }
 
 void voc_freq_init(void)
@@ -78,11 +83,15 @@ void voc_freq_init(void)
     timer_init();
     CNCON |= CNCON_ON;
     CNEN  |= (0x1u << VOC_FREQ_CN_NO);
-    VOC_FREQ_TRIS &= ~(0x1u << VOC_FREQ_PIN);
+    VOC_FREQ_TRIS |= (0x1u << VOC_FREQ_PIN);
+    TRISF         |= (0x1u << 3);
     IPC6bits.CNIP  = ES_INTR_DEFAULT_ISR_PRIO;
     IPC6bits.CNIS  = 0;
     IFS1bits.CNIF  = 0;
     IEC1bits.CNIE  = 1;
 }
 
-
+uint32_t voc_freq_raw(void)
+{
+    return (g_current_val);
+}
