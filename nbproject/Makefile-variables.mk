@@ -6,8 +6,8 @@
 CND_BASEDIR=`pwd`
 # default configuration
 CND_ARTIFACT_DIR_default=dist/default/production
-CND_ARTIFACT_NAME_default=gluko_tester.X.production.hex
-CND_ARTIFACT_PATH_default=dist/default/production/gluko_tester.X.production.hex
+CND_ARTIFACT_NAME_default=gluco_meter.production.hex
+CND_ARTIFACT_PATH_default=dist/default/production/gluco_meter.production.hex
 CND_PACKAGE_DIR_default=${CND_DISTDIR}/default/package
-CND_PACKAGE_NAME_default=glukotester.x.tar
-CND_PACKAGE_PATH_default=${CND_DISTDIR}/default/package/glukotester.x.tar
+CND_PACKAGE_NAME_default=glucometer.tar
+CND_PACKAGE_PATH_default=${CND_DISTDIR}/default/package/glucometer.tar

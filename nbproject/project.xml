@@ -2,7 +2,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>gluko_tester</name>
+            <name>gluco_meter</name>
             <creation-uuid>41c86e16-7d87-4072-9795-9ee018893f37</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>

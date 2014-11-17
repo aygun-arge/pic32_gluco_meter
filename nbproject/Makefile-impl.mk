@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=gluko_tester.X
+PROJECTNAME=gluco_meter
 
 # Active Configuration
 DEFAULTCONF=default
