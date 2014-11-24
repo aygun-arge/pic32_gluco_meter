@@ -21,6 +21,7 @@
 #include "arch/intr_config.h"
 #include "main.h"
 #include "voc_freq.h"
+#include "GenericTypeDefs.h"
 
 struct i2c_bus g_i2c1_bus;
 
@@ -78,9 +79,17 @@ int main(int argc, char** argv)
     voc_freq_init();
 
     while (1) {
-        static volatile uint32_t raw_value;
+        static uint32_t          no;
+        static volatile uint64_t raw_value;
 
-        raw_value = voc_freq_raw();
+        while (voc_is_sampling());
+        raw_value += (uint64_t)voc_freq_raw();
+        no++;
+
+        if (no == 100) {
+            raw_value = raw_value / (uint64_t)100ul;
+            no = 0;
+        }
     }
     
     return (EXIT_SUCCESS);
