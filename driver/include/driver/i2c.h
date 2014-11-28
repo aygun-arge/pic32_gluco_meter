@@ -13,6 +13,8 @@
 #include <stddef.h>
 
 #include "driver/lld_i2c1.h"
+#include "driver/lld_i2c2.h"
+#include "driver/lld_i2c5.h"
 
 #ifdef	__cplusplus
 extern "C" {

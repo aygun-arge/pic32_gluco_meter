@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#define CONFIG_USE_INT_OSC              1
+#define CONFIG_USE_INT_OSC              0
    
 // DEVCFG3
 // USERID = No Setting
@@ -39,7 +39,7 @@ extern "C" {
 #pragma config IESO = OFF               // Internal/External Switch Over (Disabled)
 #pragma config POSCMOD = XT             // Primary Oscillator Configuration (XT osc mode)
 #pragma config OSCIOFNC = OFF           // CLKO Output Signal Active on the OSCO Pin (Disabled)
-#pragma config FPBDIV = DIV_8           // Peripheral Clock Divisor (Pb_Clk is Sys_Clk/8)
+#pragma config FPBDIV = DIV_1           // Peripheral Clock Divisor (Pb_Clk is Sys_Clk/1)
 #pragma config FCKSM = CSDCMD           // Clock Switching and Monitor Selection (Clock Switch Disable, FSCM Disabled)
 #pragma config WDTPS = PS1048576        // Watchdog Timer Postscaler (1:1048576)
 #pragma config FWDTEN = OFF             // Watchdog Timer Enable (WDT Disabled (SWDTEN Bit Controls))
