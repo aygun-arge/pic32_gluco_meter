@@ -50,7 +50,7 @@ static void board_init_i2c_bus(void)
     {
         &I2C5,
         I2C_BUS_ADDRESS_7BIT,
-        400000,
+        100000,
         CONFIG_INTR_MAX_ISR_PRIO
     };
     i2c_driver_init();
@@ -62,7 +62,7 @@ static void board_init_lcd(void)
     lcd_init();
 }
 
-#define MLX90614_ADDRESS                (0x5a << 1)
+#define MLX90614_ADDRESS                (0xb4)
 #define MLX90614_RD                     (MLX90614_ADDRESS |  0x1u)
 #define MLX90614_WR                     (MLX90614_ADDRESS)
 
@@ -109,6 +109,7 @@ failure:
  */
 int main(int argc, char** argv)
 {
+    uint32_t count;
     double temperature;
 
     (void)argc;
@@ -118,6 +119,8 @@ int main(int argc, char** argv)
     board_init_clock();
     board_init_gpio();
     board_init_i2c_bus();
+
+    for (count = 0; count < 1000000ul; count++);
 
     while (1) {
         temperature = mlx90614_read_temp(&g_i2c_bus);
