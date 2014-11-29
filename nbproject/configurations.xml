@@ -32,6 +32,9 @@
           <itemPath>driver/include/driver/s25fl.h</itemPath>
           <itemPath>driver/include/driver/lld_spi2.h</itemPath>
           <itemPath>driver/include/driver/lld_spis.h</itemPath>
+          <itemPath>driver/include/driver/lld_i2c2.h</itemPath>
+          <itemPath>driver/include/driver/lld_i2c5.h</itemPath>
+          <itemPath>driver/include/driver/ad8242.h</itemPath>
         </logicalFolder>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
@@ -47,6 +50,8 @@
         <itemPath>driver/source/lcd_ili9341_lld.c</itemPath>
         <itemPath>driver/source/ad5242.c</itemPath>
         <itemPath>driver/source/ina219.c</itemPath>
+        <itemPath>driver/source/lld_i2c5.c</itemPath>
+        <itemPath>driver/source/ad8242.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="esolid-base" displayName="esolid-base" projectFiles="true">
@@ -378,6 +383,7 @@
         <property key="UART5" value="true"/>
         <property key="UART6" value="true"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="false"/>
