@@ -90,6 +90,7 @@ static void open(const struct i2c_bus_config * config, struct i2c_bus * handle) 
     I2C5BRG = brg;
     start(handle);
     stop(handle);
+    I2C5STAT = 0;
 }
 
 static void close(struct i2c_bus * handle) {
