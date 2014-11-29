@@ -62,70 +62,68 @@ static void board_init_lcd(void)
     lcd_init();
 }
 
-#define AD5280_POTA 0
-#define AD5280_POTB (0x1u << 7)
+#define MLX90614_ADDRESS                (0x5a << 1)
+#define MLX90614_RD                     (MLX90614_ADDRESS |  0x1u)
+#define MLX90614_WR                     (MLX90614_ADDRESS)
 
-static void ad5280_write(struct i2c_bus * bus, uint8_t reg, uint8_t val)
+static uint16_t mlx90614_read_temp(struct i2c_bus * bus)
 {
-    bool success;
-    
+    bool                        success;
+    uint8_t                     buff[2];
+    uint16_t                    retval;
+
     i2c_bus_start(bus);
-    success = i2c_bus_write(bus, DIG_POT_WR_CMD);
+    success = i2c_bus_write(bus, MLX90614_WR);
 
     if (!success) {
-        goto error_handler;
+        goto failure;
     }
-    success = i2c_bus_write(bus, reg);
+    success = i2c_bus_write(bus, 0x07);
 
     if (!success) {
-        goto error_handler;
+        goto failure;
     }
-    success = i2c_bus_write(bus, val);
+    i2c_bus_restart(bus);
+    success = i2c_bus_write(bus, MLX90614_RD);
 
     if (!success) {
-        goto error_handler;
+        goto failure;
     }
-error_handler:
+    buff[0] = i2c_bus_read(bus);
+    i2c_bus_ack(bus);
+    buff[1] = i2c_bus_read(bus);
+    i2c_bus_nack(bus);
     i2c_bus_stop(bus);
+
+    retval = ((uint16_t)buff[1] << 8u) | (uint16_t)buff[0];
+
+    return (retval);
+failure:
+    i2c_bus_stop(bus);
+
+    return (0);
 }
 
-#define VOC_SAMPLES     16
-
-static uint32_t g_raw_value;
 /*
  * 
  */
 int main(int argc, char** argv)
 {
+    double temperature;
+
     (void)argc;
     (void)argv;
-
-    TRISD = ~(0x1u << 10);
-    LATD |= (0x1u << 10);
-
-    TRISD |= (0x1u << 1u);
-    PORTD |= (0x1u << 1u);
 
     board_init_intr();
     board_init_clock();
     board_init_gpio();
     board_init_i2c_bus();
-    voc_freq_init();
-    
-    ad5280_write(&g_i2c_bus, AD5280_POTA, 33);
-    ad5280_write(&g_i2c_bus, AD5280_POTB, 0);
 
     while (1) {
-        uint32_t count;
-        uint64_t acc;
-
-        for (count = 0, acc = 0; count < VOC_SAMPLES; count++) {
-            while (voc_is_sampling());
-
-            acc += (uint64_t)voc_freq_raw();
-        }
-        acc /= (uint64_t)VOC_SAMPLES;
-        g_raw_value = acc;
+        temperature = mlx90614_read_temp(&g_i2c_bus);
+        temperature *= 0.02;
+        temperature -= 273.15;
+        temperature -= 0.01;
     }
 
     return (EXIT_SUCCESS);
