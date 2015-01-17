@@ -53,11 +53,6 @@ extern const struct gpio GpioD;
 
 void initGpioDriver(void);
 
-struct change_slot * gpio_request_slot(const struct gpio * gpio, uint32_t pin, void (* handler)(void));
-void gpio_release_slot(struct change_slot * slot);
-void gpio_change_enable(struct change_slot * slot);
-void gpio_change_disable(struct change_slot * slot);
-
 static inline void gpioSetAsInput(const struct gpio * gpio, uint32_t pin)
 {
     *gpio->tris |= ((uint32_t)0x1u << pin);

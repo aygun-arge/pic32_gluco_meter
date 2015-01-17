@@ -17,6 +17,11 @@
 #define CONFIG_FMARK_GPIO               LATG
 #define CONFIG_FMARK_PIN                6
 
+#define CONFIG_DATA_PORT_TRIS           TRISE
+#define CONFIG_DATA_PORT_GPIO           LATE
+
+#define CONFIG_USE_GPIO                 0
+
 #define ACTIVATE_COMMAND()              CONFIG_DC_GPIO_CLR = (0x1u << CONFIG_DC_PIN)
 #define DEACTIVATE_COMMAND()            CONFIG_DC_GPIO_SET = (0x1u << CONFIG_DC_PIN)
 
@@ -93,15 +98,19 @@
 #define PMSTAT_OB1E                     (0x1u <<  1)
 #define PMSTAT_OB0E                     (0x1u <<  0)
 
+#if (CONFIG_USE_GPIO == 0)
 static void pmp_wait_idle(void)
 {
     while (PMMODE & PMMODE_BUSY);
 }
+#endif
 
+#if (CONFIG_USE_GPIO == 0)
 static void pmp_write(uint32_t data)
 {
     PMDIN = data;
 }
+#endif
  
 void ili9341_lld_init(void)
 {
@@ -114,6 +123,8 @@ void ili9341_lld_init(void)
     CONFIG_CS_TRIS    &= ~(0x1u << CONFIG_CS_PIN);
     CONFIG_CS_GPIO    &= ~(0x1u << CONFIG_CS_PIN);
     CONFIG_FMARK_TRIS |=  (0x1u << CONFIG_FMARK_PIN);
+    CONFIG_DATA_PORT_TRIS = 0;
+    CONFIG_DATA_PORT_GPIO = 0;
     
     /* Setup PMP */
     PMCON  = 0;

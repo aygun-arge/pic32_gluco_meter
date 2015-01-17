@@ -74,23 +74,10 @@ int main(int argc, char** argv)
     board_init_intr();
     board_init_clock();
     board_init_gpio();
-    //board_init_i2c_bus();
+    board_init_i2c_bus();
     board_init_lcd();
-    voc_freq_init();
 
-    while (1) {
-        static uint32_t          no;
-        static volatile uint64_t raw_value;
-
-        while (voc_is_sampling());
-        raw_value += (uint64_t)voc_freq_raw();
-        no++;
-
-        if (no == 100) {
-            raw_value = raw_value / (uint64_t)100ul;
-            no = 0;
-        }
-    }
+    for (;;);
     
     return (EXIT_SUCCESS);
 }
