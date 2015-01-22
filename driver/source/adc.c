@@ -159,6 +159,13 @@ int32_t adcReadChannel(uint32_t id) {
     }
 }
 
+int32_t adcReadChannelOneShot(uint32_t id) {
+    /*TODO*/
+
+    return 0;
+}
+
+
 void __ISR(_ADC_VECTOR) adcHandler(void) {
     int32_t             value;
     uint32_t            cnt;

@@ -6,11 +6,37 @@
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/application/include/main.h</itemPath>
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/application/include/mcu_config.h</itemPath>
         <itemPath>application/include/voc_freq.h</itemPath>
+        <itemPath>application/include/verdanabold14.h</itemPath>
+        <itemPath>application/include/draw_edit_page.h</itemPath>
+        <itemPath>application/include/draw_main_page.h</itemPath>
+        <itemPath>application/include/draw_measure_page.h</itemPath>
+        <itemPath>application/include/exe_edit_page.h</itemPath>
+        <itemPath>application/include/exe_main_page.h</itemPath>
+        <itemPath>application/include/exe_meassure_page.h</itemPath>
+        <itemPath>application/include/gui.h</itemPath>
+        <itemPath>application/include/colors.h</itemPath>
+        <itemPath>application/include/drawing.h</itemPath>
+        <itemPath>application/include/lcd_adc.h</itemPath>
+        <itemPath>application/include/lcd_gpio.h</itemPath>
+        <itemPath>application/include/dejavusansbold9.h</itemPath>
+        <itemPath>application/include/bitmapfonts.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/application/source/main.c</itemPath>
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/application/source/support.c</itemPath>
         <itemPath>application/source/voc_freq.c</itemPath>
+        <itemPath>application/source/dejavusansbold9.c</itemPath>
+        <itemPath>application/source/verdanabold14.c</itemPath>
+        <itemPath>application/source/draw_edit_page.c</itemPath>
+        <itemPath>application/source/draw_main_page.c</itemPath>
+        <itemPath>application/source/draw_measure_page.c</itemPath>
+        <itemPath>application/source/exe_edit_page.c</itemPath>
+        <itemPath>application/source/exe_main_page.c</itemPath>
+        <itemPath>application/source/exe_meassure_page.c</itemPath>
+        <itemPath>application/source/gui.c</itemPath>
+        <itemPath>application/source/drawing.c</itemPath>
+        <itemPath>application/source/lcd_adc.c</itemPath>
+        <itemPath>application/source/lcd_gpio.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="driver" displayName="driver" projectFiles="true">
@@ -25,13 +51,15 @@
           <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/include/driver/rtc.h</itemPath>
           <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/include/driver/spi.h</itemPath>
           <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/include/driver/systick.h</itemPath>
-          <itemPath>driver/include/driver/lcd_ili9341.h</itemPath>
           <itemPath>driver/include/driver/ad5242.h</itemPath>
           <itemPath>driver/include/driver/ina219.h</itemPath>
-          <itemPath>driver/include/driver/lcd_ili9341_lld.h</itemPath>
           <itemPath>driver/include/driver/s25fl.h</itemPath>
           <itemPath>driver/include/driver/lld_spi2.h</itemPath>
           <itemPath>driver/include/driver/lld_spis.h</itemPath>
+          <itemPath>driver/include/driver/eeprom.h</itemPath>
+          <itemPath>driver/include/driver/ILI9341.h</itemPath>
+          <itemPath>driver/include/driver/touchscreen.h</itemPath>
+          <itemPath>driver/include/driver/lcd.h</itemPath>
         </logicalFolder>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
@@ -43,10 +71,11 @@
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/clock.c</itemPath>
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/rtc.c</itemPath>
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/i2c.c</itemPath>
-        <itemPath>driver/source/lcd_ili9341.c</itemPath>
-        <itemPath>driver/source/lcd_ili9341_lld.c</itemPath>
         <itemPath>driver/source/ad5242.c</itemPath>
         <itemPath>driver/source/ina219.c</itemPath>
+        <itemPath>driver/source/ILI9341.c</itemPath>
+        <itemPath>driver/source/eeprom.c</itemPath>
+        <itemPath>driver/source/touchscreen.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="esolid-base" displayName="esolid-base" projectFiles="true">
@@ -168,8 +197,6 @@
         </logicalFolder>
       </logicalFolder>
     </logicalFolder>
-    <logicalFolder name="f1" displayName="New Folder 1" projectFiles="true">
-    </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
@@ -188,6 +215,7 @@
     <Elem>esolid-vtimer</Elem>
     <Elem>application</Elem>
     <Elem>mla</Elem>
+    <Elem>lcd</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

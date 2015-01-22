@@ -18,6 +18,7 @@ void initAdcDriver(void);
 void adcEnableChannel(uint32_t id, void (* callback)(int32_t));
 void adcDisableChannel(uint32_t id);
 int32_t adcReadChannel(uint32_t id);
+int32_t adcReadChannelOneShot(uint32_t id); /*TODO*/
 
 #ifdef	__cplusplus
 }

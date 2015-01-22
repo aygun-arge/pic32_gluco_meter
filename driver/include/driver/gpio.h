@@ -48,6 +48,8 @@ extern const struct gpio GpioA;
 extern const struct gpio GpioB;
 extern const struct gpio GpioC;
 extern const struct gpio GpioD;
+extern const struct gpio GpioE;
+extern const struct gpio GpioG;
 
 /*===================================================  FUNCTION PROTOTYPES  ==*/
 
@@ -68,6 +70,11 @@ static inline void gpioSetAsOutput(const struct gpio * gpio, uint32_t pin)
     *gpio->tris &= ~((uint32_t)0x1u << pin);
 }
 
+static inline void gpioSetAllAsOutput(const struct gpio * gpio)
+{
+    *gpio->tris = 0;
+}
+
 static inline void gpioSetAsOutputPullUp(const struct gpio * gpio, uint32_t pin)
 {
     *gpio->tris   &= ~((uint32_t)0x1u << pin);
@@ -75,9 +82,24 @@ static inline void gpioSetAsOutputPullUp(const struct gpio * gpio, uint32_t pin)
     *gpio->pullup |=  ((uint32_t)0x1u << pin);
 }
 
+static inline void gpioSetPin(const struct gpio * gpio, uint32_t pin)
+{
+    *gpio->set = ((uint32_t)0x1u << pin);
+}
+
+static inline void gpioClrPin(const struct gpio * gpio, uint32_t pin)
+{
+    *gpio->clr = ((uint32_t)0x1u << pin);
+}
+
 static inline uint32_t gpioRead(const struct gpio * gpio)
 {
     return (*gpio->port);
+}
+
+static inline void gpioWrite(const struct gpio * gpio, uint8_t data)
+{
+    *gpio->lat = data;
 }
 
 /*--------------------------------------------------------  C++ extern end  --*/

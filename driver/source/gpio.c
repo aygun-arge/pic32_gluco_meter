@@ -86,6 +86,22 @@ const struct gpio GpioE = {
 };
 #endif
 
+#if (((__PIC32_FEATURE_SET__ >= 500) && (__PIC32_FEATURE_SET__ <= 700)))
+const struct gpio GpioG = {
+    .port     = &PORTG,
+    .tris     = &TRISG,
+    .lat      = &LATG,
+    .set      = &LATGSET,
+    .clr      = &LATGCLR,
+    .invert   = &LATGINV,
+    .od       = &ODCG,
+    .change   = NULL,
+    .status   = NULL,
+    .pullup   = NULL,
+    .pulldown = NULL,
+    .ansel    = NULL
+};
+#endif
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
 static void init_port(const struct gpio * gpio)

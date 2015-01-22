@@ -17,11 +17,13 @@
 #include "driver/intr.h"
 #include "driver/rtc.h"
 #include "driver/systick.h"
-#include "driver/lcd_ili9341.h"
 #include "arch/intr_config.h"
 #include "main.h"
 #include "voc_freq.h"
 #include "GenericTypeDefs.h"
+#include "gui.h"
+
+#include "draw_main_page.h"
 
 struct i2c_bus g_i2c1_bus;
 
@@ -55,14 +57,15 @@ static void board_init_i2c_bus(void)
     i2c_bus_open(&g_i2c1_bus, &i2c_bus_config);
 }
 
-static void board_init_lcd(void)
-{
-    lcd_init();
+/*
+ * Brief GUI stuff
+ */
+void guiReact(guiAction_T action) {
+	if (action == GUI_REC_PRESSED) {
+		startMeassurePage();
+	}
 }
 
-/*
- * 
- */
 int main(int argc, char** argv)
 {
     (void)argc;
@@ -75,7 +78,28 @@ int main(int argc, char** argv)
     board_init_clock();
     board_init_gpio();
     board_init_i2c_bus();
-    board_init_lcd();
+
+    guiInit();
+    guiStart();
+
+    drawMainPageResistanceString();
+    mainPageParameters_T mpParams;
+
+    mpParams.sensorResistance = 84.32;
+    mpParams.heaterVoltage = 5.28;
+    mpParams.current =	131;
+    mpParams.temperature = 56;
+    drawMainPageParametars(&mpParams);
+    resistanceValues_T rValues;
+
+    rValues.ro = 31.2;
+    rValues.rmax = 35.3;
+    rValues.rmin = 10.42;
+    drawMainPageResistanceValues(&rValues);
+
+    while (1) {
+        guiExe();
+    }
 
     for (;;);
     
