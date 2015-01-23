@@ -59,11 +59,6 @@ static void board_init_i2c_bus(void)
     i2c_bus_open(&g_i2c_bus, &i2c_bus_config);
 }
 
-static void board_init_lcd(void)
-{
-    lcd_init();
-}
-
 #define MLX90614_ADDRESS                (0xb4)
 #define MLX90614_RD                     (MLX90614_ADDRESS |  0x1u)
 #define MLX90614_WR                     (MLX90614_ADDRESS)
@@ -129,7 +124,7 @@ int main(int argc, char** argv)
     board_init_i2c_bus();
 
     guiInit();
-    guiStart();
+    //guiStart();
 
     drawMainPageResistanceString();
     mainPageParameters_T mpParams;

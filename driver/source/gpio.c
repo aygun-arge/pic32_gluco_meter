@@ -87,6 +87,23 @@ const struct gpio GpioE = {
 #endif
 
 #if (((__PIC32_FEATURE_SET__ >= 500) && (__PIC32_FEATURE_SET__ <= 700)))
+const struct gpio GpioF = {
+    .port     = &PORTF,
+    .tris     = &TRISF,
+    .lat      = &LATF,
+    .set      = &LATFSET,
+    .clr      = &LATFCLR,
+    .invert   = &LATFINV,
+    .od       = &ODCF,
+    .change   = NULL,
+    .status   = NULL,
+    .pullup   = NULL,
+    .pulldown = NULL,
+    .ansel    = NULL
+};
+#endif
+
+#if (((__PIC32_FEATURE_SET__ >= 500) && (__PIC32_FEATURE_SET__ <= 700)))
 const struct gpio GpioG = {
     .port     = &PORTG,
     .tris     = &TRISG,

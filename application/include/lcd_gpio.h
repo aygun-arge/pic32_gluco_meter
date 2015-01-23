@@ -18,8 +18,11 @@
 #define TFT_LCD_RD_PIN        8
 #define TFT_LCD_RD_PORT       GpioB
 
-#define TFT_LCD_RESET_PIN     3
-#define TFT_LCD_RESET_PORT    GpioB /*TODO*/
+#define TFT_LCD_RESET_PIN     1
+#define TFT_LCD_RESET_PORT    GpioF
+
+#define TFT_LCD_BACKLIGHT_PIN 9
+#define TFT_LCD_BACKLIGHT_PORT GpioB
 
 /*
 #define lcdTouchscreenYDPin   10

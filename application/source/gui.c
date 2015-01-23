@@ -50,7 +50,8 @@ void guiInit(void) {
     lcdGpioInit();
     lcdAdcInit();
     lcdInit();
-    tsInit();
+    //tsInit();
+    lcdTest();
 }
 
 /*_____________________________________________________________________________*/
