@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-struct i2c_bus g_i2c1_bus;
+struct i2c_bus g_i2c_bus;
 
 
 #ifdef	__cplusplus

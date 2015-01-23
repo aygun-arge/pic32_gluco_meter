@@ -60,8 +60,6 @@
           <itemPath>driver/include/driver/ILI9341.h</itemPath>
           <itemPath>driver/include/driver/touchscreen.h</itemPath>
           <itemPath>driver/include/driver/lcd.h</itemPath>
-        </logicalFolder>
-      </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/intr.c</itemPath>
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/adc.c</itemPath>
@@ -406,6 +404,7 @@
         <property key="UART5" value="true"/>
         <property key="UART6" value="true"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="false"/>

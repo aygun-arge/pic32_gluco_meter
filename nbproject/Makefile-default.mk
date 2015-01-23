@@ -56,10 +56,6 @@ OBJECTFILES=${OBJECTDIR}/_ext/843335180/main.o ${OBJECTDIR}/_ext/843335180/suppo
 
 # Source Files
 SOURCEFILES=/home/nenad/workspace/mplabx/gluco_meter/application/source/main.c /home/nenad/workspace/mplabx/gluco_meter/application/source/support.c application/source/voc_freq.c application/source/dejavusansbold9.c application/source/verdanabold14.c application/source/draw_edit_page.c application/source/draw_main_page.c application/source/draw_measure_page.c application/source/exe_edit_page.c application/source/exe_main_page.c application/source/exe_meassure_page.c application/source/gui.c application/source/drawing.c application/source/lcd_adc.c application/source/lcd_gpio.c /home/nenad/workspace/mplabx/gluco_meter/driver/source/intr.c /home/nenad/workspace/mplabx/gluco_meter/driver/source/adc.c /home/nenad/workspace/mplabx/gluco_meter/driver/source/systick.c /home/nenad/workspace/mplabx/gluco_meter/driver/source/gpio.c /home/nenad/workspace/mplabx/gluco_meter/driver/source/lld_i2c1.c /home/nenad/workspace/mplabx/gluco_meter/driver/source/clock.c /home/nenad/workspace/mplabx/gluco_meter/driver/source/rtc.c /home/nenad/workspace/mplabx/gluco_meter/driver/source/i2c.c driver/source/ad5242.c driver/source/ina219.c driver/source/ILI9341.c driver/source/eeprom.c driver/source/touchscreen.c /home/nenad/workspace/mplabx/gluco_meter/esolid-base/port/pic32-none-gcc/mips-m4k/intr.c /home/nenad/workspace/mplabx/gluco_meter/esolid-base/port/pic32-none-gcc/mips-m4k/systimer.c /home/nenad/workspace/mplabx/gluco_meter/esolid-base/port/pic32-none-gcc/mips-m4k/cpu.c /home/nenad/workspace/mplabx/gluco_meter/esolid-base/src/prio_queue.c /home/nenad/workspace/mplabx/gluco_meter/esolid-base/src/base.c /home/nenad/workspace/mplabx/gluco_meter/esolid-base/src/debug.c /home/nenad/workspace/mplabx/gluco_meter/esolid-base/src/error.c /home/nenad/workspace/mplabx/gluco_meter/esolid-eds/src/epa.c /home/nenad/workspace/mplabx/gluco_meter/esolid-eds/src/smp.c /home/nenad/workspace/mplabx/gluco_meter/esolid-eds/src/event.c /home/nenad/workspace/mplabx/gluco_meter/esolid-mem/src/heap.c /home/nenad/workspace/mplabx/gluco_meter/esolid-mem/src/static.c /home/nenad/workspace/mplabx/gluco_meter/esolid-mem/src/pool.c /home/nenad/workspace/mplabx/gluco_meter/esolid-mem/src/mem_class.c /home/nenad/workspace/mplabx/gluco_meter/esolid-vtimer/src/vtimer.c mla/Microchip/Common/TimeDelay.c
-
-
-CFLAGS=
-ASFLAGS=
 LDLIBSOPTIONS=
 
 ############# Tool locations ##########################################
@@ -232,18 +228,6 @@ ${OBJECTDIR}/_ext/1395779432/i2c.o: /home/nenad/workspace/mplabx/gluco_meter/dri
 	@${RM} ${OBJECTDIR}/_ext/1395779432/i2c.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1395779432/i2c.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -I"driver/include" -I"application/include" -I"esolid-base/inc" -I"esolid-base/port/pic32-none-gcc/common" -I"esolid-base/port/pic32-none-gcc/mips-m4k" -I"esolid-base/port/pic32-none-gcc/pic32mx675f512h" -I"esolid-eds/inc" -I"esolid-mem/inc" -I"esolid-vtimer/inc" -I"mla/Microchip/Include" -Wall -MMD -MF "${OBJECTDIR}/_ext/1395779432/i2c.o.d" -o ${OBJECTDIR}/_ext/1395779432/i2c.o /home/nenad/workspace/mplabx/gluco_meter/driver/source/i2c.c   
 	
-${OBJECTDIR}/driver/source/ad5242.o: driver/source/ad5242.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/driver/source 
-	@${RM} ${OBJECTDIR}/driver/source/ad5242.o.d 
-	@${RM} ${OBJECTDIR}/driver/source/ad5242.o 
-	@${FIXDEPS} "${OBJECTDIR}/driver/source/ad5242.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -I"driver/include" -I"application/include" -I"esolid-base/inc" -I"esolid-base/port/pic32-none-gcc/common" -I"esolid-base/port/pic32-none-gcc/mips-m4k" -I"esolid-base/port/pic32-none-gcc/pic32mx675f512h" -I"esolid-eds/inc" -I"esolid-mem/inc" -I"esolid-vtimer/inc" -I"mla/Microchip/Include" -Wall -MMD -MF "${OBJECTDIR}/driver/source/ad5242.o.d" -o ${OBJECTDIR}/driver/source/ad5242.o driver/source/ad5242.c   
-	
-${OBJECTDIR}/driver/source/ina219.o: driver/source/ina219.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/driver/source 
-	@${RM} ${OBJECTDIR}/driver/source/ina219.o.d 
-	@${RM} ${OBJECTDIR}/driver/source/ina219.o 
-	@${FIXDEPS} "${OBJECTDIR}/driver/source/ina219.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -I"driver/include" -I"application/include" -I"esolid-base/inc" -I"esolid-base/port/pic32-none-gcc/common" -I"esolid-base/port/pic32-none-gcc/mips-m4k" -I"esolid-base/port/pic32-none-gcc/pic32mx675f512h" -I"esolid-eds/inc" -I"esolid-mem/inc" -I"esolid-vtimer/inc" -I"mla/Microchip/Include" -Wall -MMD -MF "${OBJECTDIR}/driver/source/ina219.o.d" -o ${OBJECTDIR}/driver/source/ina219.o driver/source/ina219.c   
-	
 ${OBJECTDIR}/driver/source/ILI9341.o: driver/source/ILI9341.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/driver/source 
 	@${RM} ${OBJECTDIR}/driver/source/ILI9341.o.d 
@@ -261,6 +245,17 @@ ${OBJECTDIR}/driver/source/touchscreen.o: driver/source/touchscreen.c  nbproject
 	@${RM} ${OBJECTDIR}/driver/source/touchscreen.o.d 
 	@${RM} ${OBJECTDIR}/driver/source/touchscreen.o 
 	@${FIXDEPS} "${OBJECTDIR}/driver/source/touchscreen.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -I"driver/include" -I"application/include" -I"esolid-base/inc" -I"esolid-base/port/pic32-none-gcc/common" -I"esolid-base/port/pic32-none-gcc/mips-m4k" -I"esolid-base/port/pic32-none-gcc/pic32mx675f512h" -I"esolid-eds/inc" -I"esolid-mem/inc" -I"esolid-vtimer/inc" -I"mla/Microchip/Include" -Wall -MMD -MF "${OBJECTDIR}/driver/source/touchscreen.o.d" -o ${OBJECTDIR}/driver/source/touchscreen.o driver/source/touchscreen.c   
+${OBJECTDIR}/driver/source/lld_i2c5.o: driver/source/lld_i2c5.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/driver/source 
+	@${RM} ${OBJECTDIR}/driver/source/lld_i2c5.o.d 
+	@${RM} ${OBJECTDIR}/driver/source/lld_i2c5.o 
+	@${FIXDEPS} "${OBJECTDIR}/driver/source/lld_i2c5.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -I"driver/include" -I"application/include" -I"esolid-base/inc" -I"esolid-base/port/pic32-none-gcc/common" -I"esolid-base/port/pic32-none-gcc/mips-m4k" -I"esolid-base/port/pic32-none-gcc/pic32mx675f512h" -I"esolid-eds/inc" -I"esolid-mem/inc" -I"esolid-vtimer/inc" -I"mla/Microchip/Include" -Wall -MMD -MF "${OBJECTDIR}/driver/source/lld_i2c5.o.d" -o ${OBJECTDIR}/driver/source/lld_i2c5.o driver/source/lld_i2c5.c   
+	
+${OBJECTDIR}/driver/source/ad8242.o: driver/source/ad8242.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/driver/source 
+	@${RM} ${OBJECTDIR}/driver/source/ad8242.o.d 
+	@${RM} ${OBJECTDIR}/driver/source/ad8242.o 
+	@${FIXDEPS} "${OBJECTDIR}/driver/source/ad8242.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -I"driver/include" -I"application/include" -I"esolid-base/inc" -I"esolid-base/port/pic32-none-gcc/common" -I"esolid-base/port/pic32-none-gcc/mips-m4k" -I"esolid-base/port/pic32-none-gcc/pic32mx675f512h" -I"esolid-eds/inc" -I"esolid-mem/inc" -I"esolid-vtimer/inc" -I"mla/Microchip/Include" -Wall -MMD -MF "${OBJECTDIR}/driver/source/ad8242.o.d" -o ${OBJECTDIR}/driver/source/ad8242.o driver/source/ad8242.c   
 	
 ${OBJECTDIR}/_ext/1544851922/intr.o: /home/nenad/workspace/mplabx/gluco_meter/esolid-base/port/pic32-none-gcc/mips-m4k/intr.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1544851922 
@@ -496,6 +491,18 @@ ${OBJECTDIR}/_ext/1395779432/i2c.o: /home/nenad/workspace/mplabx/gluco_meter/dri
 	@${RM} ${OBJECTDIR}/_ext/1395779432/i2c.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1395779432/i2c.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1395779432/i2c.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -I"driver/include" -I"application/include" -I"esolid-base/inc" -I"esolid-base/port/pic32-none-gcc/common" -I"esolid-base/port/pic32-none-gcc/mips-m4k" -I"esolid-base/port/pic32-none-gcc/pic32mx675f512h" -I"esolid-eds/inc" -I"esolid-mem/inc" -I"esolid-vtimer/inc" -I"mla/Microchip/Include" -Wall -MMD -MF "${OBJECTDIR}/_ext/1395779432/i2c.o.d" -o ${OBJECTDIR}/_ext/1395779432/i2c.o /home/nenad/workspace/mplabx/gluco_meter/driver/source/i2c.c   
+	
+${OBJECTDIR}/driver/source/lcd_ili9341.o: driver/source/lcd_ili9341.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/driver/source 
+	@${RM} ${OBJECTDIR}/driver/source/lcd_ili9341.o.d 
+	@${RM} ${OBJECTDIR}/driver/source/lcd_ili9341.o 
+	@${FIXDEPS} "${OBJECTDIR}/driver/source/lcd_ili9341.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -I"driver/include" -I"application/include" -I"esolid-base/inc" -I"esolid-base/port/pic32-none-gcc/common" -I"esolid-base/port/pic32-none-gcc/mips-m4k" -I"esolid-base/port/pic32-none-gcc/pic32mx675f512h" -I"esolid-eds/inc" -I"esolid-mem/inc" -I"esolid-vtimer/inc" -I"mla/Microchip/Include" -Wall -MMD -MF "${OBJECTDIR}/driver/source/lcd_ili9341.o.d" -o ${OBJECTDIR}/driver/source/lcd_ili9341.o driver/source/lcd_ili9341.c   
+	
+${OBJECTDIR}/driver/source/lcd_ili9341_lld.o: driver/source/lcd_ili9341_lld.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/driver/source 
+	@${RM} ${OBJECTDIR}/driver/source/lcd_ili9341_lld.o.d 
+	@${RM} ${OBJECTDIR}/driver/source/lcd_ili9341_lld.o 
+	@${FIXDEPS} "${OBJECTDIR}/driver/source/lcd_ili9341_lld.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -I"driver/include" -I"application/include" -I"esolid-base/inc" -I"esolid-base/port/pic32-none-gcc/common" -I"esolid-base/port/pic32-none-gcc/mips-m4k" -I"esolid-base/port/pic32-none-gcc/pic32mx675f512h" -I"esolid-eds/inc" -I"esolid-mem/inc" -I"esolid-vtimer/inc" -I"mla/Microchip/Include" -Wall -MMD -MF "${OBJECTDIR}/driver/source/lcd_ili9341_lld.o.d" -o ${OBJECTDIR}/driver/source/lcd_ili9341_lld.o driver/source/lcd_ili9341_lld.c   
 	
 ${OBJECTDIR}/driver/source/ad5242.o: driver/source/ad5242.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/driver/source 
