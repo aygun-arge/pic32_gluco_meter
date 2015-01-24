@@ -106,7 +106,7 @@ failure:
  */
 void guiReact(guiAction_T action) {
 	if (action == GUI_REC_PRESSED) {
-		startMeassurePage();
+		//startMeassurePage();
 	}
 }
 
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
     board_init_i2c_bus();
 
     guiInit();
-    //guiStart();
+    guiStart();
 
     drawMainPageResistanceString();
     mainPageParameters_T mpParams;

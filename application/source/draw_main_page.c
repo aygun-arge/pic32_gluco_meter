@@ -56,10 +56,10 @@ void drawMainPage(void) {
 	drawButton(20, 20, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[SENSOR_BUTTON], COLOR_BLACK, "Sensor ON/OFF");
 	drawButton(20, 70, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[START_STOP_BUTTON], COLOR_BLACK, "Start/Stop");
 	drawButton(160, 20, 60, 88, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[REC_BUTTON], COLOR_BLACK, "REC");
-	drawString(13, 120, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Sensor resistance (Meg) : 			");
-	drawString(13, 140, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Heater       voltage [V] :  			");
-	drawString(10, 160, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "             current [mA] :  			");
-	drawString(13, 180, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "         temperature [C] :  			");
+	drawString(13, 120, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Sensor resistance (Meg) :                  ");
+	drawString(13, 140, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Heater       voltage [V] :                         ");
+	drawString(10, 160, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "             current [mA] :                        ");
+	drawString(13, 180, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "         temperature [C] :                         ");
 }
 
 /*_____________________________________________________________________________*/
@@ -83,13 +83,13 @@ void drawMainPageMessages(mainPageMessages_T message) {
 		case START_BLOWING : {
 			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "  Start blowing gently  ");
 			drawString(10, 262, COLOR_YELLOW, &verdanabold14ptFontInfo, "       into the device  ");
-			drawString(10, 289, COLOR_YELLOW, &verdanabold14ptFontInfo, "         				 ");
+			drawString(10, 289, COLOR_YELLOW, &verdanabold14ptFontInfo, "                        ");
 			break;
 		}
 		case STOP_BLOWING : {
 			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "         Stop blowing   ");
-			drawString(10, 262, COLOR_YELLOW, &verdanabold14ptFontInfo, "  						 ");
-			drawString(10, 289, COLOR_YELLOW, &verdanabold14ptFontInfo, "         				 ");
+			drawString(10, 262, COLOR_YELLOW, &verdanabold14ptFontInfo, "                        ");
+			drawString(10, 289, COLOR_YELLOW, &verdanabold14ptFontInfo, "                        ");
 			break;
 		}
 		default : {

@@ -47,16 +47,16 @@ void drawMeasurePage(void) {
 	drawFill(COLOR_BLUE);
 
 	drawString(15, 35, COLOR_MAGENTA, &verdanabold14ptFontInfo,   "Meassurement session");
-	drawString(140, 60, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Ro :     		");
-	drawString(120, 80, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Rmax : 		");
-	drawString(125, 100, COLOR_WHITE, &dejaVuSansBold9ptFontInfo,"Rmin :		");
-	drawString(15, 120, COLOR_WHITE, &dejaVuSansBold9ptFontInfo,"Response Rmax/Rmin : 		");
+	drawString(140, 60, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Ro :          ");
+	drawString(120, 80, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Rmax :        ");
+	drawString(125, 100, COLOR_WHITE, &dejaVuSansBold9ptFontInfo,"Rmin :        ");         
+	drawString(15, 120, COLOR_WHITE, &dejaVuSansBold9ptFontInfo,"Response Rmax/Rmin :       ");
 
 	drawString(15, 140, COLOR_MAGENTA, &verdanabold14ptFontInfo,   "Previous measurement");
-	drawString(140, 165, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Ro : 		");
-	drawString(120, 185, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Rmax :		");
-	drawString(125, 205, COLOR_WHITE, &dejaVuSansBold9ptFontInfo,"Rmin : 		");
-	drawString(15, 225, COLOR_WHITE, &dejaVuSansBold9ptFontInfo,"Response Rmax/Rmin : 		");
+	drawString(140, 165, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Ro :         ");
+	drawString(120, 185, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Rmax :       ");
+	drawString(125, 205, COLOR_WHITE, &dejaVuSansBold9ptFontInfo,"Rmin :        ");         
+	drawString(15, 225, COLOR_WHITE, &dejaVuSansBold9ptFontInfo,"Response Rmax/Rmin :       ");
 
 	drawButton(20, 260, 90, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, COLOR_RED, COLOR_WHITE, "BACK");
 }

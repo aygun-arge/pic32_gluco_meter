@@ -1,10 +1,12 @@
 
 #include <xc.h>
+#include <plib.h>
 #include <sys/attribs.h>
 
 #include "driver/clock.h"
 #include "driver/adc.h"
 #include "GenericTypeDefs.h"
+#include "driver/gpio.h"
 
 #define CONFIG_ADC_ISR_PRIORITY         4
 #define CONFIG_ADC_ISR_SUBPRIORITY      0
@@ -159,10 +161,46 @@ int32_t adcReadChannel(uint32_t id) {
     }
 }
 
-int32_t adcReadChannelOneShot(uint32_t id) {
-    /*TODO*/
+#define PARAM1  ADC_FORMAT_INTG | ADC_CLK_AUTO | ADC_AUTO_SAMPLING_ON
+#define PARAM2  ADC_VREF_AVDD_AVSS | ADC_OFFSET_CAL_DISABLE | ADC_SCAN_OFF | ADC_SAMPLES_PER_INT_2 | ADC_ALT_BUF_ON | ADC_ALT_INPUT_ON
+#define PARAM3  ADC_CONV_CLK_INTERNAL_RC | ADC_SAMPLE_TIME_15
+#define PARAM4	ENABLE_AN4_ANA | ENABLE_AN5_ANA
+#define PARAM5	SKIP_SCAN_ALL
 
-    return 0;
+int32_t adcReadChannelOneShot(uint32_t id) {
+
+    int32_t             val;
+
+    gpioSetAsInput(&GpioB, id);
+    AD1PCFGCLR = (0x1u << id);
+    
+    CloseADC10();
+
+    AD1CHSbits.CH0NA  = 0;
+    AD1CHSbits.CH0SA  = id;
+    AD1CON1bits.FORM  = 0;
+    AD1CON1bits.SSRC  = 0;
+    AD1CON1bits.ASAM  = 1;
+    AD1CON2bits.ALTS  = 0;
+    AD1CON2bits.BUFM  = 0;
+    AD1CON2bits.CSCNA = 0;
+    AD1CON2bits.VCFG  = 0;
+    AD1CON3bits.ADRC  = 1;
+    AD1CON3bits.ADCS  = 255;
+    AD1CSSL           = 0;
+    AD1CON1bits.ON    = 1;
+
+    while (!AD1CON1bits.SAMP);
+
+    AD1CON1bits.SAMP = 0;
+
+    while (!AD1CON1bits.DONE);
+    
+    val = ADC1BUF0;
+    CloseADC10();
+    AD1PCFGSET = (0x1u << id);
+
+    return val;
 }
 
 
