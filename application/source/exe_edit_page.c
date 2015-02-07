@@ -38,7 +38,7 @@
 
 /*=========================================================  LOCAL MACRO's  ==*/
 #define STRING_COLOR 		COLOR_DARK_BLUE
-#define MAX_NUM_OF_DIGITS	2
+#define MAX_NUM_OF_DIGITS	3
 /*======================================================  LOCAL DATA TYPES  ==*/
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
 /*=======================================================  LOCAL VARIABLES  ==*/

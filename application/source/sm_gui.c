@@ -7,6 +7,9 @@
 #include "app_timer.h"
 #include "voc_freq.h"
 
+#include "drawing.h"
+#include "dejavusansbold9.h"
+
 /*=========================================================  LOCAL MACRO's  ==*/
 
 #define GUI_TABLE(entry)                                                        \
@@ -78,27 +81,23 @@ static esAction state_main(void * space, const esEvent * event) {
 
     switch (event->id) {
         case ES_ENTRY: {
-            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200), EVENT_REFRESH_LCD);
+            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(333), EVENT_REFRESH_LCD);
             drawMainPageResistanceString();
+            drawFill(COLOR_BLUE);
 
             return (ES_STATE_HANDLED());
         }
         case EVENT_REFRESH_LCD: {
-            mainPageParameters_T mpParams;
-            resistanceValues_T rValues;
+            char buff[16];
+            uint32_t            raw_value;
 
-            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200), EVENT_REFRESH_LCD);
-            
-            mpParams.sensorResistance = voc_freq_raw();
-            mpParams.heaterVoltage = 1.0;
-            mpParams.current =	0.0;
-            mpParams.temperature = 3;
-            drawMainPageParametars(&mpParams);
+            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(250), EVENT_REFRESH_LCD);
 
-            rValues.ro = 1.0;
-            rValues.rmax = 2.0;
-            rValues.rmin = 3.0;
-            drawMainPageResistanceValues(&rValues);
+            raw_value = voc_freq_raw();
+            drawRectangleFilled(10,10,80,40, COLOR_BLACK);
+            snprintf(buff, sizeof(buff), "%d", raw_value);
+            drawString(20, 20, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
+
             guiExe();
 
             return (ES_STATE_HANDLED());

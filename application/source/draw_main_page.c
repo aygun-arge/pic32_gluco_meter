@@ -111,7 +111,7 @@ void drawMainPageResistanceString(void) {
 
 /*_____________________________________________________________________________*/
 void drawMainPageResistanceValues(resistanceValues_T * values) {
-	char buff[6];
+	char buff[16];
 
 	snprintf(buff, sizeof(buff), "%3.2f", (double)values->ro);
 	drawString(35, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
@@ -123,9 +123,10 @@ void drawMainPageResistanceValues(resistanceValues_T * values) {
 
 /*_____________________________________________________________________________*/
 void drawMainPageParametars(mainPageParameters_T * params) {
-	char buff[6];
+	char buff[16];
 
-	snprintf(buff, sizeof(buff), "%3.2f", (double)params->sensorResistance);
+        drawRectangleFilled(200, 120, 240, 140, COLOR_BLUE);
+	snprintf(buff, sizeof(buff), "%2.3f", (double)params->sensorResistance);
 	drawString(200, 120, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
 	snprintf(buff, sizeof(buff), "%3.2f", (double)params->heaterVoltage);
 	drawString(200, 140, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);

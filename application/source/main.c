@@ -69,12 +69,13 @@ int main(int argc, char** argv)
     (void)argc;
     (void)argv;
 
+    DDPCONbits.JTAGEN = 0;
+
     board_init_intr();
     board_init_clock();
     board_init_gpio();
     board_init_i2c_bus();
     voc_freq_init();
-
 
     /*-- eSolid --------------------------------------------------------------*/
     esEdsInit();
