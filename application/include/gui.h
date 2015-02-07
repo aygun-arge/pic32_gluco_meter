@@ -35,6 +35,8 @@
 
 #include "driver/touchscreen.h"
 #include "draw_measure_page.h"
+#include "draw_main_page.h"
+#include "draw_edit_page.h"
 #include "exe_meassure_page.h"
 
 /*===============================================================  MACRO's  ==*/

@@ -9,7 +9,7 @@
 #include "arch/intr.h"
 
 #define CONFIG_IC_SELECTION             4
-#define CONFIG_NUM_OF_SAMPLES           16
+#define CONFIG_NUM_OF_SAMPLES           8
 
 #define ICxCON_ON                       (0x1u << 15)
 #define ICxCON_FEDGE                    (0x1u << 9)

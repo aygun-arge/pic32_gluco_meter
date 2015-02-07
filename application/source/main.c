@@ -21,15 +21,19 @@
 #include "main.h"
 #include "voc_freq.h"
 #include "GenericTypeDefs.h"
-#include "gui.h"
 
-#include "draw_main_page.h"
-
-#define DIG_POT_ADDR            0x58
-#define DIG_POT_RD_CMD          (DIG_POT_ADDR |  0x01u)
-#define DIG_POT_WR_CMD          (DIG_POT_ADDR & ~0x01u)
+#include "vtimer/vtimer.h"
+#include "mem/static.h"
+#include "mem/mem_class.h"
+#include "eds/epa.h"
+#include "sm_gui.h"
 
 struct i2c_bus g_i2c_bus;
+
+static uint8_t g_static_storage[1024];
+static uint8_t g_heap_storage[4096];
+static esMem g_static_mem;
+static esMem g_heap_mem;
 
 static void board_init_intr(void)
 {
@@ -39,6 +43,7 @@ static void board_init_intr(void)
 static void board_init_clock(void)
 {
     initClockDriver();
+    initSysTickDriver();
 }
 
 static void board_init_gpio(void)
@@ -59,62 +64,8 @@ static void board_init_i2c_bus(void)
     i2c_bus_open(&g_i2c_bus, &i2c_bus_config);
 }
 
-#define MLX90614_ADDRESS                (0xb4)
-#define MLX90614_RD                     (MLX90614_ADDRESS |  0x1u)
-#define MLX90614_WR                     (MLX90614_ADDRESS)
-
-static uint16_t mlx90614_read_temp(struct i2c_bus * bus)
-{
-    bool                        success;
-    uint8_t                     buff[2];
-    uint16_t                    retval;
-
-    i2c_bus_start(bus);
-    success = i2c_bus_write(bus, MLX90614_WR);
-
-    if (!success) {
-        goto failure;
-    }
-    success = i2c_bus_write(bus, 0x07);
-
-    if (!success) {
-        goto failure;
-    }
-    i2c_bus_restart(bus);
-    success = i2c_bus_write(bus, MLX90614_RD);
-
-    if (!success) {
-        goto failure;
-    }
-    buff[0] = i2c_bus_read(bus);
-    i2c_bus_ack(bus);
-    buff[1] = i2c_bus_read(bus);
-    i2c_bus_nack(bus);
-    i2c_bus_stop(bus);
-
-    retval = ((uint16_t)buff[1] << 8u) | (uint16_t)buff[0];
-
-    return (retval);
-failure:
-    i2c_bus_stop(bus);
-
-    return (0);
-}
-
-/*
- * Brief GUI stuff
- */
-void guiReact(guiAction_T action) {
-	if (action == GUI_REC_PRESSED) {
-		//startMeassurePage();
-	}
-}
-
 int main(int argc, char** argv)
 {
-    uint32_t count;
-    double temperature;
-
     (void)argc;
     (void)argv;
 
@@ -122,41 +73,19 @@ int main(int argc, char** argv)
     board_init_clock();
     board_init_gpio();
     board_init_i2c_bus();
+    voc_freq_init();
 
-    guiInit();
-    guiStart();
 
-    drawMainPageResistanceString();
-    mainPageParameters_T mpParams;
+    /*-- eSolid --------------------------------------------------------------*/
+    esEdsInit();
+    esModuleVTimerInit();
+    esMemInit(&esGlobalStaticMemClass, &g_static_mem, g_static_storage, sizeof(g_static_storage), 0);
+    esMemInit(&esGlobalHeapMemClass, &g_heap_mem, g_heap_storage, sizeof(g_heap_storage), 0);
+    esEventRegisterMem(&g_heap_mem);
+    esEpaCreate(&g_gui_epa, &g_gui_sm, &g_static_mem, &g_gui);
 
-    mpParams.sensorResistance = 84.32;
-    mpParams.heaterVoltage = 5.28;
-    mpParams.current =	131;
-    mpParams.temperature = 56;
-    drawMainPageParametars(&mpParams);
-    resistanceValues_T rValues;
+    esEdsStart();
 
-    rValues.ro = 31.2;
-    rValues.rmax = 35.3;
-    rValues.rmin = 10.42;
-    drawMainPageResistanceValues(&rValues);
-
-    while (1) {
-        guiExe();
-    }
-
-    for (;;);
-    
-#if 0
-    for (count = 0; count < 1000000ul; count++);
-
-    while (1) {
-        temperature = mlx90614_read_temp(&g_i2c_bus);
-        temperature *= 0.02;
-        temperature -= 273.15;
-        temperature -= 0.01;
-    }
-#endif
     return (EXIT_SUCCESS);
 }
 

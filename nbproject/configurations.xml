@@ -20,6 +20,8 @@
         <itemPath>application/include/lcd_gpio.h</itemPath>
         <itemPath>application/include/dejavusansbold9.h</itemPath>
         <itemPath>application/include/bitmapfonts.h</itemPath>
+        <itemPath>application/include/sm_gui.h</itemPath>
+        <itemPath>application/include/app_timer.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/application/source/main.c</itemPath>
@@ -37,6 +39,8 @@
         <itemPath>application/source/drawing.c</itemPath>
         <itemPath>application/source/lcd_adc.c</itemPath>
         <itemPath>application/source/lcd_gpio.c</itemPath>
+        <itemPath>application/source/sm_gui.c</itemPath>
+        <itemPath>application/source/app_timer.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="driver" displayName="driver" projectFiles="true">
