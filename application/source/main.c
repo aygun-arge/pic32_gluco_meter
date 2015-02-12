@@ -27,13 +27,15 @@
 #include "mem/mem_class.h"
 #include "eds/epa.h"
 #include "sm_gui.h"
+#include "driver/ad5242.h"
 
 struct i2c_bus g_i2c_bus;
 
-static uint8_t g_static_storage[1024];
-static uint8_t g_heap_storage[4096];
-static esMem g_static_mem;
-static esMem g_heap_mem;
+static uint8_t                  g_static_storage[1024];
+static uint8_t                  g_heap_storage[4096];
+static esMem                    g_static_mem;
+static esMem                    g_heap_mem;
+static struct ad5242_handle     g_ad5242;
 
 static void board_init_intr(void)
 {
@@ -66,6 +68,7 @@ static void board_init_i2c_bus(void)
 
 int main(int argc, char** argv)
 {
+    esError             err;
     (void)argc;
     (void)argv;
 
@@ -75,7 +78,18 @@ int main(int argc, char** argv)
     board_init_clock();
     board_init_gpio();
     board_init_i2c_bus();
+
     voc_freq_init();
+    err = ad5242_init_driver(&g_ad5242, &g_i2c_bus, 0);
+
+    if (err) {
+        goto FAIL_AD5242_INIT;
+    }
+    err = ad5242_set_pot1(&g_ad5242, 100);
+
+    if (err) {
+        goto FAIL_AD5242_INIT;
+    }
 
     /*-- eSolid --------------------------------------------------------------*/
     esEdsInit();
@@ -88,5 +102,8 @@ int main(int argc, char** argv)
     esEdsStart();
 
     return (EXIT_SUCCESS);
+FAIL_AD5242_INIT:
+
+    return (EXIT_FAILURE);
 }
 
