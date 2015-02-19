@@ -45,8 +45,8 @@ static struct clocks GlobalClocks;
 /*====================================  GLOBAL PUBLIC FUNCTION DEFINITIONS  ==*/
 
 void initClockDriver(
-    void) {
-
+    void)
+{
     GlobalClocks.system        = CONFIG_SYSTEM_CLOCK;
     GlobalClocks.peripheralBus = SYSTEMConfigPerformance(CONFIG_SYSTEM_CLOCK);
 }
