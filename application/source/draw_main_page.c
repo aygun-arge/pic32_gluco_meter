@@ -75,14 +75,14 @@ void drawMainPageMessages(mainPageMessages_T message) {
 			break;
 		}
 		case BE_READY : {
-			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "Be ready to blow for Xs ");
-			drawString(10, 262, COLOR_YELLOW, &verdanabold14ptFontInfo, "  after beep, stop after");
-			drawString(10, 289, COLOR_YELLOW, &verdanabold14ptFontInfo, "         second beep    ");
+			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "Be ready to blow after  ");
+			drawString(10, 262, COLOR_YELLOW, &verdanabold14ptFontInfo, "beep, stop after second ");
+			drawString(10, 289, COLOR_YELLOW, &verdanabold14ptFontInfo, "      second beep       ");
 			break;
 		}
 		case START_BLOWING : {
 			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "  Start blowing gently  ");
-			drawString(10, 262, COLOR_YELLOW, &verdanabold14ptFontInfo, "       into the device  ");
+			drawString(10, 262, COLOR_YELLOW, &verdanabold14ptFontInfo, "    into the device     ");
 			drawString(10, 289, COLOR_YELLOW, &verdanabold14ptFontInfo, "                        ");
 			break;
 		}
@@ -125,10 +125,10 @@ void drawMainPageResistanceValues(resistanceValues_T * values) {
 void drawMainPageParametars(mainPageParameters_T * params) {
 	char buff[16];
 
-        drawRectangleFilled(200, 120, 240, 140, COLOR_BLUE);
-	snprintf(buff, sizeof(buff), "%2.3f", (double)params->sensorResistance);
+    drawRectangleFilled(200, 120, 240, 180, COLOR_BLUE);
+	snprintf(buff, sizeof(buff), "%2.3f", (double)params->resistance);
 	drawString(200, 120, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-	snprintf(buff, sizeof(buff), "%3.2f", (double)params->heaterVoltage);
+	snprintf(buff, sizeof(buff), "%3.2f", (double)params->voltage);
 	drawString(200, 140, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
 	snprintf(buff, sizeof(buff), "%2d", params->current);
 	drawString(200, 160, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);

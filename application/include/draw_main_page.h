@@ -55,8 +55,8 @@ typedef enum {
 } mainPageMessages_T;
 
 typedef struct {
-	float 	sensorResistance;
-	float 	heaterVoltage;
+	float 	resistance;
+	float 	voltage;
 	uint8_t	current;
 	uint8_t temperature;
 } mainPageParameters_T;

@@ -27,6 +27,7 @@
 #include "mem/mem_class.h"
 #include "eds/epa.h"
 #include "sm_gui.h"
+#include "sm_voc.h"
 #include "driver/ad5242.h"
 
 #include "USB/usb.h"
@@ -34,13 +35,20 @@
 #include "USB/usb_host_msd_scsi.h"
 #include "MDD/FSIO.h"
 
-struct i2c_bus g_i2c_bus;
+struct i2c_bus                  g_i2c_bus;
+struct device_state             g_device_state =
+{
+    .is_sensor_enabled  = false,
+    .heater_voltage     = 100,
+    .blowing_time       = 300
+};
+
 
 static uint8_t                  g_static_storage[1024];
 static uint8_t                  g_heap_storage[4096];
 static esMem                    g_static_mem;
 static esMem                    g_heap_mem;
-static struct ad5242_handle     g_ad5242;
+
 
 static void board_init_intr(void)
 {
@@ -78,7 +86,6 @@ static void idle_hook(void)
 
 int main(int argc, char** argv)
 {
-    esError             err;
     (void)argc;
     (void)argv;
 
@@ -92,11 +99,8 @@ int main(int argc, char** argv)
     USBInitialize(0);
 
     voc_freq_init();
-    err = ad5242_init_driver(&g_ad5242, &g_i2c_bus, 0);
+    voc_voltage_init();
 
-    if (err) {
-        goto FAIL_AD5242_INIT;
-    }
 
     /*-- eSolid --------------------------------------------------------------*/
     esEdsInit();
@@ -106,13 +110,11 @@ int main(int argc, char** argv)
     esMemInit(&esGlobalHeapMemClass, &g_heap_mem, g_heap_storage, sizeof(g_heap_storage), 0);
     esEventRegisterMem(&g_heap_mem);
     esEpaCreate(&g_gui_epa, &g_gui_sm, &g_static_mem, &g_gui);
+    esEpaCreate(&g_voc_epa, &g_voc_sm, &g_static_mem, &g_voc);
 
     esEdsStart();
 
     return (EXIT_SUCCESS);
-FAIL_AD5242_INIT:
-
-    return (EXIT_FAILURE);
 }
 
 /****************************************************************************

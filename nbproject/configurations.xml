@@ -22,6 +22,9 @@
         <itemPath>application/include/bitmapfonts.h</itemPath>
         <itemPath>application/include/sm_gui.h</itemPath>
         <itemPath>application/include/app_timer.h</itemPath>
+        <itemPath>application/include/HardwareProfile.h</itemPath>
+        <itemPath>application/include/FSconfig.h</itemPath>
+        <itemPath>application/include/sm_voc.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/application/source/main.c</itemPath>
@@ -41,6 +44,8 @@
         <itemPath>application/source/lcd_gpio.c</itemPath>
         <itemPath>application/source/sm_gui.c</itemPath>
         <itemPath>application/source/app_timer.c</itemPath>
+        <itemPath>application/source/usb_config.c</itemPath>
+        <itemPath>application/source/sm_voc.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="driver" displayName="driver" projectFiles="true">
@@ -190,16 +195,35 @@
                    projectFiles="true">
     </logicalFolder>
     <logicalFolder name="mla" displayName="mla" projectFiles="true">
-      <logicalFolder name="Microchip" displayName="Microchip" projectFiles="true">
-        <logicalFolder name="Common" displayName="Common" projectFiles="true">
-          <itemPath>mla/Microchip/Common/TimeDelay.c</itemPath>
-        </logicalFolder>
-        <logicalFolder name="Include" displayName="Include" projectFiles="true">
-          <itemPath>mla/Microchip/Include/TimeDelay.h</itemPath>
-          <itemPath>mla/Microchip/Include/HardwareProfile.h</itemPath>
-          <itemPath>mla/Microchip/Include/GenericTypeDefs.h</itemPath>
-          <itemPath>mla/Microchip/Include/Compiler.h</itemPath>
-        </logicalFolder>
+      <logicalFolder name="Common" displayName="Common" projectFiles="true">
+        <itemPath>mla/Common/Compiler.h</itemPath>
+        <itemPath>mla/Common/TimeDelay.c</itemPath>
+        <itemPath>mla/Common/GenericTypeDefs.h</itemPath>
+        <itemPath>mla/Common/TimeDelay.h</itemPath>
+        <itemPath>mla/Common/debug.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="MDD" displayName="MDD" projectFiles="true">
+        <itemPath>mla/MDD/FSIO.c</itemPath>
+        <itemPath>mla/MDD/FSDefs.h</itemPath>
+        <itemPath>mla/MDD/FSIO.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="USB" displayName="USB" projectFiles="true">
+        <itemPath>mla/USB/usb_host_msd_scsi.h</itemPath>
+        <itemPath>mla/USB/usb_hal.h</itemPath>
+        <itemPath>mla/USB/usb_host_msd.c</itemPath>
+        <itemPath>mla/USB/usb_host_msd_scsi.c</itemPath>
+        <itemPath>mla/USB/usb_host_msd.h</itemPath>
+        <itemPath>mla/USB/usb_ch9.h</itemPath>
+        <itemPath>mla/USB/usb_host.h</itemPath>
+        <itemPath>mla/USB/usb_host_hid.h</itemPath>
+        <itemPath>mla/USB/usb.h</itemPath>
+        <itemPath>mla/USB/usb_common.h</itemPath>
+        <itemPath>mla/USB/usb_host_hid_parser.h</itemPath>
+        <itemPath>mla/USB/usb_hal_pic32.h</itemPath>
+        <itemPath>mla/USB/usb_host.c</itemPath>
+        <itemPath>mla/USB/usb_hal_local.h</itemPath>
+        <itemPath>mla/USB/usb_host_local.h</itemPath>
+        <itemPath>mla/USB/usb_pic32.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
@@ -233,7 +257,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC32</languageToolchain>
-        <languageToolchainVersion>1.21</languageToolchainVersion>
+        <languageToolchainVersion>1.31</languageToolchainVersion>
         <platform>2</platform>
       </toolsSet>
       <compileType>
@@ -266,7 +290,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="driver/include;application/include;esolid-base/inc;esolid-base/port/pic32-none-gcc/common;esolid-base/port/pic32-none-gcc/mips-m4k;esolid-base/port/pic32-none-gcc/pic32mx675f512h;esolid-eds/inc;esolid-mem/inc;esolid-vtimer/inc;mla/Microchip/Include;mla/Common;mla/USB;mla/MDD"/>
+                  value="driver/include;application/include;esolid-base/inc;esolid-base/port/pic32-none-gcc/common;esolid-base/port/pic32-none-gcc/mips-m4k;esolid-base/port/pic32-none-gcc/pic32mx675f512h;esolid-eds/inc;esolid-mem/inc;esolid-vtimer/inc;mla/Common;mla/USB;mla"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>
@@ -319,7 +343,7 @@
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-cross-reference-file" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
-        <property key="heap-size" value=""/>
+        <property key="heap-size" value="4096"/>
         <property key="input-libraries" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
@@ -364,6 +388,7 @@
         <property key="common-include-directories" value=""/>
         <property key="gp-relative-option" value=""/>
         <property key="legacy-libc" value="false"/>
+        <property key="relaxed-math" value="false"/>
         <property key="save-temps" value="false"/>
         <property key="wpo-lto" value="false"/>
       </C32Global>
@@ -415,21 +440,30 @@
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="false"/>
         <property key="memories.configurationmemory" value="true"/>
+        <property key="memories.configurationmemory2" value="true"/>
         <property key="memories.dataflash" value="true"/>
         <property key="memories.eeprom" value="true"/>
         <property key="memories.flashdata" value="true"/>
         <property key="memories.id" value="true"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.end" value="0x1d07ffff"/>
+        <property key="memories.programmemory.partition2" value="true"/>
+        <property key="memories.programmemory.partition2.end"
+                  value="${memories.programmemory.partition2.end.value}"/>
+        <property key="memories.programmemory.partition2.start"
+                  value="${memories.programmemory.partition2.start.value}"/>
         <property key="memories.programmemory.start" value="0x1d000000"/>
         <property key="poweroptions.powerenable" value="false"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
+        <property key="programoptions.preservedataflash" value="false"/>
         <property key="programoptions.preserveeeprom" value="false"/>
         <property key="programoptions.preserveprogramrange" value="false"/>
         <property key="programoptions.preserveprogramrange.end" value="0x1d07ffff"/>
         <property key="programoptions.preserveprogramrange.start" value="0x1d000000"/>
         <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.programcalmem" value="false"/>
+        <property key="programoptions.programuserotp" value="false"/>
         <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
         <property key="programoptions.usehighvoltageonmclr" value="false"/>
         <property key="programoptions.uselvpprogramming" value="false"/>

@@ -11,13 +11,16 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "base/error.h"
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
 void voc_freq_init(void);
-bool voc_is_sampling(void);
 uint32_t voc_freq_raw(void);
+void voc_voltage_init(void);
+esError voc_set_voltage(int voltage);
 
 #ifdef	__cplusplus
 }

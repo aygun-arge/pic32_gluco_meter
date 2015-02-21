@@ -6,10 +6,13 @@
 #include "TimeDelay.h"
 #include <stdbool.h>
 #include <peripheral/timer.h>
+#include "main.h"
 #include "arch/intr.h"
+#include "driver/ad5242.h"
 
 #define CONFIG_IC_SELECTION             4
 #define CONFIG_NUM_OF_SAMPLES           8
+#define CONFIG_VOC_VOLTAGE_COEF_100     300
 
 #define ICxCON_ON                       (0x1u << 15)
 #define ICxCON_FEDGE                    (0x1u << 9)
@@ -102,7 +105,7 @@
 #define TxCON_TCS                       (0x1u << 1)
 
 static uint32_t g_current_val;
-static bool     g_is_sampling;
+static struct ad5242_handle     g_ad5242;
 
 void __ISR(IC_VECTOR) change_notice_isr(void)
 {
@@ -126,7 +129,6 @@ void __ISR(IC_VECTOR) change_notice_isr(void)
     if (no == CONFIG_NUM_OF_SAMPLES) {
         no  = 0;
         g_current_val = (uint32_t)(acc / (uint64_t)CONFIG_NUM_OF_SAMPLES);
-        g_is_sampling = false;
         acc = (uint64_t)0ul;
     }
 
@@ -140,7 +142,6 @@ void __ISR(IC_VECTOR) change_notice_isr(void)
 
 void voc_freq_init(void)
 {
-    g_is_sampling = true;
     g_current_val = 0u;
     ICxTRIS |= (0x1u << ICxPIN);
     ICxCON  = 0;
@@ -162,13 +163,22 @@ void voc_freq_init(void)
     ICxCON |= ICxCON_ON;
 }
 
-bool voc_is_sampling(void)
-{
-    return (g_is_sampling);
-}
-
 uint32_t voc_freq_raw(void)
 {
-    g_is_sampling = true;
     return (g_current_val);
+}
+
+void voc_voltage_init(void)
+{
+    ad5242_init_driver(&g_ad5242, &g_i2c_bus, 0);
+}
+
+esError voc_set_voltage(int voltage)
+{
+    esError                     err;
+
+    voltage *= 100;
+    err = ad5242_set_pot1(&g_ad5242, voltage / CONFIG_VOC_VOLTAGE_COEF_100);
+
+    return (err);
 }
