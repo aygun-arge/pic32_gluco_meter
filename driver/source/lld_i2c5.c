@@ -49,7 +49,7 @@ static void nack(struct i2c_bus *);
 /*=======================================================  LOCAL VARIABLES  ==*/
 /*======================================================  GLOBAL VARIABLES  ==*/
 
-const struct i2c_id I2C5 = {
+const struct i2c_id g_I2C5 = {
     open,
     close,
     write,

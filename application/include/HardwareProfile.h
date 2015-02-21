@@ -41,7 +41,7 @@
     #elif defined(RUN_AT_60MHZ)    
         #define GetSystemClock()            60000000UL
         #define GetPeripheralClock()        30000000UL  // Will be divided down
-        #define GetInstructionClock()       (GetSystemClock() / 2) ???
+        #define GetInstructionClock()       (GetSystemClock() / 2) 
     #else
         #error Choose a speed
     #endif        
@@ -84,7 +84,9 @@
 #else
     #include <p32xxxx.h>
     #include <plib.h>
+#if 0
     #include <uart2.h>
+#endif
 #endif
 
 #endif  

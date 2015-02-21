@@ -76,7 +76,7 @@ Change History:
 
 #include "USB/usb.h"
 #include "FSconfig.h"
-#include "MDD File System/FSDefs.h"
+#include "MDD/FSDefs.h"
 
 // *****************************************************************************
 // *****************************************************************************

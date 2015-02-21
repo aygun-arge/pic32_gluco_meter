@@ -49,6 +49,7 @@ void initClockDriver(
 {
     GlobalClocks.system        = CONFIG_SYSTEM_CLOCK;
     GlobalClocks.peripheralBus = SYSTEMConfigPerformance(CONFIG_SYSTEM_CLOCK);
+    CheKseg0CacheOn();
 }
 
 uint32_t clockGetSystemClock(

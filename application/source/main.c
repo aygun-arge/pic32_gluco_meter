@@ -29,6 +29,11 @@
 #include "sm_gui.h"
 #include "driver/ad5242.h"
 
+#include "USB/usb.h"
+#include "USB/usb_host_msd.h"
+#include "USB/usb_host_msd_scsi.h"
+#include "MDD/FSIO.h"
+
 struct i2c_bus g_i2c_bus;
 
 static uint8_t                  g_static_storage[1024];
@@ -57,13 +62,18 @@ static void board_init_i2c_bus(void)
 {
     struct i2c_bus_config i2c_bus_config =
     {
-        &I2C5,
+        &g_I2C5,
         I2C_BUS_ADDRESS_7BIT,
         100000,
         CONFIG_INTR_MAX_ISR_PRIO
     };
     i2c_driver_init();
     i2c_bus_open(&g_i2c_bus, &i2c_bus_config);
+}
+
+static void idle_hook(void)
+{
+    USBTasks();
 }
 
 int main(int argc, char** argv)
@@ -79,13 +89,10 @@ int main(int argc, char** argv)
     board_init_gpio();
     board_init_i2c_bus();
 
+    USBInitialize(0);
+
     voc_freq_init();
     err = ad5242_init_driver(&g_ad5242, &g_i2c_bus, 0);
-
-    if (err) {
-        goto FAIL_AD5242_INIT;
-    }
-    err = ad5242_set_pot1(&g_ad5242, 100);
 
     if (err) {
         goto FAIL_AD5242_INIT;
@@ -93,6 +100,7 @@ int main(int argc, char** argv)
 
     /*-- eSolid --------------------------------------------------------------*/
     esEdsInit();
+    esEdsSetIdle(idle_hook);
     esModuleVTimerInit();
     esMemInit(&esGlobalStaticMemClass, &g_static_mem, g_static_storage, sizeof(g_static_storage), 0);
     esMemInit(&esGlobalHeapMemClass, &g_heap_mem, g_heap_storage, sizeof(g_heap_storage), 0);
@@ -107,3 +115,91 @@ FAIL_AD5242_INIT:
     return (EXIT_FAILURE);
 }
 
+/****************************************************************************
+  Function:
+    BOOL USB_ApplicationEventHandler( BYTE address, USB_EVENT event,
+                void *data, DWORD size )
+
+  Summary:
+    This is the application event handler.  It is called when the stack has
+    an event that needs to be handled by the application layer rather than
+    by the client driver.
+
+  Description:
+    This is the application event handler.  It is called when the stack has
+    an event that needs to be handled by the application layer rather than
+    by the client driver.  If the application is able to handle the event, it
+    returns TRUE.  Otherwise, it returns FALSE.
+
+  Precondition:
+    None
+
+  Parameters:
+    BYTE address    - Address of device where event occurred
+    USB_EVENT event - Identifies the event that occured
+    void *data      - Pointer to event-specific data
+    DWORD size      - Size of the event-specific data
+
+  Return Values:
+    TRUE    - The event was handled
+    FALSE   - The event was not handled
+
+  Remarks:
+    The application may also implement an event handling routine if it
+    requires knowledge of events.  To do so, it must implement a routine that
+    matches this function signature and define the USB_HOST_APP_EVENT_HANDLER
+    macro as the name of that function.
+  ***************************************************************************/
+
+BOOL USB_ApplicationEventHandler( BYTE address, USB_EVENT event, void *data, DWORD size )
+{
+    switch( event )
+    {
+        case EVENT_VBUS_REQUEST_POWER:
+            // The data pointer points to a byte that represents the amount of power
+            // requested in mA, divided by two.  If the device wants too much power,
+            // we reject it.
+            return TRUE;
+
+        case EVENT_VBUS_RELEASE_POWER:
+            // Turn off Vbus power.
+            // The PIC24F with the Explorer 16 cannot turn off Vbus through software.
+
+            //This means that the device was removed
+            return TRUE;
+            break;
+
+        case EVENT_HUB_ATTACH:
+            return TRUE;
+            break;
+
+        case EVENT_UNSUPPORTED_DEVICE:
+            return TRUE;
+            break;
+
+        case EVENT_CANNOT_ENUMERATE:
+            //UART2PrintString( "\r\n***** USB Error - cannot enumerate device *****\r\n" );
+            return TRUE;
+            break;
+
+        case EVENT_CLIENT_INIT_ERROR:
+            //UART2PrintString( "\r\n***** USB Error - client driver initialization error *****\r\n" );
+            return TRUE;
+            break;
+
+        case EVENT_OUT_OF_MEMORY:
+            //UART2PrintString( "\r\n***** USB Error - out of heap memory *****\r\n" );
+            return TRUE;
+            break;
+
+        case EVENT_UNSPECIFIED_ERROR:   // This should never be generated.
+            //UART2PrintString( "\r\n***** USB Error - unspecified *****\r\n" );
+            return TRUE;
+            break;
+
+        default:
+            break;
+    }
+
+    return FALSE;
+}

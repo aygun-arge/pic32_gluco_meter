@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-extern const struct i2c_id I2C1;
+extern const struct i2c_id g_I2C1;
 
 #ifdef	__cplusplus
 }
