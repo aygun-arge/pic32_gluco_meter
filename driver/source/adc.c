@@ -1,6 +1,7 @@
 
 #include <xc.h>
 #include <plib.h>
+#include <string.h>
 #include <sys/attribs.h>
 
 #include "driver/clock.h"

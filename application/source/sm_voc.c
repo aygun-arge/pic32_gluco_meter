@@ -2,13 +2,17 @@
 
 /*=========================================================  INCLUDE FILES  ==*/
 
+#include <math.h>
+
 #include "eds/epa.h"
 #include "app_timer.h"
-#include "voc_freq.h"
+#include "voc.h"
 
 #include "sm_voc.h"
 
 /*=========================================================  LOCAL MACRO's  ==*/
+
+#define CONFIG_D_RCURR_PERCENT                  2.0
 
 #define VOC_TABLE(entry)                                                        \
     entry(state_init,                TOP)                                       
@@ -28,6 +32,8 @@ enum voc_local_evt
 struct wspace
 {
     struct appTimer     periodic;
+    struct voc_meas     prev;
+    struct voc_meas     curr;
 };
 
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
@@ -53,14 +59,7 @@ const struct esSmDefine         g_voc_sm = ES_SM_DEFINE(
     state_init);
 struct esEpa *                  g_voc;
 
-float                           g_voc_voltage = 0.0f;
-float                           g_voc_current = 0.0f;
-float                           g_voc_temperature = 0.0f;
-float                           g_voc_resistance  = 0.0f;
-float                           g_voc_ro;
-float                           g_voc_rmin;
-float                           g_voc_rmax;
-bool                            g_is_voc_stabilised;
+bool                            g_voc_is_stabilised;
 
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
@@ -69,19 +68,35 @@ static esAction state_init(void * space, const esEvent * event) {
 
     switch (event->id) {
         case ES_INIT: {
-
             appTimerInit(&wspace->periodic);
-            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200), EVENT_REFRESH_STATE);
+            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(1000), EVENT_REFRESH_STATE);
+            voc_env_update();
+            voc_meas_get_current(&wspace->curr);
+            voc_meas_get_current(&wspace->prev);
 
             return (ES_STATE_HANDLED());
         }
         case EVENT_REFRESH_STATE: {
-            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200), EVENT_REFRESH_STATE);
+            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(1000), EVENT_REFRESH_STATE);
+            voc_env_update();
+            voc_meas_get_current(&wspace->curr);
 
-            g_voc_voltage = 0.0;
-            g_voc_current = 0.0;
-            g_voc_temperature = 0.0;
-            g_voc_resistance  = 0.0;
+            if (wspace->curr.rcurr > 0.001) {
+                float           d_rcurr;
+                float           rcurr_rel;
+
+                d_rcurr = fabsf(wspace->curr.rcurr - wspace->prev.rcurr);
+                rcurr_rel = d_rcurr / wspace->curr.rcurr;
+
+                if (rcurr_rel < (CONFIG_D_RCURR_PERCENT / 100.0)) {
+                    g_voc_is_stabilised = true;
+                } else {
+                    g_voc_is_stabilised = false;
+                }
+            } else {
+                g_voc_is_stabilised = false;
+            }
+            wspace->prev = wspace->curr;
 
             return (ES_STATE_HANDLED());
         }

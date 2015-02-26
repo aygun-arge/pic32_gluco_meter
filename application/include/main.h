@@ -16,15 +16,6 @@ extern "C" {
 
 extern struct i2c_bus g_i2c_bus;
 
-struct device_state
-{
-    bool                is_sensor_enabled;
-    int                 heater_voltage;
-    int                 blowing_time;
-};
-
-extern struct device_state g_device_state;
-
 #ifdef	__cplusplus
 }
 #endif

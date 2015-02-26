@@ -48,8 +48,8 @@ typedef struct {
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*===================================================  FUNCTION PROTOTYPES  ==*/
 void drawMeasurePage(void);
-void drawMeasureResults(measurePageData_T * result);
-void drawPreviousResults(measurePageData_T * result);
+void draw_meas_curr_results(measurePageData_T * result);
+void draw_meas_prev_results(measurePageData_T * result);
 /*--------------------------------------------------------  C++ extern end  --*/
 #ifdef __cplusplus
 }

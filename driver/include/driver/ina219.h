@@ -19,12 +19,27 @@ extern "C" {
 struct ina219_handle
 {
     struct i2c_slave    comm;
+    float               bus_voltage;
+    float               shunt_voltage;
+    float               shunt_res;
+    float               current_lsb;
 };
 
-esError ina219_init_driver(struct ina219_handle * handle, struct i2c_bus * bus, uint8_t id);
+struct ina219_config
+{
+    float               bus_voltage;
+    float               shunt_current;
+    float               shunt_res;
+};
+
+esError ina219_init_driver(
+    struct ina219_handle * handle,
+    struct i2c_bus *    bus,
+    uint8_t             id,
+    const struct ina219_config * config);
 void ina219_term_driver(struct ina219_handle * handle);
-esError ina219_get_shunt_voltage(struct ina219_handle * handle, int32_t * value);
-esError ina219_get_bus_voltage(struct ina219_handle * handle, int32_t * value);
+esError ina219_get_current(struct ina219_handle * handle, float * value);
+esError ina219_get_voltage(struct ina219_handle * handle, float * value);
 
 #ifdef	__cplusplus
 }

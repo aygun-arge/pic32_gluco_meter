@@ -9,6 +9,7 @@
 /*=========================================================  INCLUDE FILES  ==*/
 
 #include <xc.h>
+#include <stddef.h>
 
 #include "driver/gpio.h"
 

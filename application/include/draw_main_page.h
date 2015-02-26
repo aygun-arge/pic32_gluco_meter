@@ -40,10 +40,10 @@ extern "C" {
 #endif
   
 /*============================================================  DATA TYPES  ==*/
-typedef enum {
-	SENSOR_BUTTON = 0,
-	START_STOP_BUTTON,
-	REC_BUTTON
+typedef enum main_page_btn_id {
+	BTN_SENSOR_ID = 0,
+	BTN_SS_ID,
+	BTN_REC_ID
 } mainPageButtons_T;
 
 typedef enum {
@@ -68,14 +68,14 @@ typedef struct {
 } resistanceValues_T;
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*===================================================  FUNCTION PROTOTYPES  ==*/
-void setMainPageButtonColor(mainPageButtons_T button, uint16_t color);
+void main_page_btn_set_color(mainPageButtons_T button, uint16_t color);
 void drawMainPage(void);
 void drawMainPageMessages(mainPageMessages_T message);
 mainPageMessages_T getMainPageMessage(void);
 void drawMainPageResistanceString(void);
 void drawMainPageResistanceValues(resistanceValues_T * values);
 void drawMainPageParametars(mainPageParameters_T * params);
-void redrawMainPageButton(mainPageButtons_T button);
+void main_page_btn_redraw(mainPageButtons_T button);
 /*--------------------------------------------------------  C++ extern end  --*/
 #ifdef __cplusplus
 }

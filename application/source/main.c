@@ -5,6 +5,8 @@
  * Created on 22 October 2014, 21:35
  */
 
+/*=========================================================  INCLUDE FILES  ==*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -19,8 +21,7 @@
 #include "driver/systick.h"
 #include "arch/intr_config.h"
 #include "main.h"
-#include "voc_freq.h"
-#include "GenericTypeDefs.h"
+#include "voc.h"
 
 #include "vtimer/vtimer.h"
 #include "mem/static.h"
@@ -28,55 +29,52 @@
 #include "eds/epa.h"
 #include "sm_gui.h"
 #include "sm_voc.h"
-#include "driver/ad5242.h"
 
 #include "USB/usb.h"
 #include "USB/usb_host_msd.h"
-#include "USB/usb_host_msd_scsi.h"
-#include "MDD/FSIO.h"
 
-struct i2c_bus                  g_i2c_bus;
-struct device_state             g_device_state =
-{
-    .is_sensor_enabled  = false,
-    .heater_voltage     = 100,
-    .blowing_time       = 300
-};
+/*=========================================================  LOCAL MACRO's  ==*/
+/*======================================================  LOCAL DATA TYPES  ==*/
+/*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
 
+static void board_init(void);
+static void idle_hook(void);
 
+/*=======================================================  LOCAL VARIABLES  ==*/
+
+static const ES_MODULE_INFO_CREATE("main", "Main module", "Nenad Radulovic");
 static uint8_t                  g_static_storage[1024];
 static uint8_t                  g_heap_storage[4096];
 static esMem                    g_static_mem;
 static esMem                    g_heap_mem;
 
+/*======================================================  GLOBAL VARIABLES  ==*/
 
-static void board_init_intr(void)
-{
-    initIntrDriver();
-}
+struct i2c_bus                  g_i2c_bus;
 
-static void board_init_clock(void)
-{
-    initClockDriver();
-    initSysTickDriver();
-}
+/*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
-static void board_init_gpio(void)
+static void board_init(void)
 {
-    initGpioDriver();
-}
-
-static void board_init_i2c_bus(void)
-{
-    struct i2c_bus_config i2c_bus_config =
+    static const struct i2c_bus_config i2c_bus_config =
     {
         &g_I2C5,
         I2C_BUS_ADDRESS_7BIT,
         100000,
         CONFIG_INTR_MAX_ISR_PRIO
     };
+
+    /* Turn off FUCKING JTAG. */
+    DDPCONbits.JTAGEN = 0;
+
+    initIntrDriver();
+    initClockDriver();
+    initSysTickDriver();
+    initGpioDriver();
     i2c_driver_init();
     i2c_bus_open(&g_i2c_bus, &i2c_bus_config);
+    rtc_init_driver(&g_i2c_bus);
+    USBInitialize(0);
 }
 
 static void idle_hook(void)
@@ -84,23 +82,16 @@ static void idle_hook(void)
     USBTasks();
 }
 
+/*===================================  GLOBAL PRIVATE FUNCTION DEFINITIONS  ==*/
+/*====================================  GLOBAL PUBLIC FUNCTION DEFINITIONS  ==*/
+
 int main(int argc, char** argv)
 {
     (void)argc;
     (void)argv;
 
-    DDPCONbits.JTAGEN = 0;
-
-    board_init_intr();
-    board_init_clock();
-    board_init_gpio();
-    board_init_i2c_bus();
-
-    USBInitialize(0);
-
-    voc_freq_init();
-    voc_voltage_init();
-
+    board_init();
+    ES_ENSURE(voc_init());
 
     /*-- eSolid --------------------------------------------------------------*/
     esEdsInit();
@@ -205,3 +196,8 @@ BOOL USB_ApplicationEventHandler( BYTE address, USB_EVENT event, void *data, DWO
 
     return FALSE;
 }
+
+/*================================*//** @cond *//*==  CONFIGURATION ERRORS  ==*/
+/** @endcond *//** @} *//******************************************************
+ * END of main.c
+ ******************************************************************************/

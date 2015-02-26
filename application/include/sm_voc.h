@@ -5,8 +5,8 @@
  * Created on 21 February 2015, 15:50
  */
 
-#ifndef SM_VOC_STATE_H
-#define	SM_VOC_STATE_H
+#ifndef SM_VOC_H
+#define	SM_VOC_H
 
 #include <stdbool.h>
 
@@ -22,19 +22,11 @@ extern const struct esEpaDefine g_voc_epa;
 extern const struct esSmDefine  g_voc_sm;
 extern struct esEpa *           g_voc;
 
-extern float                    g_voc_voltage;
-extern float                    g_voc_current;
-extern float                    g_voc_temperature;
-extern float                    g_voc_resistance;
-extern float                    g_voc_ro;
-extern float                    g_voc_rmin;
-extern float                    g_voc_rmax;
-extern bool                     g_is_voc_stabilised;
-
+extern bool                     g_voc_is_stabilised;
 
 #ifdef	__cplusplus
 }
 #endif
 
-#endif	/* SM_VOC_STATE_H */
+#endif	/* SM_VOC_H */
 

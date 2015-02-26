@@ -40,11 +40,12 @@
 /*======================================================  LOCAL DATA TYPES  ==*/
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
 /*=======================================================  LOCAL VARIABLES  ==*/
-static bool sensorBtnPressed = false;
-static bool ssBtnPressed = false;
-static bool recBtnPressed = false;
+static bool btn_sensor_is_pressed   = false;
+static bool btn_ss_is_pressed       = false;
+static bool btn_rec_is_pressed      = false;
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
+
 static void heaterVoltageCtx(editPageCtxElement_T element) {
 	startMainPage();
 	if (element == EDIT_BUTTON_OK) {
@@ -66,24 +67,53 @@ static void blowingTimeCtx(editPageCtxElement_T element) {
 
 /*_____________________________________________________________________________*/
 static inline void setButtonsColor(void) {
-	if (sensorBtnPressed == true) {
-		setMainPageButtonColor(SENSOR_BUTTON, COLOR_GREEN);
+	if (btn_sensor_is_pressed) {
+		main_page_btn_set_color(BTN_SENSOR_ID, COLOR_GREEN);
 	} else {
-		setMainPageButtonColor(SENSOR_BUTTON, COLOR_ORANGE);
+		main_page_btn_set_color(BTN_SENSOR_ID, COLOR_ORANGE);
 	}
-	if (ssBtnPressed == true) {
-		setMainPageButtonColor(START_STOP_BUTTON, COLOR_GREEN);
+	if (btn_ss_is_pressed) {
+		main_page_btn_set_color(BTN_SS_ID, COLOR_GREEN);
 	} else {
-		setMainPageButtonColor(START_STOP_BUTTON, COLOR_ORANGE);
+		main_page_btn_set_color(BTN_SS_ID, COLOR_ORANGE);
 	}
-	if (recBtnPressed == true) {
-		setMainPageButtonColor(REC_BUTTON, COLOR_GREEN);
+	if (btn_rec_is_pressed) {
+		main_page_btn_set_color(BTN_REC_ID, COLOR_GREEN);
 	} else {
-		setMainPageButtonColor(REC_BUTTON, COLOR_ORANGE);
+		main_page_btn_set_color(BTN_REC_ID, COLOR_ORANGE);
 	}
 }
 /*===================================  GLOBAL PRIVATE FUNCTION DEFINITIONS  ==*/
 /*====================================  GLOBAL PUBLIC FUNCTION DEFINITIONS  ==*/
+
+void main_page_btn_set_is_pressed(enum main_page_btn_id btn_id, bool is_pressed)
+{
+    switch (btn_id) {
+        case BTN_SENSOR_ID: {
+            btn_sensor_is_pressed = is_pressed;
+            break;
+        }
+        case BTN_SS_ID: {
+            btn_ss_is_pressed = is_pressed;
+            break;
+        }
+        case BTN_REC_ID: {
+            btn_rec_is_pressed = is_pressed;
+            break;
+        }
+        default: {
+            return;
+        }
+    }
+    
+    if (is_pressed) {
+		main_page_btn_set_color(btn_id, COLOR_GREEN);
+	} else {
+		main_page_btn_set_color(btn_id, COLOR_ORANGE);
+	}
+    main_page_btn_redraw(btn_id);
+}
+
 void startMainPage(void) {
 	guiSetUpdater(updateMainPage);
 	setButtonsColor();
@@ -95,45 +125,45 @@ void startMainPage(void) {
 void updateMainPage(tsTouchData_t * tsData) {
 	if (tsData->xlcd > 20 && tsData->xlcd < 134) {								/* sensor ON/OFF button */
 		if (tsData->ylcd > 20 && tsData->ylcd < 60) {
-			if (sensorBtnPressed == false) {
-				sensorBtnPressed = true;
+			if (btn_sensor_is_pressed == false) {
+				btn_sensor_is_pressed = true;
 		    	guiSetUpdater(updateEditPage);
 		    	startEditPage(heaterVoltageCtx, SET_HEATER_VOLTAGE);
 		    	guiReact(GUI_SENSOR_PRESSED);
 			} else {
-				sensorBtnPressed = false;
+				btn_sensor_is_pressed = false;
 				setButtonsColor();
-				redrawMainPageButton(SENSOR_BUTTON);
+				main_page_btn_redraw(BTN_SENSOR_ID);
 				guiReact(GUI_SENSOR_RELEASED);
 			}
 		}
 	}
 	if (tsData->xlcd > 20 && tsData->xlcd < 134) {								/* start/stop button */
 		if (tsData->ylcd > 70 && tsData->ylcd < 110) {
-			if (ssBtnPressed == false) {
-				ssBtnPressed = true;
+			if (btn_ss_is_pressed == false) {
+				btn_ss_is_pressed = true;
 		    	guiSetUpdater(updateEditPage);
 		    	startEditPage(blowingTimeCtx, INPUT_BLOWING_TIME);
 		    	guiReact(GUI_START_STOP_PRESSED);
 			} else {
-				ssBtnPressed = false;
+				btn_ss_is_pressed = false;
 				setButtonsColor();
-				redrawMainPageButton(START_STOP_BUTTON);
+				main_page_btn_redraw(BTN_SS_ID);
 				guiReact(GUI_START_STOP_RELEASED);
 			}
 		}
 	}
 	if (tsData->xlcd > 160 && tsData->xlcd < 220) {								/* rec button */
 		if (tsData->ylcd > 20 && tsData->ylcd < 88) {
-			if (recBtnPressed == false) {
-				recBtnPressed = true;
+			if (btn_rec_is_pressed == false) {
+				btn_rec_is_pressed = true;
 				guiReact(GUI_REC_PRESSED);
 			} else {
-				recBtnPressed = false;
+				btn_rec_is_pressed = false;
 				guiReact(GUI_REC_RELEASED);
 			}
 			setButtonsColor();
-			redrawMainPageButton(REC_BUTTON);
+			main_page_btn_redraw(BTN_REC_ID);
 		}
 	}
 }

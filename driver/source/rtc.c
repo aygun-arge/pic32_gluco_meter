@@ -13,6 +13,8 @@
 #define CONFIG_DEFAULT_MINUTE           0
 #define CONFIG_DEFAULT_SECOND           0
 
+#define CONFIG_USE_EXT_INT              0
+
 #define REG_CONTROL_1                   0x00
 #define REG_CONTROL_INT                 0x01
 #define REG_CONTROL_INT_FLAG            0x02
@@ -263,7 +265,7 @@ void rtc_init_driver(struct i2c_bus * i2c_bus) {
     if (rtc_write_array(REG_ALARM_SECONDS, (const uint8_t *)&regs, sizeof(regs)) != ES_ERROR_NONE) {
         goto FAILURE;
     }
-    
+
     if (rtc_write(REG_CONTROL_INT, 0) != ES_ERROR_NONE) {
         goto FAILURE;
     }
@@ -272,7 +274,7 @@ void rtc_init_driver(struct i2c_bus * i2c_bus) {
     if (rtc_write(REG_CONTROL_1, reg) != ES_ERROR_NONE) {
         goto FAILURE;
     }
-
+#if (CONFIG_USE_EXT_INT == 1)
     if (rtc_write(REG_TIMER_LOW, 32) != ES_ERROR_NONE) {
         goto FAILURE;
     }
@@ -280,25 +282,29 @@ void rtc_init_driver(struct i2c_bus * i2c_bus) {
     if (rtc_write(REG_TIMER_HIGH, 0) != ES_ERROR_NONE) {
         goto FAILURE;
     }
+
     reg |= CONTROL_1_TAR;
 
     if (rtc_write(REG_CONTROL_1, reg) != ES_ERROR_NONE) {
         goto FAILURE;
     }
+
     reg |= CONTROL_1_TE;
 
     if (rtc_write(REG_CONTROL_1, reg) != ES_ERROR_NONE) {
         goto FAILURE;
     }
-
+#endif
 
     if (rtc_write(REG_CONTROL_INT_FLAG, 0) != ES_ERROR_NONE) {
         goto FAILURE;
     }
 
+#if (CONFIG_USE_EXT_INT)
     if (rtc_write(REG_CONTROL_INT, CONTROL_INT_TIE) != ES_ERROR_NONE) {
         goto FAILURE;
     }
+#endif
 
     return;
 FAILURE:
@@ -322,27 +328,39 @@ bool isRtcActive(void) {
 }
 
 esError rtc_set_time_i(const struct rtc_time * time) {
-    esError             error;
+    esError             err;
 
-    error = rtc_put_time(time);
-
-    if (error == ES_ERROR_NONE) {
+    err = rtc_put_time(time);
+    
+#if (CONFIG_USE_EXT_INT == 1)
+    if (err == ES_ERROR_NONE) {
         g_current_time = *time;
     }
+#endif
 
-    return (error);
+    return (err);
 }
 
 esError rtc_get_time_i(struct rtc_time * time)
 {
-    *time = g_current_time;
+    esError                     err;
 
-    return (ES_ERROR_NONE);
+#if (CONFIG_USE_EXT_INT == 1)
+    *time = g_current_time;
+#else
+    err = rtc_fetch_time(time);
+#endif
+
+    return (err);
 }
 
 void rtc_tick_i(void)
 {
+#if (CONFIG_USE_EXT_INT == 1)
     rtc_write(REG_CONTROL_INT_FLAG, 0);
     rtc_fetch_time(&g_current_time);
+#endif
 }
+
+
 

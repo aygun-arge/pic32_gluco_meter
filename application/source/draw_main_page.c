@@ -46,16 +46,16 @@ static mainPageMessages_T gMsg = STABILISING_SENSOR;
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 /*===================================  GLOBAL PRIVATE FUNCTION DEFINITIONS  ==*/
 /*====================================  GLOBAL PUBLIC FUNCTION DEFINITIONS  ==*/
-void setMainPageButtonColor(mainPageButtons_T button, uint16_t color) {
+void main_page_btn_set_color(mainPageButtons_T button, uint16_t color) {
 	buttonColors[button] = color;
 }
 
 /*_____________________________________________________________________________*/
 void drawMainPage(void) {
 	drawFill(COLOR_BLUE);
-	drawButton(20, 20, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[SENSOR_BUTTON], COLOR_BLACK, "Sensor ON/OFF");
-	drawButton(20, 70, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[START_STOP_BUTTON], COLOR_BLACK, "Start/Stop");
-	drawButton(160, 20, 60, 88, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[REC_BUTTON], COLOR_BLACK, "REC");
+	drawButton(20, 20, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[BTN_SENSOR_ID], COLOR_BLACK, "Sensor ON/OFF");
+	drawButton(20, 70, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[BTN_SS_ID], COLOR_BLACK, "Start/Stop");
+	drawButton(160, 20, 60, 88, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[BTN_REC_ID], COLOR_BLACK, "REC");
 	drawString(13, 120, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Sensor resistance (Meg) :                  ");
 	drawString(13, 140, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Heater       voltage [V] :                         ");
 	drawString(10, 160, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "             current [mA] :                        ");
@@ -137,18 +137,18 @@ void drawMainPageParametars(mainPageParameters_T * params) {
 }
 
 /*_____________________________________________________________________________*/
-void redrawMainPageButton(mainPageButtons_T button) {
+void main_page_btn_redraw(mainPageButtons_T button) {
 	switch (button) {
-		case SENSOR_BUTTON : {
-			drawButton(20, 20, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[SENSOR_BUTTON], COLOR_BLACK, "Sensor ON/OFF");
+		case BTN_SENSOR_ID : {
+			drawButton(20, 20, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[BTN_SENSOR_ID], COLOR_BLACK, "Sensor ON/OFF");
 			break;
 		}
-		case START_STOP_BUTTON : {
-			drawButton(20, 70, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[START_STOP_BUTTON], COLOR_BLACK, "Start/Stop");
+		case BTN_SS_ID : {
+			drawButton(20, 70, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[BTN_SS_ID], COLOR_BLACK, "Start/Stop");
 			break;
 		}
-		case REC_BUTTON : {
-			drawButton(160, 20, 60, 88, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[REC_BUTTON], COLOR_BLACK, "REC");
+		case BTN_REC_ID : {
+			drawButton(160, 20, 60, 88, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[BTN_REC_ID], COLOR_BLACK, "REC");
 			break;
 		}
 		default : {

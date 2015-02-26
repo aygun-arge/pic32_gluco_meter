@@ -34,6 +34,7 @@
 /*=========================================================  INCLUDE FILES  ==*/
 
 #include "driver/touchscreen.h"
+#include "draw_main_page.h"
 
 /*===============================================================  MACRO's  ==*/
 /*------------------------------------------------------  C++ extern begin  --*/
@@ -44,6 +45,7 @@ extern "C" {
 /*============================================================  DATA TYPES  ==*/
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*===================================================  FUNCTION PROTOTYPES  ==*/
+void main_page_btn_set_is_pressed(enum main_page_btn_id button, bool is_pressed);
 void startMainPage(void);
 void updateMainPage(tsTouchData_t * tsData);
 /*--------------------------------------------------------  C++ extern end  --*/

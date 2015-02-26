@@ -62,7 +62,7 @@ void drawMeasurePage(void) {
 }
 
 /*_____________________________________________________________________________*/
-void drawMeasureResults(measurePageData_T * result) {
+void draw_meas_curr_results(measurePageData_T * result) {
 	char buff[6];
 
 	snprintf(buff, sizeof(buff), "%3.2f", (double)result->ro);
@@ -76,7 +76,7 @@ void drawMeasureResults(measurePageData_T * result) {
 }
 
 /*_____________________________________________________________________________*/
-void drawPreviousResults(measurePageData_T * result) {
+void draw_meas_prev_results(measurePageData_T * result) {
 	char buff[6];
 
 	snprintf(buff, sizeof(buff), "%3.2f", (double)result->ro);

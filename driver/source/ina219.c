@@ -17,20 +17,27 @@ static const struct i2c_slave_config g_ina219_i2c_config =
     INA219_ID
 };
 
-esError ina219_init_driver(struct ina219_handle * handle, struct i2c_bus * bus, uint8_t id)
+esError ina219_init_driver(
+    struct ina219_handle * handle,
+    struct i2c_bus *    bus,
+    uint8_t             id,
+    const struct ina219_config * config)
 {
-    uint8_t             dummy_array[2];
+    float                       max_possible_i;
+    uint16_t                    cal;
+    uint8_t                     buff[2];
 
     i2c_slave_open(&handle->comm, &g_ina219_i2c_config, bus, id);
+    max_possible_i = 0.32 / config->shunt_res;
+    handle->current_lsb = config->shunt_current / 32768;
+    cal = 0.04096 / (handle->current_lsb * config->shunt_res);
+    buff[0] = cal >> 8u;
+    buff[1] = cal & 0xffu;
 
-    if (i2c_slave_read(&handle->comm, INA219_BUS, dummy_array, sizeof(dummy_array)) == false) {
-        i2c_slave_close(&handle->comm);
-
+    if (!i2c_slave_write(&handle->comm, INA219_CALIBRATION, buff, sizeof(buff))) {
         return (ES_ERROR_DEVICE_FAIL);
-    } else {
-
-        return (ES_ERROR_NONE);
     }
+    return (ES_ERROR_NONE);
 }
 
 void ina219_term_driver(struct ina219_handle * handle)
@@ -38,12 +45,14 @@ void ina219_term_driver(struct ina219_handle * handle)
     i2c_slave_close(&handle->comm);
 }
 
-esError ina219_get_shunt_voltage(struct ina219_handle * handle, int32_t * value)
+esError ina219_get_current(struct ina219_handle * handle, float * value)
 {
-    uint8_t             array[2];
+    uint8_t             buff[2];
+    uint16_t            raw_value;
 
-    if (i2c_slave_read(&handle->comm, INA219_SHUNT, array, sizeof(array)) == true) {
-        *value = ((uint32_t)array[0] << 8u) | array[1];
+    if (i2c_slave_read(&handle->comm, INA219_CURRENT, buff, sizeof(buff)) == true) {
+        raw_value = ((uint16_t)buff[0] << 8u) | (uint16_t)buff[1];
+        *value = (float)raw_value * handle->current_lsb;
 
         return (ES_ERROR_NONE);
     } else {
@@ -52,12 +61,14 @@ esError ina219_get_shunt_voltage(struct ina219_handle * handle, int32_t * value)
     }
 }
 
-esError ina219_get_bus_voltage(struct ina219_handle * handle, int32_t * value)
+esError ina219_get_voltage(struct ina219_handle * handle, float * value)
 {
-    uint8_t             array[2];
+    uint16_t            buff[2];
+    uint16_t            raw_value;
 
-    if (i2c_slave_read(&handle->comm, INA219_BUS, array, sizeof(array)) == true) {
-        *value = ((uint32_t)array[0] << 8u) | array[1];
+    if (i2c_slave_read(&handle->comm, INA219_BUS, buff, sizeof(buff)) == true) {
+        raw_value = ((uint16_t)buff[0] << 8u) | (uint16_t)buff[1];
+        *value = (float)raw_value * 0.004;
 
         return (ES_ERROR_NONE);
     } else {
