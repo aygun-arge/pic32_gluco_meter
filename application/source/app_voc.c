@@ -4,6 +4,7 @@
 #include <xc.h>
 #include <stdbool.h>
 
+#include "HardwareProfile.h"
 #include "TimeDelay.h"
 
 #include "arch/intr.h"
@@ -308,6 +309,9 @@ esError voc_env_voltage_set(int voltage)
 {
     esError                     err;
 
+    if (voltage > 600) {
+        voltage = 600;
+    }
     voltage *= 100;
     err = ad5282_set_pot1(&g_ad5282, voltage / CONFIG_VOC_VOLTAGE_COEF_100);
 
@@ -325,7 +329,7 @@ void voc_meas_init(void)
     Delay10us(10);
     MEAS_TMR_A_CON  = TxCON_TCKPS(7);
     MEAS_TMR_A      = 0;
-    MEAS_TMR_A_PR   = 80000000u / (256u * MEAS_PERIOD_HZ);
+    MEAS_TMR_A_PR   = GetPeripheralClock() / (256u * MEAS_PERIOD_HZ);
     MEAS_TMR_IPC   &= ~(0x1fu << MEAS_TMR_PRIO_BIT);
     MEAS_TMR_IPC   |=  (6u << (MEAS_TMR_PRIO_BIT + 2u));
     MEAS_TMR_IFS   &= ~(0x1u << MEAS_TMR_ISR_BIT);
