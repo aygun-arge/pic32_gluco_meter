@@ -24,6 +24,13 @@ extern "C" {
 #endif
 
 /*============================================================  DATA TYPES  ==*/
+
+enum gui_events
+{
+    EVENT_SENSOR_IS_STABLE = 1000,
+    EVENT_SENSOR_IS_UNSTABLE
+};
+
 /*======================================================  GLOBAL VARIABLES  ==*/
 
 extern const struct esEpaDefine g_gui_epa;

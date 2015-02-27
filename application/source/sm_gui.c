@@ -11,8 +11,9 @@
 #include "dejavusansbold9.h"
 #include "sm_voc.h"
 
-#include "exe_main_page.h"
-#include "exe_edit_page.h"
+#include "draw_main_page.h"
+#include "draw_edit_page.h"
+#include "draw_measure_page.h"
 #include "MDD/FSIO.h"
 #include "main.h"
 
@@ -21,6 +22,7 @@
 #define GUI_TABLE(entry)                                                        \
     entry(state_init,                TOP)                                       \
     entry(state_main,                TOP)                                       \
+    entry(state_set_voltage,         TOP)                                       \
     entry(state_start_meas,          TOP)                                       \
     entry(state_meas,                TOP)                                       \
     entry(state_stop_meas,           TOP)                                       \
@@ -36,10 +38,15 @@ enum gui_state_id
 enum gui_local_evt
 {
     EVENT_REFRESH_LCD = ES_EVENT_LOCAL_ID,
-    EVENT_START_MEAS,
-    EVENT_STOP_MEAS,
-    EVENT_OVERVIEW_MEAS,
-    EVENT_PREP_MEAS_TIMOUT
+    EVENT_TIMEOUT_PREP_MEAS,
+    EVENT_GUI_SENSOR_ACTIVE,
+    EVENT_GUI_SENSOR_INACTIVE,
+    EVENT_GUI_SS_ACTIVE,
+    EVENT_GUI_SS_INACTIVE,
+    EVENT_GUI_REC_ACTIVE,
+    EVENT_GUI_REC_INACTIVE,
+    EVENT_GUI_BTN_BACK,
+    EVENT_GUI_BTN_OK
 };
 
 struct wspace
@@ -50,6 +57,7 @@ struct wspace
     float               prev_r0;
     struct voc_record   curr;
     struct voc_record   prev;
+    struct main_page_ctx main_page_ctx;
 };
 
 struct device_state
@@ -61,6 +69,7 @@ struct device_state
 
 static esAction state_init              (void *, const esEvent *);
 static esAction state_main              (void *, const esEvent *);
+static esAction state_set_voltage       (void *, const esEvent *);
 static esAction state_start_meas        (void *, const esEvent *);
 static esAction state_meas              (void *, const esEvent *);
 static esAction state_stop_meas         (void *, const esEvent *);
@@ -97,10 +106,10 @@ static esAction state_init(void * space, const esEvent * event) {
     switch (event->id) {
         case ES_INIT: {
             memset(wspace, 0, sizeof(*wspace));
-            appTimerInit(&wspace->periodic);
-            appTimerInit(&wspace->timeout);
-            guiInit();
-            guiStart();
+            app_timer_init(&wspace->periodic);
+            app_timer_init(&wspace->timeout);
+            gui_init();
+            gui_start();
 
             return (ES_STATE_TRANSITION(state_main));
         }
@@ -116,45 +125,89 @@ static esAction state_main(void * space, const esEvent * event) {
 
     switch (event->id) {
         case ES_ENTRY: {
-            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(400), EVENT_REFRESH_LCD);
-            startMainPage();
+            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(400), EVENT_REFRESH_LCD);
+            main_page_draw(&wspace->main_page_ctx);
+
+            if (g_voc_is_stabilised) {
+                main_page_msg(MSG_STABLE);
+            } else {
+                main_page_msg(MSG_UNSTABLE);
+            }
 
             return (ES_STATE_HANDLED());
         }
         case ES_EXIT: {
-            appTimerCancel(&wspace->periodic);
+            app_timer_cancel(&wspace->periodic);
             
             return (ES_STATE_HANDLED());
         }
         case EVENT_REFRESH_LCD: {
-            mainPageParameters_T    params;
+            struct main_page_overview overview;
             struct voc_environment  env;
             struct voc_meas         meas;
 
-            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200), EVENT_REFRESH_LCD);
             voc_env_get_current(&env);
             voc_meas_get_current(&meas);
-            params.resistance  = meas.rcurr;
-            params.current     = env.current;
-            params.voltage     = env.voltage;
-            params.temperature = env.temperature;
-            drawMainPageParametars(&params);
-
-            if (g_voc_is_stabilised) {
-                drawMainPageMessages(SENSOR_READY);
-            } else {
-                drawMainPageMessages(STABILISING_SENSOR);
-            }
-            guiExe();
+            overview.resistance  = meas.rcurr;
+            overview.current     = env.current;
+            overview.voltage     = env.voltage;
+            overview.temperature = env.temperature;
+            main_page_overview(&overview);
+            gui_exe();
 
             return (ES_STATE_HANDLED());
         }
-        case EVENT_START_MEAS: {
-            
-            return (ES_STATE_TRANSITION(state_start_meas));
+        case EVENT_SENSOR_IS_STABLE: {
+            main_page_msg(MSG_STABLE);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_SENSOR_IS_UNSTABLE: {
+            main_page_msg(MSG_UNSTABLE);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_SENSOR_ACTIVE: {
+
+            return (ES_STATE_TRANSITION(state_set_voltage));
         }
         default: {
 
+            return (ES_STATE_IGNORED());
+        }
+    }
+}
+static esAction state_set_voltage(void * space, const esEvent * event) {
+    struct wspace * wspace = space;
+
+    switch (event->id) {
+        case ES_ENTRY: {
+            edit_page_draw(SET_HEATER_VOLTAGE);
+            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(100u), EVENT_REFRESH_LCD);
+
+            return (ES_STATE_HANDLED());
+        }
+        case ES_EXIT: {
+            app_timer_cancel(&wspace->periodic);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_REFRESH_LCD: {
+            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(100u), EVENT_REFRESH_LCD);
+            gui_exe();
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_BTN_BACK: {
+            return (ES_STATE_TRANSITION(state_main));
+        }
+        case EVENT_GUI_BTN_OK: {
+            voc_env_voltage_set(edit_page_get_value());
+
+            return (ES_STATE_TRANSITION(state_start_meas));
+        }
+        default: {
             return (ES_STATE_IGNORED());
         }
     }
@@ -167,8 +220,9 @@ static esAction state_start_meas(void * space, const esEvent * event) {
         case ES_ENTRY: {
             struct voc_meas         meas;
 
-            drawMainPageMessages(BE_READY);
-            appTimerStart(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(3000), EVENT_PREP_MEAS_TIMOUT);
+            main_page_draw(&wspace->main_page_ctx);
+            main_page_msg(MSG_BLOW_PREPARE);
+            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(3000), EVENT_TIMEOUT_PREP_MEAS);
             voc_meas_get_current(&meas);
             wspace->curr_r0 = meas.rcurr;
             voc_rec_start();
@@ -176,13 +230,10 @@ static esAction state_start_meas(void * space, const esEvent * event) {
             return (ES_STATE_HANDLED());
         }
         case ES_EXIT: {
-            appTimerCancel(&wspace->timeout);
+            app_timer_cancel(&wspace->timeout);
             return (ES_STATE_HANDLED());
         }
-        case EVENT_STOP_MEAS: {
-            return (ES_STATE_TRANSITION(state_main));
-        }
-        case EVENT_PREP_MEAS_TIMOUT: {
+        case EVENT_TIMEOUT_PREP_MEAS: {
             return (ES_STATE_TRANSITION(state_meas));
         }
         default: {
@@ -196,46 +247,44 @@ static esAction state_meas(void * space, const esEvent * event) {
 
     switch (event->id) {
         case ES_ENTRY: {
-            drawMainPageMessages(START_BLOWING);
-            appTimerStart(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(g_device_state.blowing_time * 10u), EVENT_PREP_MEAS_TIMOUT);
-            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
+            main_page_msg(MSG_BLOW_START);
+            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(g_device_state.blowing_time * 10u), EVENT_TIMEOUT_PREP_MEAS);
+            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
 
             return (ES_STATE_HANDLED());
         }
         case ES_EXIT: {
-            appTimerCancel(&wspace->periodic);
-            appTimerCancel(&wspace->timeout);
+            app_timer_cancel(&wspace->periodic);
+            app_timer_cancel(&wspace->timeout);
 
             return (ES_STATE_HANDLED());
         }
         case EVENT_REFRESH_LCD: {
-            mainPageParameters_T    params;
-            resistanceValues_T      res;
-            struct voc_environment  env;
-            struct voc_meas         meas;
+            struct main_page_overview   overview;
+            struct main_page_res        res;
+            struct voc_environment      env;
+            struct voc_meas             meas;
 
-            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200), EVENT_REFRESH_LCD);
             voc_env_get_current(&env);
             voc_meas_get_current(&meas);
             voc_rec_get_current(&wspace->curr);
-            params.resistance  = meas.rcurr;
-            params.current     = env.current;
-            params.voltage     = env.voltage;
-            params.temperature = env.temperature;
-            drawMainPageParametars(&params);
-            res.ro      = wspace->curr_r0;
+            overview.resistance  = meas.rcurr;
+            overview.current     = env.current;
+            overview.voltage     = env.voltage;
+            overview.temperature = env.temperature;
+            main_page_overview(&overview);
+            res.r0      = wspace->curr_r0;
             res.rmin    = wspace->curr.rmin;
             res.rmax    = wspace->curr.rmax;
-            drawMainPageResistanceValues(&res);
+            main_page_res(&res);
+            gui_exe();
             
-            guiExe();
             return (ES_STATE_HANDLED());
         }
-        case EVENT_STOP_MEAS: {
-            return (ES_STATE_TRANSITION(state_meas_overview));
-        }
-        case EVENT_PREP_MEAS_TIMOUT: {
-            main_page_btn_set_is_pressed(BTN_SS_ID, false);
+        case EVENT_TIMEOUT_PREP_MEAS: {
+            wspace->main_page_ctx.is_switch_ss_on = false;
+            
             return (ES_STATE_TRANSITION(state_stop_meas));
         }
         default: {
@@ -249,43 +298,39 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
 
     switch (event->id) {
         case ES_ENTRY: {
-            drawMainPageMessages(STOP_BLOWING);
-            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
-            appTimerStart(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(60000u), EVENT_PREP_MEAS_TIMOUT);
+            main_page_msg(MSG_BLOW_STOP);
+            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(60000u), EVENT_TIMEOUT_PREP_MEAS);
 
             return (ES_STATE_HANDLED());
         }
         case ES_EXIT: {
-            appTimerCancel(&wspace->periodic);
-            appTimerCancel(&wspace->timeout);
+            app_timer_cancel(&wspace->periodic);
+            app_timer_cancel(&wspace->timeout);
 
             return (ES_STATE_HANDLED());
         }
         case EVENT_REFRESH_LCD: {
-            mainPageParameters_T    params;
-            struct voc_environment  env;
-            struct voc_meas         meas;
+            struct main_page_overview   overview;
+            struct voc_environment      env;
+            struct voc_meas             meas;
 
             if (voc_rec_get_remaining_no() == 0) {
                 return (ES_STATE_TRANSITION(state_meas_overview));
             }
-            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
             voc_env_get_current(&env);
             voc_meas_get_current(&meas);
-            params.resistance  = meas.rcurr;
-            params.current     = env.current;
-            params.voltage     = env.voltage;
-            params.temperature = env.temperature;
-            drawMainPageParametars(&params);
-            guiExe();
+            overview.resistance  = meas.rcurr;
+            overview.current     = env.current;
+            overview.voltage     = env.voltage;
+            overview.temperature = env.temperature;
+            main_page_overview(&overview);
+            gui_exe();
 
             return (ES_STATE_HANDLED());
         }
-        case EVENT_STOP_MEAS: {
-            
-            return (ES_STATE_TRANSITION(state_meas_overview));
-        }
-        case EVENT_PREP_MEAS_TIMOUT: {
+        case EVENT_TIMEOUT_PREP_MEAS: {
 
             return (ES_STATE_TRANSITION(state_meas_overview));
         }
@@ -301,27 +346,27 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
 
     switch (event->id) {
         case ES_ENTRY: {
-            measurePageData_T meas_data;
+            struct meas_page_data curr;
+            struct meas_page_data prev;
 
-            startMeassurePage();
-            meas_data.ro        = wspace->curr_r0;
-            meas_data.rmin      = wspace->curr.rmin;
-            meas_data.rmax      = wspace->curr.rmax;
-            meas_data.rRatio    = 0.0;
+            curr.r0        = wspace->curr_r0;
+            curr.rmin      = wspace->curr.rmin;
+            curr.rmax      = wspace->curr.rmax;
+            curr.rRatio    = 0.0;
 
             if (wspace->curr.rmin > 0.0) {
-                meas_data.rRatio = wspace->curr.rmax / wspace->curr.rmin;
+                curr.rRatio = wspace->curr.rmax / wspace->curr.rmin;
             }
-            draw_meas_curr_results(&meas_data);
-            meas_data.ro        = wspace->prev_r0;
-            meas_data.rmin      = wspace->prev.rmin;
-            meas_data.rmax      = wspace->prev.rmax;
-            meas_data.rRatio    = 0.0;
+            prev.r0        = wspace->prev_r0;
+            prev.rmin      = wspace->prev.rmin;
+            prev.rmax      = wspace->prev.rmax;
+            prev.rRatio    = 0.0;
 
             if (wspace->prev.rmin > 0.0) {
-                meas_data.rRatio = wspace->prev.rmax / wspace->prev.rmin;
+                curr.rRatio = wspace->prev.rmax / wspace->prev.rmin;
             }
-            draw_meas_prev_results(&meas_data);
+            meas_page_draw(&curr, &prev);
+            
             wspace->prev    = wspace->curr;
             wspace->prev_r0 = wspace->curr_r0;
             
@@ -352,23 +397,20 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
                     FSfclose(data_file);
                 }
             }
-            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
             
             return (ES_STATE_HANDLED());
         }
         case ES_EXIT: {
-            appTimerCancel(&wspace->periodic);
+            app_timer_cancel(&wspace->periodic);
 
             return (ES_STATE_HANDLED());
         }
         case EVENT_REFRESH_LCD: {
-            appTimerStart(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
-            guiExe();
+            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
+            gui_exe();
 
             return (ES_STATE_HANDLED());
-        }
-        case EVENT_OVERVIEW_MEAS: {
-            return (ES_STATE_TRANSITION(state_main));
         }
         default: {
 
@@ -380,87 +422,53 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
 /*===================================  GLOBAL PRIVATE FUNCTION DEFINITIONS  ==*/
 /*====================================  GLOBAL PUBLIC FUNCTION DEFINITIONS  ==*/
 
-void guiReact(guiAction_T action)
+void gui_event(enum gui_action action)
 {
+    esError                     error;
+    esEvent *                   event;
+    uint16_t                    id;
+
     switch (action) {
-        case GUI_SENSOR_PRESSED: {
+        case GUI_SENSOR_ACTIVE: {
+            id = EVENT_GUI_SENSOR_ACTIVE;
             break;
         }
-        case GUI_SENSOR_RELEASED: {
-            voc_env_voltage_set(0);
+        case GUI_SENSOR_INACTIVE: {
+            id = EVENT_GUI_SENSOR_INACTIVE;
             break;
         }
-        case GUI_START_STOP_PRESSED: {
+        case GUI_SS_ACTIVE: {
+            id = EVENT_GUI_SS_ACTIVE;
             break;
         }
-        case GUI_START_STOP_RELEASED: {
-            esError     err;
-            esEvent *   event;
-
-            err = esEventCreate(sizeof(esEvent), EVENT_STOP_MEAS, &event);
-
-            if (!err) {
-                ES_ENSURE(esEpaSendEvent(g_gui, event));
-            }
+        case GUI_SS_INACTIVE: {
+            id = EVENT_GUI_SS_INACTIVE;
             break;
         }
-        case GUI_REC_PRESSED: {
+        case GUI_REC_ACTIVE: {
+            id = EVENT_GUI_REC_ACTIVE;
             break;
         }
-        case GUI_REC_RELEASED: {
+        case GUI_REC_INACTIVE: {
+            id = EVENT_GUI_REC_INACTIVE;
             break;
         }
-        case GUI_HEATER_BACK_PRESSED: {
+        case GUI_BTN_BACK: {
+            id = EVENT_GUI_BTN_BACK;
             break;
         }
-        case GUI_HEATER_OK_PRESSED: {
-            uint16_t    value;
-
-            value = getEditValue();
-
-            if (value > 600) {
-                value = 600;
-            }
-            voc_env_voltage_set(value);
-            break;
-        }
-        case GUI_TIME_BACK_PRESSED: {
-            break;
-        }
-        case GUI_TIME_OK_PRESSED: {
-            uint16_t    value;
-            esError     err;
-            esEvent *   event;
-
-            value = getEditValue();
-
-            if (value > 1000) {
-                value = 1000;
-            }
-            g_device_state.blowing_time = value;
-
-            err = esEventCreate(sizeof(esEvent), EVENT_START_MEAS, &event);
-
-            if (!err) {
-                ES_ENSURE(esEpaSendEvent(g_gui, event));
-            }
-            break;
-        }
-        case GUI_MEASSURE_BACK_PRESSED: {
-            esError     err;
-            esEvent *   event;
-
-            err = esEventCreate(sizeof(esEvent), EVENT_OVERVIEW_MEAS, &event);
-
-            if (!err) {
-                ES_ENSURE(esEpaSendEvent(g_gui, event));
-            }
-            break;
+        case GUI_BTN_OK: {
+            id = EVENT_GUI_BTN_OK;
             break;
         }
         default: {
-            break;
+            return;
         }
+    }
+    ES_ENSURE(error = esEventCreate(sizeof(esEvent), id, &event));
+
+    if (!error) {
+        esEpaSendEvent(g_gui, event);
     }
 }
 

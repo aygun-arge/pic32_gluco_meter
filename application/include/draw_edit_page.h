@@ -32,6 +32,9 @@
 #define DRAWEDITPAGE_H_
 
 /*=========================================================  INCLUDE FILES  ==*/
+
+#include <stdint.h>
+
 /*===============================================================  MACRO's  ==*/
 /*------------------------------------------------------  C++ extern begin  --*/
 #ifdef __cplusplus
@@ -39,14 +42,18 @@ extern "C" {
 #endif
   
 /*============================================================  DATA TYPES  ==*/
+    
 typedef enum {
 	SET_HEATER_VOLTAGE = 0,
 	INPUT_BLOWING_TIME
 } editPageMessages_T;
+
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*===================================================  FUNCTION PROTOTYPES  ==*/
-void drawEditPage(void);
-void drawEditPageMessages(editPageMessages_T message);
+
+void edit_page_draw(editPageMessages_T message);
+uint16_t edit_page_get_value(void);
+
 /*--------------------------------------------------------  C++ extern end  --*/
 #ifdef __cplusplus
 }

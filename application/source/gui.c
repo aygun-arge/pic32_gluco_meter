@@ -32,21 +32,21 @@
 #include "gui.h"
 #include "driver/gpio.h"
 #include "driver/ILI9341.h"
-#include "drawing.h"
-#include "stdbool.h"
-#include "exe_main_page.h"
 #include "lcd_gpio.h"
+
 /*=========================================================  LOCAL MACRO's  ==*/
 /*======================================================  LOCAL DATA TYPES  ==*/
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
 /*=======================================================  LOCAL VARIABLES  ==*/
-static tsTouchData_t gTsData;
-static updater_T gUpdater;
+
+static updater_T        g_event_handler;
+static void *           g_event_handler_data;
+
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 /*===================================  GLOBAL PRIVATE FUNCTION DEFINITIONS  ==*/
 /*====================================  GLOBAL PUBLIC FUNCTION DEFINITIONS  ==*/
-void guiInit(void) {
+void gui_init(void) {
     lcdGpioInit();
     lcdAdcInit();
     lcdInit();
@@ -54,34 +54,34 @@ void guiInit(void) {
 }
 
 /*_____________________________________________________________________________*/
-void guiSetUpdater(updater_T upFunc) {
-	gUpdater = upFunc;
+void gui_set_update(updater_T handler, void * data)
+{
+	g_event_handler      = handler;
+    g_event_handler_data = data;
 }
 
 /*_____________________________________________________________________________*/
-void guiStart(void) {
+void gui_start(void) {
     tsCalibrate();
 }
 
 /*_____________________________________________________________________________*/
-void guiExe(void) {
+void gui_exe(void) {
+    tsTouchData_t ts_data;
+
 	static bool alreadyPressed = false;
 
-	tsRead(&gTsData);
-	if (gTsData.valid == true) {
+	tsRead(&ts_data);
+	if (ts_data.valid == true) {
 		if (alreadyPressed == false) {
 			alreadyPressed = true;
-			gUpdater(&gTsData);
+			g_event_handler(&ts_data, &g_event_handler_data);
 		}
 	} else {
 		alreadyPressed = false;
 	}
 }
 
-/*_____________________________________________________________________________*/
-__attribute__((weak)) void guiReact(guiAction_T action) {
-
-}
 /*================================*//** @cond *//*==  CONFIGURATION ERRORS  ==*/
 /** @endcond *//** @} *//******************************************************
  * END of gui.c

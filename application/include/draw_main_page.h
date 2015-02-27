@@ -32,7 +32,10 @@
 #define DRAW_MAIN_PAGE_H_
 
 /*=========================================================  INCLUDE FILES  ==*/
-#include "stdint.h"
+
+#include <stdint.h>
+#include <stdbool.h>
+
 /*===============================================================  MACRO's  ==*/
 /*------------------------------------------------------  C++ extern begin  --*/
 #ifdef __cplusplus
@@ -40,42 +43,46 @@ extern "C" {
 #endif
   
 /*============================================================  DATA TYPES  ==*/
-typedef enum main_page_btn_id {
-	BTN_SENSOR_ID = 0,
-	BTN_SS_ID,
-	BTN_REC_ID
-} mainPageButtons_T;
 
-typedef enum {
-	STABILISING_SENSOR = 0,
-	SENSOR_READY,
-	BE_READY,
-	START_BLOWING,
-	STOP_BLOWING
-} mainPageMessages_T;
+enum main_page_msg
+{
+    MSG_UNSTABLE = 0,
+    MSG_STABLE,
+    MSG_BLOW_PREPARE,
+    MSG_BLOW_START,
+    MSG_BLOW_STOP
+};
 
-typedef struct {
-	float 	resistance;
-	float 	voltage;
-	uint8_t	current;
-	uint8_t temperature;
-} mainPageParameters_T;
+struct main_page_overview
+{
+    float               resistance;
+    float               voltage;
+    uint8_t             current;
+    uint8_t             temperature;
+};
 
-typedef struct {
-	float ro;
-	float rmax;
-	float rmin;
-} resistanceValues_T;
+struct main_page_res
+{
+    float               r0;
+    float               rmax;
+    float               rmin;
+};
+
+struct main_page_ctx
+{
+    bool                is_switch_sensor_on;
+    bool                is_switch_ss_on;
+    bool                is_switch_rec_on;
+};
+
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*===================================================  FUNCTION PROTOTYPES  ==*/
-void main_page_btn_set_color(mainPageButtons_T button, uint16_t color);
-void drawMainPage(void);
-void drawMainPageMessages(mainPageMessages_T message);
-mainPageMessages_T getMainPageMessage(void);
-void drawMainPageResistanceString(void);
-void drawMainPageResistanceValues(resistanceValues_T * values);
-void drawMainPageParametars(mainPageParameters_T * params);
-void main_page_btn_redraw(mainPageButtons_T button);
+
+void main_page_draw(struct main_page_ctx * ctx);
+void main_page_msg(enum main_page_msg message);
+void main_page_res(struct main_page_res * values);
+void main_page_overview(struct main_page_overview * values);
+
 /*--------------------------------------------------------  C++ extern end  --*/
 #ifdef __cplusplus
 }

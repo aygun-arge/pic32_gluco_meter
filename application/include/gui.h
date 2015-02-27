@@ -37,7 +37,6 @@
 #include "draw_measure_page.h"
 #include "draw_main_page.h"
 #include "draw_edit_page.h"
-#include "exe_meassure_page.h"
 
 /*===============================================================  MACRO's  ==*/
 /*------------------------------------------------------  C++ extern begin  --*/
@@ -46,28 +45,29 @@ extern "C" {
 #endif
   
 /*============================================================  DATA TYPES  ==*/
-typedef void (*updater_T)(tsTouchData_t * tsData);
+    
+typedef void (*updater_T)(tsTouchData_t *, void *);
 
-typedef enum {
-	GUI_SENSOR_PRESSED = 0,
-	GUI_SENSOR_RELEASED,
-	GUI_START_STOP_PRESSED,
-	GUI_START_STOP_RELEASED,
-	GUI_REC_PRESSED,
-	GUI_REC_RELEASED,
-	GUI_HEATER_BACK_PRESSED,
-	GUI_HEATER_OK_PRESSED,
-	GUI_TIME_BACK_PRESSED,
-	GUI_TIME_OK_PRESSED,
-	GUI_MEASSURE_BACK_PRESSED
-} guiAction_T;
+enum gui_action {
+	GUI_SENSOR_ACTIVE = 0,
+	GUI_SENSOR_INACTIVE,
+	GUI_SS_ACTIVE,
+	GUI_SS_INACTIVE,
+	GUI_REC_ACTIVE,
+	GUI_REC_INACTIVE,
+        GUI_BTN_BACK,
+	GUI_BTN_OK
+};
+
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*===================================================  FUNCTION PROTOTYPES  ==*/
-void guiInit(void);
-void guiStart(void);
-void guiSetUpdater(updater_T upFunc);
-void guiExe(void);
-__attribute__((weak)) void guiReact(guiAction_T action);
+
+void gui_init(void);
+void gui_start(void);
+void gui_set_update(updater_T upFunc, void * data);
+void gui_exe(void);
+void gui_event(enum gui_action action);
+
 /*--------------------------------------------------------  C++ extern end  --*/
 #ifdef __cplusplus
 }

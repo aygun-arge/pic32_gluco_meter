@@ -34,62 +34,145 @@
 #include "colors.h"
 #include "dejavusansbold9.h"
 #include "verdanabold14.h"
+#include "gui.h"
 #include <stdio.h>
 
 /*=========================================================  LOCAL MACRO's  ==*/
 /*======================================================  LOCAL DATA TYPES  ==*/
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
+
+static void draw_switch_sensor(struct main_page_ctx * ctx);
+static void draw_switch_ss(struct main_page_ctx * ctx);
+static void draw_switch_rec(struct main_page_ctx * ctx);
+static void main_page_events(tsTouchData_t * ts_data, void * data);
+
 /*=======================================================  LOCAL VARIABLES  ==*/
-static uint16_t buttonColors[3] = {COLOR_RED, COLOR_RED, COLOR_RED};
-static mainPageMessages_T gMsg = STABILISING_SENSOR;
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
+
+static void draw_switch_sensor(struct main_page_ctx * ctx)
+{
+    uint16_t            color;
+
+    if (ctx->is_switch_sensor_on) {
+        color = COLOR_ORANGE;
+    } else {
+        color = COLOR_GREEN;
+    }
+    drawButton(20, 20, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, color, COLOR_BLACK, "Sensor ON/OFF");
+}
+
+static void draw_switch_ss(struct main_page_ctx * ctx)
+{
+    uint16_t            color;
+
+    if (ctx->is_switch_ss_on) {
+        color = COLOR_ORANGE;
+    } else {
+        color = COLOR_GREEN;
+    }
+    drawButton(20, 70, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, color, COLOR_BLACK, "Start/Stop");
+}
+
+static void draw_switch_rec(struct main_page_ctx * ctx)
+{
+    uint16_t            color;
+
+    if (ctx->is_switch_rec_on) {
+        color = COLOR_ORANGE;
+    } else {
+        color = COLOR_GREEN;
+    }
+    drawButton(160, 20, 60, 88, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, color, COLOR_BLACK, "REC");
+}
+
+static void main_page_events(tsTouchData_t * ts_data, void * data)
+{
+    struct main_page_ctx * ctx = data;
+
+	if (ts_data->xlcd > 20 && ts_data->xlcd < 134) {								/* sensor ON/OFF button */
+		if (ts_data->ylcd > 20 && ts_data->ylcd < 60) {
+            if (ctx->is_switch_sensor_on) {
+                ctx->is_switch_sensor_on = false;
+                gui_event(GUI_SENSOR_INACTIVE);
+            } else {
+                ctx->is_switch_sensor_on = true;
+                gui_event(GUI_SENSOR_ACTIVE);
+            }
+		}
+	}
+
+	if (ts_data->xlcd > 20 && ts_data->xlcd < 134) {								/* start/stop button */
+		if (ts_data->ylcd > 70 && ts_data->ylcd < 110) {
+            if (ctx->is_switch_ss_on) {
+                ctx->is_switch_ss_on = false;
+                gui_event(GUI_SS_INACTIVE);
+            } else {
+                ctx->is_switch_ss_on = true;
+                gui_event(GUI_SS_ACTIVE);
+            }
+		}
+	}
+
+	if (ts_data->xlcd > 160 && ts_data->xlcd < 220) {								/* rec button */
+		if (ts_data->ylcd > 20 && ts_data->ylcd < 88) {
+            if (ctx->is_switch_rec_on) {
+                ctx->is_switch_rec_on = false;
+                gui_event(GUI_REC_INACTIVE);
+            } else {
+                ctx->is_switch_rec_on = true;
+                gui_event(GUI_REC_ACTIVE);
+            }
+		}
+	}
+}
+
 /*===================================  GLOBAL PRIVATE FUNCTION DEFINITIONS  ==*/
 /*====================================  GLOBAL PUBLIC FUNCTION DEFINITIONS  ==*/
-void main_page_btn_set_color(mainPageButtons_T button, uint16_t color) {
-	buttonColors[button] = color;
-}
 
-/*_____________________________________________________________________________*/
-void drawMainPage(void) {
+void main_page_draw(struct main_page_ctx * ctx)
+{
 	drawFill(COLOR_BLUE);
-	drawButton(20, 20, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[BTN_SENSOR_ID], COLOR_BLACK, "Sensor ON/OFF");
-	drawButton(20, 70, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[BTN_SS_ID], COLOR_BLACK, "Start/Stop");
-	drawButton(160, 20, 60, 88, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[BTN_REC_ID], COLOR_BLACK, "REC");
-	drawString(13, 120, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Sensor resistance (Meg) :                  ");
-	drawString(13, 140, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Heater       voltage [V] :                         ");
-	drawString(10, 160, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "             current [mA] :                        ");
-	drawString(13, 180, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "         temperature [C] :                         ");
+    draw_switch_sensor(ctx);
+    draw_switch_ss(ctx);
+    draw_switch_rec(ctx);
+    drawString(13, 120, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Resistance");
+	drawString(13, 140, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Voltage");
+	drawString(13, 160, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Current");
+	drawString(13, 180, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Temperature");
+    drawString(120, 120, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[Meg]:");
+	drawString(120, 140, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[V]:");
+	drawString(120, 160, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[mA]:");
+	drawString(120, 180, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[C]:");
+    gui_set_update(main_page_events, ctx);
 }
 
-/*_____________________________________________________________________________*/
-void drawMainPageMessages(mainPageMessages_T message) {
-	gMsg = message;
-	switch (message) {
-		case STABILISING_SENSOR : {
-			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "      stabilising sensor");
+
+
+void main_page_msg(enum main_page_msg message)
+{
+    switch (message) {
+		case MSG_UNSTABLE : {
+			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "stabilising sensor");
 			break;
 		}
-		case SENSOR_READY : {
-			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "   sensor ready for use ");
+		case MSG_STABLE : {
+			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "sensor ready for use");
 			break;
 		}
-		case BE_READY : {
-			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "Be ready to blow after  ");
-			drawString(10, 262, COLOR_YELLOW, &verdanabold14ptFontInfo, "beep, stop after second ");
-			drawString(10, 289, COLOR_YELLOW, &verdanabold14ptFontInfo, "      second beep       ");
+		case MSG_BLOW_PREPARE : {
+			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "Be ready to blow after");
+			drawString(10, 262, COLOR_YELLOW, &verdanabold14ptFontInfo, "beep, stop after");
+			drawString(10, 289, COLOR_YELLOW, &verdanabold14ptFontInfo, "second beep");
 			break;
 		}
-		case START_BLOWING : {
-			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "  Start blowing gently  ");
-			drawString(10, 262, COLOR_YELLOW, &verdanabold14ptFontInfo, "    into the device     ");
-			drawString(10, 289, COLOR_YELLOW, &verdanabold14ptFontInfo, "                        ");
+		case MSG_BLOW_START : {
+			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "Start blowing gently");
+			drawString(10, 262, COLOR_YELLOW, &verdanabold14ptFontInfo, "into the device");
 			break;
 		}
-		case STOP_BLOWING : {
-			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "         Stop blowing   ");
-			drawString(10, 262, COLOR_YELLOW, &verdanabold14ptFontInfo, "                        ");
-			drawString(10, 289, COLOR_YELLOW, &verdanabold14ptFontInfo, "                        ");
+		case MSG_BLOW_STOP : {
+			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "Stop blowing");
 			break;
 		}
 		default : {
@@ -98,64 +181,44 @@ void drawMainPageMessages(mainPageMessages_T message) {
 	}
 }
 
-/*_____________________________________________________________________________*/
-mainPageMessages_T getMainPageMessage(void) {
 
-	return gMsg;
+
+void main_page_res(struct main_page_res * values)
+{
+    char r0[8];
+    char rmax[8];
+    char rmin[8];
+
+    snprintf(r0, sizeof(r0), "%3.2f", (double)values->r0);
+    snprintf(rmax, sizeof(rmax), "%3.2f", (double)values->rmax);
+    snprintf(rmin, sizeof(rmin), "%3.2f", (double)values->rmin);
+
+    drawString(11, 210, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Ro:       ,Rmax:       ,Rmin:    ");
+	drawString(35, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, r0);
+	drawString(120, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, rmax);
+	drawString(200, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, rmin);
 }
 
-/*_____________________________________________________________________________*/
-void drawMainPageResistanceString(void) {
-	drawString(11, 210, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Ro:       ,Rmax:       ,Rmin:    ");
+
+
+void main_page_overview(struct main_page_overview * values)
+{
+    char resistance[8];
+    char voltage[8];
+    char current[8];
+    char temperature[8];
+
+    snprintf(resistance, sizeof(resistance), "%2.3f", (double)values->resistance);
+    snprintf(voltage, sizeof(voltage), "%3.2f", (double)values->voltage);
+    snprintf(current, sizeof(current), "%2d", values->current);
+    snprintf(temperature, sizeof(temperature), "%2d", values->temperature);
+    drawRectangleFilled(200, 120, 240, 180, COLOR_BLACK);
+	drawString(180, 120, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, resistance);
+	drawString(180, 140, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, voltage);
+	drawString(180, 160, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, current);
+	drawString(180, 180, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, temperature);
 }
 
-/*_____________________________________________________________________________*/
-void drawMainPageResistanceValues(resistanceValues_T * values) {
-	char buff[16];
-
-	snprintf(buff, sizeof(buff), "%3.2f", (double)values->ro);
-	drawString(35, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-	snprintf(buff, sizeof(buff), "%3.2f", (double)values->rmax);
-	drawString(120, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-	snprintf(buff, sizeof(buff), "%3.2f", (double)values->rmin);
-	drawString(200, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-}
-
-/*_____________________________________________________________________________*/
-void drawMainPageParametars(mainPageParameters_T * params) {
-	char buff[16];
-
-    drawRectangleFilled(200, 120, 240, 180, COLOR_BLUE);
-	snprintf(buff, sizeof(buff), "%2.3f", (double)params->resistance);
-	drawString(200, 120, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-	snprintf(buff, sizeof(buff), "%3.2f", (double)params->voltage);
-	drawString(200, 140, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-	snprintf(buff, sizeof(buff), "%2d", params->current);
-	drawString(200, 160, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-	snprintf(buff, sizeof(buff), "%2d", params->temperature);
-	drawString(200, 180, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-}
-
-/*_____________________________________________________________________________*/
-void main_page_btn_redraw(mainPageButtons_T button) {
-	switch (button) {
-		case BTN_SENSOR_ID : {
-			drawButton(20, 20, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[BTN_SENSOR_ID], COLOR_BLACK, "Sensor ON/OFF");
-			break;
-		}
-		case BTN_SS_ID : {
-			drawButton(20, 70, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[BTN_SS_ID], COLOR_BLACK, "Start/Stop");
-			break;
-		}
-		case BTN_REC_ID : {
-			drawButton(160, 20, 60, 88, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, buttonColors[BTN_REC_ID], COLOR_BLACK, "REC");
-			break;
-		}
-		default : {
-			;
-		}
-	}
-}
 /*================================*//** @cond *//*==  CONFIGURATION ERRORS  ==*/
 /** @endcond *//** @} *//******************************************************
  * END of draw_main_page.c

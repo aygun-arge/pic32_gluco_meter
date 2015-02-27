@@ -27,14 +27,14 @@ static void timeout(void * arg) {
     }
 }
 
-void appTimerInit(
+void app_timer_init(
     struct appTimer *   timer) {
 
     esVTimerInit(&timer->timer);
     timer->epa = esEdsGetCurrent();
 }
 
-void appTimerStart(
+void app_timer_start(
     struct appTimer *   timer,
     esSysTimerTick      tick,
     uint16_t            eventId) {
@@ -44,7 +44,7 @@ void appTimerStart(
     esVTimerStart(&timer->timer, tick, timeout, timer);
 }
 
-void appTimerCancel(
+void app_timer_cancel(
     struct appTimer *   timer) {
 
     esVTimerCancel(&timer->timer);

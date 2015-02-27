@@ -21,15 +21,15 @@ struct appTimer {
     esEpa *             epa;
 };
 
-void appTimerInit(
+void app_timer_init(
     struct appTimer *   timer);
 
-void appTimerStart(
+void app_timer_start(
     struct appTimer *   timer,
     esSysTimerTick      tick,
     uint16_t            eventId);
 
-void appTimerCancel(
+void app_timer_cancel(
     struct appTimer *   timer);
 
 

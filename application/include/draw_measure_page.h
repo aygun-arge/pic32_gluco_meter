@@ -39,17 +39,22 @@ extern "C" {
 #endif
   
 /*============================================================  DATA TYPES  ==*/
-typedef struct {
-	float ro;
-	float rmax;
-	float rmin;
-	float rRatio;
-} measurePageData_T;
+
+struct meas_page_data
+{
+    float               r0;
+    float               rmax;
+    float               rmin;
+    float               rRatio;
+};
+
+typedef struct meas_page_data meas_page_data;
+
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*===================================================  FUNCTION PROTOTYPES  ==*/
-void drawMeasurePage(void);
-void draw_meas_curr_results(measurePageData_T * result);
-void draw_meas_prev_results(measurePageData_T * result);
+
+void meas_page_draw(struct meas_page_data * curr, struct meas_page_data * prev);
+
 /*--------------------------------------------------------  C++ extern end  --*/
 #ifdef __cplusplus
 }
