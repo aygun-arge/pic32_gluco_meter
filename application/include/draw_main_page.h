@@ -78,10 +78,14 @@ struct main_page_ctx
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*===================================================  FUNCTION PROTOTYPES  ==*/
 
+void main_page_init(struct main_page_ctx * ctx);
 void main_page_draw(struct main_page_ctx * ctx);
 void main_page_msg(enum main_page_msg message);
 void main_page_res(struct main_page_res * values);
 void main_page_overview(struct main_page_overview * values);
+void main_page_switch_sensor(struct main_page_ctx * ctx);
+void main_page_switch_ss(struct main_page_ctx * ctx);
+void main_page_switch_rec(struct main_page_ctx * ctx);
 
 /*--------------------------------------------------------  C++ extern end  --*/
 #ifdef __cplusplus

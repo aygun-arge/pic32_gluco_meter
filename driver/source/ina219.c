@@ -63,7 +63,7 @@ esError ina219_get_current(struct ina219_handle * handle, float * value)
 
 esError ina219_get_voltage(struct ina219_handle * handle, float * value)
 {
-    uint16_t            buff[2];
+    uint8_t             buff[2];
     uint16_t            raw_value;
 
     if (i2c_slave_read(&handle->comm, INA219_BUS, buff, sizeof(buff)) == true) {

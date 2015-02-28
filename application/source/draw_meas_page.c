@@ -73,10 +73,8 @@ static void prev_results(struct meas_page_data * result) {
 	drawString(180, 225, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
 }
 
-static void meas_page_events(tsTouchData_t * tsData, void * data)
+static void meas_page_events(tsTouchData_t * tsData)
 {
-    (void)data;
-    
 	if (tsData->xlcd > 20 && tsData->xlcd < 110) {								/* sensor ON/OFF button */
 		if (tsData->ylcd > 260 && tsData->ylcd < 300) {
 		    gui_event(GUI_BTN_BACK);
@@ -106,7 +104,7 @@ void meas_page_draw(struct meas_page_data * curr, struct meas_page_data * prev)
 	drawButton(20, 260, 90, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, COLOR_RED, COLOR_WHITE, "BACK");
     curr_results(curr);
     prev_results(prev);
-    gui_set_update(meas_page_events, NULL);
+    gui_set_update(meas_page_events);
 }
 
 /*================================*//** @cond *//*==  CONFIGURATION ERRORS  ==*/

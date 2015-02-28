@@ -371,37 +371,133 @@ tsTouchError_t tsRead(tsTouchData_t* data) {
 /**************************************************************************/
 void tsCalibrate(void)
 {
-  tsTouchData_t data;
+    tsTouchData_t data;
 
-  /* --------------- Welcome Screen --------------- */
-  data = tsRenderCalibrationScreen(lcdGetWidth() / 2, lcdGetHeight() / 2, 5);
+    /* --------------- Welcome Screen --------------- */
+    data = tsRenderCalibrationScreen(lcdGetWidth() / 2, lcdGetHeight() / 2, 5);
 
-  /* ----------------- First Dot ------------------ */
-  // 10% over and 10% down
-  data = tsRenderCalibrationScreen(lcdGetWidth() / 10, lcdGetHeight() / 10, 5);
-  _tsLCDPoints[0].x = lcdGetWidth() / 10;
-  _tsLCDPoints[0].y = lcdGetHeight() / 10;
-  _tsTSPoints[0].x = data.xraw;
-  _tsTSPoints[0].y = data.yraw;
+    /* ----------------- First Dot ------------------ */
+    // 10% over and 10% down
+    data = tsRenderCalibrationScreen(lcdGetWidth() / 10, lcdGetHeight() / 10, 5);
+    _tsLCDPoints[0].x = lcdGetWidth() / 10;
+    _tsLCDPoints[0].y = lcdGetHeight() / 10;
+    _tsTSPoints[0].x = data.xraw;
+    _tsTSPoints[0].y = data.yraw;
 
-  /* ---------------- Second Dot ------------------ */
-  // 50% over and 90% down
-  data = tsRenderCalibrationScreen(lcdGetWidth() / 2, lcdGetHeight() - lcdGetHeight() / 10, 5);
-  _tsLCDPoints[1].x = lcdGetWidth() / 2;
-  _tsLCDPoints[1].y = lcdGetHeight() - lcdGetHeight() / 10;
-  _tsTSPoints[1].x = data.xraw;
-  _tsTSPoints[1].y = data.yraw;
+    /* ---------------- Second Dot ------------------ */
+    // 50% over and 90% down
+    data = tsRenderCalibrationScreen(lcdGetWidth() / 2, lcdGetHeight() - lcdGetHeight() / 10, 5);
+    _tsLCDPoints[1].x = lcdGetWidth() / 2;
+    _tsLCDPoints[1].y = lcdGetHeight() - lcdGetHeight() / 10;
+    _tsTSPoints[1].x = data.xraw;
+    _tsTSPoints[1].y = data.yraw;
 
-  /* ---------------- Third Dot ------------------- */
-  // 90% over and 50% down
-  data = tsRenderCalibrationScreen(lcdGetWidth() - lcdGetWidth() / 10, lcdGetHeight() / 2, 5);
-  _tsLCDPoints[2].x = lcdGetWidth() - lcdGetWidth() / 10;
-  _tsLCDPoints[2].y = lcdGetHeight() / 2;
-  _tsTSPoints[2].x = data.xraw;
-  _tsTSPoints[2].y = data.yraw;
+    /* ---------------- Third Dot ------------------- */
+    // 90% over and 50% down
+    data = tsRenderCalibrationScreen(lcdGetWidth() - lcdGetWidth() / 10, lcdGetHeight() / 2, 5);
+    _tsLCDPoints[2].x = lcdGetWidth() - lcdGetWidth() / 10;
+    _tsLCDPoints[2].y = lcdGetHeight() / 2;
+    _tsTSPoints[2].x = data.xraw;
+    _tsTSPoints[2].y = data.yraw;
 
-  // Do matrix calculations for calibration and store to EEPROM
-  setCalibrationMatrix(&_tsLCDPoints[0], &_tsTSPoints[0], &_tsMatrix);
+    // Do matrix calculations for calibration and store to EEPROM
+    setCalibrationMatrix(&_tsLCDPoints[0], &_tsTSPoints[0], &_tsMatrix);
+
+#if 1
+    {
+#include <stdio.h>
+        uint16_t x, y;
+        tsTouchData_t data;
+        tsTouchError_t error;
+        bool valid;
+        char buff[40];
+
+        {
+            x = lcdGetWidth() / 10;
+            y = lcdGetHeight() / 10;
+            drawFill(COLOR_BLUE);
+            drawCircle(x, y, 5, COLOR_RED);
+            drawCircle(x, y, 7, COLOR_GRAY_128);
+            snprintf(buff, sizeof(buff), "set: x=%d, y=%d", x, y);
+            tsCalibCenterText(buff, 50, COLOR_GRAY_50);
+
+            valid = false;
+            while (!valid) {
+                error = tsRead(&data);
+
+                if (!error && data.valid) {
+                    valid = true;
+                }
+            }
+            snprintf(buff, sizeof(buff), "mes: x=%d, y=%d", data.xlcd, data.ylcd);
+            tsCalibCenterText(buff, 70, COLOR_GRAY_50);
+
+            while (valid) {
+                error = tsRead(&data);
+
+                if (!error) {
+                    valid = data.valid;
+                }
+            }
+        }
+        {
+            x = lcdGetWidth() / 2;
+            y = lcdGetHeight() - lcdGetHeight() / 10;
+            drawFill(COLOR_BLUE);
+            drawCircle(x, y, 5, COLOR_RED);
+            drawCircle(x, y, 7, COLOR_GRAY_128);
+            snprintf(buff, sizeof(buff), "set: x=%d, y=%d", x, y);
+            tsCalibCenterText(buff, 50, COLOR_GRAY_50);
+
+            valid = false;
+            while (!valid) {
+                error = tsRead(&data);
+
+                if (!error && data.valid) {
+                    valid = true;
+                }
+            }
+            snprintf(buff, sizeof(buff), "mes: x=%d, y=%d", data.xlcd, data.ylcd);
+            tsCalibCenterText(buff, 70, COLOR_GRAY_50);
+
+            while (valid) {
+                error = tsRead(&data);
+
+                if (!error) {
+                    valid = data.valid;
+                }
+            }
+        }
+                {
+            x = lcdGetWidth() - lcdGetWidth() / 10;
+            y = lcdGetHeight() / 2;
+            drawFill(COLOR_BLUE);
+            drawCircle(x, y, 5, COLOR_RED);
+            drawCircle(x, y, 7, COLOR_GRAY_128);
+            snprintf(buff, sizeof(buff), "set: x=%d, y=%d", x, y);
+            tsCalibCenterText(buff, 50, COLOR_GRAY_50);
+
+            valid = false;
+            while (!valid) {
+                error = tsRead(&data);
+
+                if (!error && data.valid) {
+                    valid = true;
+                }
+            }
+            snprintf(buff, sizeof(buff), "mes: x=%d, y=%d", data.xlcd, data.ylcd);
+            tsCalibCenterText(buff, 70, COLOR_GRAY_50);
+
+            while (valid) {
+                error = tsRead(&data);
+
+                if (!error) {
+                    valid = data.valid;
+                }
+            }
+        }
+    }
+#endif
 }
 
 /**************************************************************************/

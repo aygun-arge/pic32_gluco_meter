@@ -41,16 +41,16 @@
 /*======================================================  LOCAL DATA TYPES  ==*/
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
 
-static void draw_switch_sensor(struct main_page_ctx * ctx);
-static void draw_switch_ss(struct main_page_ctx * ctx);
-static void draw_switch_rec(struct main_page_ctx * ctx);
-static void main_page_events(tsTouchData_t * ts_data, void * data);
+static void draw_switch_sensor(const struct main_page_ctx * ctx);
+static void draw_switch_ss(const struct main_page_ctx * ctx);
+static void draw_switch_rec(const struct main_page_ctx * ctx);
+static void main_page_events(tsTouchData_t * ts_data);
 
 /*=======================================================  LOCAL VARIABLES  ==*/
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
-static void draw_switch_sensor(struct main_page_ctx * ctx)
+static void draw_switch_sensor(const struct main_page_ctx * ctx)
 {
     uint16_t            color;
 
@@ -62,7 +62,7 @@ static void draw_switch_sensor(struct main_page_ctx * ctx)
     drawButton(20, 20, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, color, COLOR_BLACK, "Sensor ON/OFF");
 }
 
-static void draw_switch_ss(struct main_page_ctx * ctx)
+static void draw_switch_ss(const struct main_page_ctx * ctx)
 {
     uint16_t            color;
 
@@ -74,7 +74,7 @@ static void draw_switch_ss(struct main_page_ctx * ctx)
     drawButton(20, 70, 114, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, color, COLOR_BLACK, "Start/Stop");
 }
 
-static void draw_switch_rec(struct main_page_ctx * ctx)
+static void draw_switch_rec(const struct main_page_ctx * ctx)
 {
     uint16_t            color;
 
@@ -86,49 +86,36 @@ static void draw_switch_rec(struct main_page_ctx * ctx)
     drawButton(160, 20, 60, 88, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, color, COLOR_BLACK, "REC");
 }
 
-static void main_page_events(tsTouchData_t * ts_data, void * data)
+static void main_page_events(tsTouchData_t * ts_data)
 {
-    struct main_page_ctx * ctx = data;
-
 	if (ts_data->xlcd > 20 && ts_data->xlcd < 134) {								/* sensor ON/OFF button */
 		if (ts_data->ylcd > 20 && ts_data->ylcd < 60) {
-            if (ctx->is_switch_sensor_on) {
-                ctx->is_switch_sensor_on = false;
-                gui_event(GUI_SENSOR_INACTIVE);
-            } else {
-                ctx->is_switch_sensor_on = true;
-                gui_event(GUI_SENSOR_ACTIVE);
-            }
+            gui_event(GUI_SWITCH_SENSOR);
 		}
 	}
 
 	if (ts_data->xlcd > 20 && ts_data->xlcd < 134) {								/* start/stop button */
 		if (ts_data->ylcd > 70 && ts_data->ylcd < 110) {
-            if (ctx->is_switch_ss_on) {
-                ctx->is_switch_ss_on = false;
-                gui_event(GUI_SS_INACTIVE);
-            } else {
-                ctx->is_switch_ss_on = true;
-                gui_event(GUI_SS_ACTIVE);
-            }
+            gui_event(GUI_SWITCH_SS);
 		}
 	}
 
 	if (ts_data->xlcd > 160 && ts_data->xlcd < 220) {								/* rec button */
 		if (ts_data->ylcd > 20 && ts_data->ylcd < 88) {
-            if (ctx->is_switch_rec_on) {
-                ctx->is_switch_rec_on = false;
-                gui_event(GUI_REC_INACTIVE);
-            } else {
-                ctx->is_switch_rec_on = true;
-                gui_event(GUI_REC_ACTIVE);
-            }
+            gui_event(GUI_SWITCH_REC);
 		}
 	}
 }
 
 /*===================================  GLOBAL PRIVATE FUNCTION DEFINITIONS  ==*/
 /*====================================  GLOBAL PUBLIC FUNCTION DEFINITIONS  ==*/
+
+void main_page_init(struct main_page_ctx * ctx)
+{
+    ctx->is_switch_rec_on    = false;
+    ctx->is_switch_sensor_on = false;
+    ctx->is_switch_ss_on     = false;
+}
 
 void main_page_draw(struct main_page_ctx * ctx)
 {
@@ -144,16 +131,17 @@ void main_page_draw(struct main_page_ctx * ctx)
 	drawString(120, 140, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[V]:");
 	drawString(120, 160, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[mA]:");
 	drawString(120, 180, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[C]:");
-    gui_set_update(main_page_events, ctx);
+    gui_set_update(main_page_events);
 }
 
 
 
 void main_page_msg(enum main_page_msg message)
 {
+    drawRectangleFilled(10, 235, 230, 310, COLOR_BLUE);
     switch (message) {
 		case MSG_UNSTABLE : {
-			drawString(10, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "stabilising sensor");
+			drawString(40, 235, COLOR_YELLOW, &verdanabold14ptFontInfo, "stabilising sensor");
 			break;
 		}
 		case MSG_STABLE : {
@@ -193,6 +181,7 @@ void main_page_res(struct main_page_res * values)
     snprintf(rmax, sizeof(rmax), "%3.2f", (double)values->rmax);
     snprintf(rmin, sizeof(rmin), "%3.2f", (double)values->rmin);
 
+    drawRectangleFilled(10, 210, 230, 220, COLOR_BLUE);
     drawString(11, 210, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Ro:       ,Rmax:       ,Rmin:    ");
 	drawString(35, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, r0);
 	drawString(120, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, rmax);
@@ -212,11 +201,31 @@ void main_page_overview(struct main_page_overview * values)
     snprintf(voltage, sizeof(voltage), "%3.2f", (double)values->voltage);
     snprintf(current, sizeof(current), "%2d", values->current);
     snprintf(temperature, sizeof(temperature), "%2d", values->temperature);
-    drawRectangleFilled(200, 120, 240, 180, COLOR_BLACK);
+    drawRectangleFilled(180, 120, 240, 190, COLOR_BLUE);
 	drawString(180, 120, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, resistance);
 	drawString(180, 140, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, voltage);
 	drawString(180, 160, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, current);
 	drawString(180, 180, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, temperature);
+}
+
+
+void main_page_switch_sensor(struct main_page_ctx * ctx)
+{
+    draw_switch_sensor(ctx);
+}
+
+
+
+void main_page_switch_ss(struct main_page_ctx * ctx)
+{
+    draw_switch_ss(ctx);
+}
+
+
+
+void main_page_switch_rec(struct main_page_ctx * ctx)
+{
+    draw_switch_rec(ctx);
 }
 
 /*================================*//** @cond *//*==  CONFIGURATION ERRORS  ==*/

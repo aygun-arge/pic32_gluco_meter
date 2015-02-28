@@ -46,15 +46,12 @@ extern "C" {
   
 /*============================================================  DATA TYPES  ==*/
     
-typedef void (*updater_T)(tsTouchData_t *, void *);
+typedef void (*updater_T)(tsTouchData_t *);
 
 enum gui_action {
-	GUI_SENSOR_ACTIVE = 0,
-	GUI_SENSOR_INACTIVE,
-	GUI_SS_ACTIVE,
-	GUI_SS_INACTIVE,
-	GUI_REC_ACTIVE,
-	GUI_REC_INACTIVE,
+	GUI_SWITCH_SENSOR,
+	GUI_SWITCH_SS,
+	GUI_SWITCH_REC,
         GUI_BTN_BACK,
 	GUI_BTN_OK
 };
@@ -64,7 +61,7 @@ enum gui_action {
 
 void gui_init(void);
 void gui_start(void);
-void gui_set_update(updater_T upFunc, void * data);
+void gui_set_update(updater_T upFunc);
 void gui_exe(void);
 void gui_event(enum gui_action action);
 

@@ -23,6 +23,7 @@
     entry(state_init,                TOP)                                       \
     entry(state_main,                TOP)                                       \
     entry(state_set_voltage,         TOP)                                       \
+    entry(state_set_meas_time,       TOP)                                       \
     entry(state_start_meas,          TOP)                                       \
     entry(state_meas,                TOP)                                       \
     entry(state_stop_meas,           TOP)                                       \
@@ -39,12 +40,9 @@ enum gui_local_evt
 {
     EVENT_REFRESH_LCD = ES_EVENT_LOCAL_ID,
     EVENT_TIMEOUT_PREP_MEAS,
-    EVENT_GUI_SENSOR_ACTIVE,
-    EVENT_GUI_SENSOR_INACTIVE,
-    EVENT_GUI_SS_ACTIVE,
-    EVENT_GUI_SS_INACTIVE,
-    EVENT_GUI_REC_ACTIVE,
-    EVENT_GUI_REC_INACTIVE,
+    EVENT_GUI_SWITCH_SENSOR,
+    EVENT_GUI_SWITCH_SS,
+    EVENT_GUI_SWITCH_REC,
     EVENT_GUI_BTN_BACK,
     EVENT_GUI_BTN_OK
 };
@@ -58,10 +56,6 @@ struct wspace
     struct voc_record   curr;
     struct voc_record   prev;
     struct main_page_ctx main_page_ctx;
-};
-
-struct device_state
-{
     int                 blowing_time;
 };
 
@@ -70,6 +64,7 @@ struct device_state
 static esAction state_init              (void *, const esEvent *);
 static esAction state_main              (void *, const esEvent *);
 static esAction state_set_voltage       (void *, const esEvent *);
+static esAction state_set_meas_time     (void *, const esEvent *);
 static esAction state_start_meas        (void *, const esEvent *);
 static esAction state_meas              (void *, const esEvent *);
 static esAction state_stop_meas         (void *, const esEvent *);
@@ -80,10 +75,6 @@ static esAction state_meas_overview     (void *, const esEvent *);
 static const ES_MODULE_INFO_CREATE("GUI state machine", "Runs main GUI machine", "Nenad Radulovic");
 
 static const esSmTable          g_gui_table[] = ES_STATE_TABLE_INIT(GUI_TABLE);
-static struct device_state      g_device_state =
-{
-    .blowing_time       = 300
-};
 
 /*======================================================  GLOBAL VARIABLES  ==*/
 
@@ -106,8 +97,10 @@ static esAction state_init(void * space, const esEvent * event) {
     switch (event->id) {
         case ES_INIT: {
             memset(wspace, 0, sizeof(*wspace));
+            wspace->blowing_time = 3000;
             app_timer_init(&wspace->periodic);
             app_timer_init(&wspace->timeout);
+            main_page_init(&wspace->main_page_ctx);
             gui_init();
             gui_start();
 
@@ -154,6 +147,16 @@ static esAction state_main(void * space, const esEvent * event) {
             overview.voltage     = env.voltage;
             overview.temperature = env.temperature;
             main_page_overview(&overview);
+
+            if (wspace->main_page_ctx.is_switch_rec_on) {
+                struct main_page_res        res;
+
+                voc_rec_get_current(&wspace->curr);
+                res.r0      = wspace->curr_r0;
+                res.rmin    = wspace->curr.rmin;
+                res.rmax    = wspace->curr.rmax;
+                main_page_res(&res);
+            }
             gui_exe();
 
             return (ES_STATE_HANDLED());
@@ -168,9 +171,50 @@ static esAction state_main(void * space, const esEvent * event) {
 
             return (ES_STATE_HANDLED());
         }
-        case EVENT_GUI_SENSOR_ACTIVE: {
+        case EVENT_VOC_REC_HAS_FINISHED: {
+            if (wspace->main_page_ctx.is_switch_rec_on) {
+                wspace->main_page_ctx.is_switch_rec_on = false;
 
-            return (ES_STATE_TRANSITION(state_set_voltage));
+                return (ES_STATE_TRANSITION(state_meas_overview));
+            }
+        }
+        case EVENT_GUI_SWITCH_REC: {
+            if (wspace->main_page_ctx.is_switch_rec_on) {
+                wspace->main_page_ctx.is_switch_rec_on = false;
+
+                voc_rec_stop();
+
+                return (ES_STATE_TRANSITION(state_meas_overview));
+            } else {
+                struct voc_meas         meas;
+
+                wspace->main_page_ctx.is_switch_rec_on = true;
+                main_page_switch_rec(&wspace->main_page_ctx);
+                voc_meas_get_current(&meas);
+                wspace->curr_r0 = meas.rcurr;
+                voc_rec_start();
+
+                return (ES_STATE_HANDLED());
+            }
+        }
+        case EVENT_GUI_SWITCH_SS: {
+            wspace->main_page_ctx.is_switch_rec_on = false;
+            voc_rec_stop();
+
+            return (ES_STATE_TRANSITION(state_set_meas_time));
+        }
+        case EVENT_GUI_SWITCH_SENSOR: {
+
+            if (wspace->main_page_ctx.is_switch_sensor_on) {
+                wspace->main_page_ctx.is_switch_sensor_on = false;
+                main_page_switch_sensor(&wspace->main_page_ctx);
+                voc_env_voltage_set(0);
+
+                return (ES_STATE_HANDLED());
+            } else {
+
+                return (ES_STATE_TRANSITION(state_set_voltage));
+            }
         }
         default: {
 
@@ -178,6 +222,7 @@ static esAction state_main(void * space, const esEvent * event) {
         }
     }
 }
+
 static esAction state_set_voltage(void * space, const esEvent * event) {
     struct wspace * wspace = space;
 
@@ -200,10 +245,60 @@ static esAction state_set_voltage(void * space, const esEvent * event) {
             return (ES_STATE_HANDLED());
         }
         case EVENT_GUI_BTN_BACK: {
+            wspace->main_page_ctx.is_switch_sensor_on = false;
             return (ES_STATE_TRANSITION(state_main));
         }
         case EVENT_GUI_BTN_OK: {
+            wspace->main_page_ctx.is_switch_sensor_on = true;
             voc_env_voltage_set(edit_page_get_value());
+
+            return (ES_STATE_TRANSITION(state_main));
+        }
+        default: {
+            return (ES_STATE_IGNORED());
+        }
+    }
+}
+
+static esAction state_set_meas_time(void * space, const esEvent * event) {
+    struct wspace * wspace = space;
+
+    switch (event->id) {
+        case ES_ENTRY: {
+            edit_page_draw(SET_BLOWING_TIME);
+            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(100u), EVENT_REFRESH_LCD);
+
+            return (ES_STATE_HANDLED());
+        }
+        case ES_EXIT: {
+            app_timer_cancel(&wspace->periodic);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_REFRESH_LCD: {
+            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(100u), EVENT_REFRESH_LCD);
+            gui_exe();
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_BTN_BACK: {
+            wspace->main_page_ctx.is_switch_ss_on = false;
+            
+            return (ES_STATE_TRANSITION(state_main));
+        }
+        case EVENT_GUI_BTN_OK: {
+            wspace->main_page_ctx.is_switch_ss_on  = true;
+            wspace->main_page_ctx.is_switch_rec_on = true;
+            wspace->blowing_time = edit_page_get_value();
+
+            if (wspace->blowing_time > 30) {
+                wspace->blowing_time = 30;
+            }
+
+            if (wspace->blowing_time < 4) {
+                wspace->blowing_time = 4;
+            }
+            wspace->blowing_time *= 1000;
 
             return (ES_STATE_TRANSITION(state_start_meas));
         }
@@ -220,6 +315,7 @@ static esAction state_start_meas(void * space, const esEvent * event) {
         case ES_ENTRY: {
             struct voc_meas         meas;
 
+            wspace->main_page_ctx.is_switch_ss_on = true;
             main_page_draw(&wspace->main_page_ctx);
             main_page_msg(MSG_BLOW_PREPARE);
             app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(3000), EVENT_TIMEOUT_PREP_MEAS);
@@ -248,7 +344,7 @@ static esAction state_meas(void * space, const esEvent * event) {
     switch (event->id) {
         case ES_ENTRY: {
             main_page_msg(MSG_BLOW_START);
-            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(g_device_state.blowing_time * 10u), EVENT_TIMEOUT_PREP_MEAS);
+            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(wspace->blowing_time), EVENT_TIMEOUT_PREP_MEAS);
             app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
 
             return (ES_STATE_HANDLED());
@@ -282,9 +378,12 @@ static esAction state_meas(void * space, const esEvent * event) {
             
             return (ES_STATE_HANDLED());
         }
-        case EVENT_TIMEOUT_PREP_MEAS: {
+        case EVENT_VOC_REC_HAS_FINISHED:
+        case EVENT_TIMEOUT_PREP_MEAS:
+        case EVENT_GUI_SWITCH_SS: {
+            wspace->main_page_ctx.is_switch_rec_on = false;
             wspace->main_page_ctx.is_switch_ss_on = false;
-            
+
             return (ES_STATE_TRANSITION(state_stop_meas));
         }
         default: {
@@ -300,7 +399,7 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
         case ES_ENTRY: {
             main_page_msg(MSG_BLOW_STOP);
             app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
-            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(60000u), EVENT_TIMEOUT_PREP_MEAS);
+            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(10000u), EVENT_TIMEOUT_PREP_MEAS);
 
             return (ES_STATE_HANDLED());
         }
@@ -315,9 +414,6 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
             struct voc_environment      env;
             struct voc_meas             meas;
 
-            if (voc_rec_get_remaining_no() == 0) {
-                return (ES_STATE_TRANSITION(state_meas_overview));
-            }
             app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
             voc_env_get_current(&env);
             voc_meas_get_current(&meas);
@@ -329,6 +425,10 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
             gui_exe();
 
             return (ES_STATE_HANDLED());
+        }
+        case EVENT_VOC_REC_HAS_FINISHED: {
+
+            return (ES_STATE_TRANSITION(state_meas_overview));
         }
         case EVENT_TIMEOUT_PREP_MEAS: {
 
@@ -412,6 +512,10 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
 
             return (ES_STATE_HANDLED());
         }
+        case EVENT_GUI_BTN_BACK: {
+
+            return (ES_STATE_TRANSITION(state_main));
+        }
         default: {
 
             return (ES_STATE_IGNORED());
@@ -429,28 +533,16 @@ void gui_event(enum gui_action action)
     uint16_t                    id;
 
     switch (action) {
-        case GUI_SENSOR_ACTIVE: {
-            id = EVENT_GUI_SENSOR_ACTIVE;
+        case GUI_SWITCH_SENSOR: {
+            id = EVENT_GUI_SWITCH_SENSOR;
             break;
         }
-        case GUI_SENSOR_INACTIVE: {
-            id = EVENT_GUI_SENSOR_INACTIVE;
+        case GUI_SWITCH_SS: {
+            id = EVENT_GUI_SWITCH_SS;
             break;
         }
-        case GUI_SS_ACTIVE: {
-            id = EVENT_GUI_SS_ACTIVE;
-            break;
-        }
-        case GUI_SS_INACTIVE: {
-            id = EVENT_GUI_SS_INACTIVE;
-            break;
-        }
-        case GUI_REC_ACTIVE: {
-            id = EVENT_GUI_REC_ACTIVE;
-            break;
-        }
-        case GUI_REC_INACTIVE: {
-            id = EVENT_GUI_REC_INACTIVE;
+        case GUI_SWITCH_REC: {
+            id = EVENT_GUI_SWITCH_REC;
             break;
         }
         case GUI_BTN_BACK: {

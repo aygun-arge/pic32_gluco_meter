@@ -28,7 +28,8 @@ extern "C" {
 enum gui_events
 {
     EVENT_SENSOR_IS_STABLE = 1000,
-    EVENT_SENSOR_IS_UNSTABLE
+    EVENT_SENSOR_IS_UNSTABLE,
+    EVENT_VOC_REC_HAS_FINISHED
 };
 
 /*======================================================  GLOBAL VARIABLES  ==*/

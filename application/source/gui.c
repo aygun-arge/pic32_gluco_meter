@@ -33,6 +33,7 @@
 #include "driver/gpio.h"
 #include "driver/ILI9341.h"
 #include "lcd_gpio.h"
+#include "drawing.h"
 
 /*=========================================================  LOCAL MACRO's  ==*/
 /*======================================================  LOCAL DATA TYPES  ==*/
@@ -40,7 +41,6 @@
 /*=======================================================  LOCAL VARIABLES  ==*/
 
 static updater_T        g_event_handler;
-static void *           g_event_handler_data;
 
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
@@ -54,10 +54,9 @@ void gui_init(void) {
 }
 
 /*_____________________________________________________________________________*/
-void gui_set_update(updater_T handler, void * data)
+void gui_set_update(updater_T handler)
 {
 	g_event_handler      = handler;
-    g_event_handler_data = data;
 }
 
 /*_____________________________________________________________________________*/
@@ -75,7 +74,7 @@ void gui_exe(void) {
 	if (ts_data.valid == true) {
 		if (alreadyPressed == false) {
 			alreadyPressed = true;
-			g_event_handler(&ts_data, &g_event_handler_data);
+			g_event_handler(&ts_data);
 		}
 	} else {
 		alreadyPressed = false;

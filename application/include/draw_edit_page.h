@@ -45,7 +45,7 @@ extern "C" {
     
 typedef enum {
 	SET_HEATER_VOLTAGE = 0,
-	INPUT_BLOWING_TIME
+	SET_BLOWING_TIME
 } editPageMessages_T;
 
 /*======================================================  GLOBAL VARIABLES  ==*/

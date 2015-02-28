@@ -13,6 +13,10 @@
 #include "driver/ina219.h"
 #include "main.h"
 #include "voc.h"
+#include "eds/epa.h"
+#include "base/error.h"
+#include "base/debug.h"
+#include "sm_gui.h"
 
 /*=========================================================  LOCAL MACRO's  ==*/
 
@@ -139,6 +143,8 @@ static void rec_init(void);
 static esError env_init(void);
 
 /*=======================================================  LOCAL VARIABLES  ==*/
+
+static const ES_MODULE_INFO_CREATE("VOC", "VOC", "Nenad Radulovic");
 
 static uint32_t                 g_current_raw_val;
 static struct ad5282_handle     g_ad5282;
@@ -292,8 +298,17 @@ void __ISR(MEAS_TMR_VECTOR, IPL6SOFT) meas_tmr_isr(void)
     }
 
     if (current_no == (CONFIG_BUFFER_SIZE - 1u)) {
+        esEvent *               event;
+        esError                 error;
+
         MEAS_TMR_IEC   &= ~(0x1u << MEAS_TMR_ISR_BIT);
         MEAS_TMR_A_CON &= ~TxCON_ON;
+
+        ES_ENSURE(error = esEventCreateI(sizeof(esEvent), EVENT_VOC_REC_HAS_FINISHED, &event));
+
+        if (!error) {
+            esEpaSendEventI(g_gui, event);
+        }
     }
     g_buffer_current = current_no;
 }

@@ -43,7 +43,7 @@
 #include "lcd_adc.h"
 #include <stdbool.h>
 
-#define CFG_TFTLCD_TS_DEFAULTTHRESHOLD (75)
+#define CFG_TFTLCD_TS_DEFAULTTHRESHOLD (50)
 #define CFG_TFTLCD_TS_KEYPADDELAY      (100)
 
 typedef struct Point

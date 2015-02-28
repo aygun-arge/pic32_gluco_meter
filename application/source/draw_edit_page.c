@@ -31,6 +31,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "driver/touchscreen.h"
 #include "draw_edit_page.h"
@@ -48,14 +49,15 @@
 #define KEYS_FONT			verdanabold14ptFontInfo
 
 #define STRING_COLOR 		COLOR_DARK_BLUE
-#define MAX_NUM_OF_DIGITS	3
+#define MAX_NUM_OF_DIGITS	2
 
 /*======================================================  LOCAL DATA TYPES  ==*/
 
 static uint16_t         gEditValue;
 static uint8_t          gDigitCnt;
-static char             gValString[MAX_NUM_OF_DIGITS + 2];
+static char             gValString[MAX_NUM_OF_DIGITS + 1];
 static char             gDrawString[MAX_NUM_OF_DIGITS + 2];
+static bool             g_is_bigger_input;
 
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
 /*=======================================================  LOCAL VARIABLES  ==*/
@@ -70,11 +72,17 @@ static inline void drawVal(void)
 
 		return;
 	}
-	gDrawString[0] = gValString[0];
-	gDrawString[1] = '.';
-	gDrawString[2] = gValString[1];
-	gDrawString[3] = gValString[2];
-	//strcpy(&gDrawString[2], &gDrawString[2]);
+
+    if (g_is_bigger_input) {
+        gDrawString[0] = gValString[0];
+        gDrawString[1] = gValString[1];
+        gDrawString[2] = 0;
+    } else {
+        gDrawString[0] = gValString[0];
+        gDrawString[1] = '.';
+        gDrawString[2] = gValString[1];
+        gDrawString[3] = 0;
+    }
 	drawString(25, 90, STRING_COLOR, &verdanabold14ptFontInfo, gDrawString);
 }
 
@@ -130,9 +138,8 @@ static void handleKeyPad(tsTouchData_t * tsData) {
 
 
 
-static void edit_page_events(tsTouchData_t * tsData, void * data) {
-    (void)data;
-
+static void edit_page_events(tsTouchData_t * tsData)
+{
 	handleKeyPad(tsData);
 	if (tsData->xlcd > 20 && tsData->xlcd < 110) {
 		if (tsData->ylcd > 260 && tsData->ylcd < 300) {
@@ -152,6 +159,10 @@ static void edit_page_events(tsTouchData_t * tsData, void * data) {
 
 void edit_page_draw(editPageMessages_T message)
 {
+    gEditValue  = 0;
+    gDigitCnt   = 0;
+    memset(gValString, 0, sizeof(gValString));
+    memset(gDrawString, 0, sizeof(gDrawString));
 	drawFill(COLOR_BLUE);
 	drawRectangleFilled(20, 80, 220, 120, COLOR_CYAN);
 	drawRectangle(20, 80, 220, 120, COLOR_DARK_BLUE);
@@ -173,11 +184,15 @@ void edit_page_draw(editPageMessages_T message)
     switch (message) {
 		case SET_HEATER_VOLTAGE : {
 			drawString(40, 30, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Set heater voltage  ");
+            g_is_bigger_input = false;
+
 			break;
 		}
 
-		case INPUT_BLOWING_TIME : {
+		case SET_BLOWING_TIME : {
 			drawString(40, 30, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Input blowing time ");
+            g_is_bigger_input = true;
+            
 			break;
 		}
 
@@ -185,7 +200,7 @@ void edit_page_draw(editPageMessages_T message)
 			;
 		}
 	}
-    gui_set_update(edit_page_events, NULL);
+    gui_set_update(edit_page_events);
 }
 
 
