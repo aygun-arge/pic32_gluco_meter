@@ -304,6 +304,7 @@ int getDisplayPoint( tsPoint_t * displayPtr, tsPoint_t * screenPtr, tsMatrix_t *
 /**************************************************************************/
 void tsInit(void) {
   _tsThreshhold = tsGetThreshhold();
+#if 0
   // Load values from EEPROM if touch screen has already been calibrated
   if (eepromReadU8(CFG_EEPROM_TOUCHSCREEN_CALIBRATED) == 1) {
     // Load calibration data
@@ -315,6 +316,15 @@ void tsInit(void) {
     _tsMatrix.Fn = eepromReadS32(CFG_EEPROM_TOUCHSCREEN_CAL_FN);
     _tsMatrix.Divider = eepromReadS32(CFG_EEPROM_TOUCHSCREEN_CAL_DIVIDER);
   }
+#else
+    _tsMatrix.An = 0x00016440;
+    _tsMatrix.Bn = 0xFFFFD2A0;
+    _tsMatrix.Cn = 0xFAEC0868;
+    _tsMatrix.Dn = 0x00000080;
+    _tsMatrix.En = 0x00022580;
+    _tsMatrix.Fn = 0xF8741560;
+    _tsMatrix.Divider = 0xFFFAB067;
+#endif
 }
 
 /**************************************************************************/
@@ -371,8 +381,12 @@ tsTouchError_t tsRead(tsTouchData_t* data) {
 /**************************************************************************/
 void tsCalibrate(void)
 {
+#if 1
     tsTouchData_t data;
 
+    if (_tsMatrix.Divider != 0) {
+        return;
+    }
     /* --------------- Welcome Screen --------------- */
     data = tsRenderCalibrationScreen(lcdGetWidth() / 2, lcdGetHeight() / 2, 5);
 
@@ -403,7 +417,7 @@ void tsCalibrate(void)
     // Do matrix calculations for calibration and store to EEPROM
     setCalibrationMatrix(&_tsLCDPoints[0], &_tsTSPoints[0], &_tsMatrix);
 
-#if 1
+#else
     {
 #include <stdio.h>
         uint16_t x, y;
@@ -468,7 +482,7 @@ void tsCalibrate(void)
                 }
             }
         }
-                {
+        {
             x = lcdGetWidth() - lcdGetWidth() / 10;
             y = lcdGetHeight() / 2;
             drawFill(COLOR_BLUE);
@@ -493,6 +507,19 @@ void tsCalibrate(void)
 
                 if (!error) {
                     valid = data.valid;
+                }
+            }
+
+            for (;;) {
+                error = tsRead(&data);
+
+                if (!error) {
+                    drawFill(COLOR_WHITE);
+                    snprintf(buff, sizeof(buff), "mes: x=%d, y=%d", data.xlcd, data.ylcd);
+                    tsCalibCenterText(buff, 70, COLOR_GRAY_50);
+                    snprintf(buff, sizeof(buff), "raw: x=%d, y=%d", data.xraw, data.yraw);
+                    tsCalibCenterText(buff, 90, COLOR_GRAY_50);
+                    drawCircle(data.xlcd, data.ylcd, 5, COLOR_RED);
                 }
             }
         }
