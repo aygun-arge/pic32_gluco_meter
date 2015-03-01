@@ -29,6 +29,14 @@
     entry(state_stop_meas,           TOP)                                       \
     entry(state_meas_overview,       TOP)                                       \
 
+#define VOC_PWR_ERRATA_0                1
+#define VOC_PWR_SHDN_PORT               &GpioD
+#define VOC_PWR_SHDN_PIN                1
+
+#define LCD_REFRESH_RATE_SLOW           ES_VTMR_TIME_TO_TICK_MS(500)
+#define LCD_REFRESH_RATE_FAST           ES_VTMR_TIME_TO_TICK_MS(100)
+#define LCD_GUI_TOUCH_POLL              ES_VTMR_TIME_TO_TICK_MS(100)
+
 /*======================================================  LOCAL DATA TYPES  ==*/
 
 enum gui_state_id
@@ -39,6 +47,7 @@ enum gui_state_id
 enum gui_local_evt
 {
     EVENT_REFRESH_LCD = ES_EVENT_LOCAL_ID,
+    EVENT_TOUCH_POLL,
     EVENT_TIMEOUT_PREP_MEAS,
     EVENT_GUI_SWITCH_SENSOR,
     EVENT_GUI_SWITCH_SS,
@@ -49,7 +58,8 @@ enum gui_local_evt
 
 struct wspace
 {
-    struct appTimer     periodic;
+    struct appTimer     refresh;
+    struct appTimer     poll;
     struct appTimer     timeout;
     float               curr_r0;
     float               prev_r0;
@@ -96,9 +106,15 @@ static esAction state_init(void * space, const esEvent * event) {
 
     switch (event->id) {
         case ES_INIT: {
+#if VOC_PWR_ERRATA_0
+#else
+            gpioSetAsOutput(VOC_PWR_SHDN_PORT, VOC_PWR_SHDN_PIN);
+            gpioClrPin(VOC_PWR_SHDN_PORT, VOC_PWR_SHDN_PIN);
+#endif
             memset(wspace, 0, sizeof(*wspace));
             wspace->blowing_time = 3000;
-            app_timer_init(&wspace->periodic);
+            app_timer_init(&wspace->refresh);
+            app_timer_init(&wspace->poll);
             app_timer_init(&wspace->timeout);
             main_page_init(&wspace->main_page_ctx);
             gui_init();
@@ -118,7 +134,8 @@ static esAction state_main(void * space, const esEvent * event) {
 
     switch (event->id) {
         case ES_ENTRY: {
-            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(400), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
             main_page_draw(&wspace->main_page_ctx);
 
             if (g_voc_is_stabilised) {
@@ -130,7 +147,8 @@ static esAction state_main(void * space, const esEvent * event) {
             return (ES_STATE_HANDLED());
         }
         case ES_EXIT: {
-            app_timer_cancel(&wspace->periodic);
+            app_timer_cancel(&wspace->refresh);
+            app_timer_cancel(&wspace->poll);
             
             return (ES_STATE_HANDLED());
         }
@@ -139,7 +157,7 @@ static esAction state_main(void * space, const esEvent * event) {
             struct voc_environment  env;
             struct voc_meas         meas;
 
-            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
             voc_env_get_current(&env);
             voc_meas_get_current(&meas);
             overview.resistance  = meas.rcurr;
@@ -157,6 +175,11 @@ static esAction state_main(void * space, const esEvent * event) {
                 res.rmax    = wspace->curr.rmax;
                 main_page_res(&res);
             }
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_TOUCH_POLL: {
+            app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
             gui_exe();
 
             return (ES_STATE_HANDLED());
@@ -208,6 +231,10 @@ static esAction state_main(void * space, const esEvent * event) {
             if (wspace->main_page_ctx.is_switch_sensor_on) {
                 wspace->main_page_ctx.is_switch_sensor_on = false;
                 main_page_switch_sensor(&wspace->main_page_ctx);
+#if VOC_PWR_ERRATA_0
+#else
+                gpioClrPin(VOC_PWR_SHDN_PORT, VOC_PWR_SHDN_PIN);
+#endif
                 voc_env_voltage_set(0);
 
                 return (ES_STATE_HANDLED());
@@ -229,17 +256,17 @@ static esAction state_set_voltage(void * space, const esEvent * event) {
     switch (event->id) {
         case ES_ENTRY: {
             edit_page_draw(SET_HEATER_VOLTAGE);
-            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(100u), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_FAST, EVENT_REFRESH_LCD);
 
             return (ES_STATE_HANDLED());
         }
         case ES_EXIT: {
-            app_timer_cancel(&wspace->periodic);
+            app_timer_cancel(&wspace->refresh);
 
             return (ES_STATE_HANDLED());
         }
         case EVENT_REFRESH_LCD: {
-            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(100u), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_FAST, EVENT_REFRESH_LCD);
             gui_exe();
 
             return (ES_STATE_HANDLED());
@@ -250,6 +277,10 @@ static esAction state_set_voltage(void * space, const esEvent * event) {
         }
         case EVENT_GUI_BTN_OK: {
             wspace->main_page_ctx.is_switch_sensor_on = true;
+#if VOC_PWR_ERRATA_0
+#else
+            gpioSetPin(VOC_PWR_SHDN_PORT, VOC_PWR_SHDN_PIN);
+#endif
             voc_env_voltage_set(edit_page_get_value());
 
             return (ES_STATE_TRANSITION(state_main));
@@ -266,17 +297,17 @@ static esAction state_set_meas_time(void * space, const esEvent * event) {
     switch (event->id) {
         case ES_ENTRY: {
             edit_page_draw(SET_BLOWING_TIME);
-            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(100u), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_FAST, EVENT_REFRESH_LCD);
 
             return (ES_STATE_HANDLED());
         }
         case ES_EXIT: {
-            app_timer_cancel(&wspace->periodic);
+            app_timer_cancel(&wspace->refresh);
 
             return (ES_STATE_HANDLED());
         }
         case EVENT_REFRESH_LCD: {
-            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(100u), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_FAST, EVENT_REFRESH_LCD);
             gui_exe();
 
             return (ES_STATE_HANDLED());
@@ -345,13 +376,21 @@ static esAction state_meas(void * space, const esEvent * event) {
         case ES_ENTRY: {
             main_page_msg(MSG_BLOW_START);
             app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(wspace->blowing_time), EVENT_TIMEOUT_PREP_MEAS);
-            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
 
             return (ES_STATE_HANDLED());
         }
         case ES_EXIT: {
-            app_timer_cancel(&wspace->periodic);
+            app_timer_cancel(&wspace->refresh);
+            app_timer_cancel(&wspace->poll);
             app_timer_cancel(&wspace->timeout);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_TOUCH_POLL: {
+            app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
+            gui_exe();
 
             return (ES_STATE_HANDLED());
         }
@@ -361,7 +400,7 @@ static esAction state_meas(void * space, const esEvent * event) {
             struct voc_environment      env;
             struct voc_meas             meas;
 
-            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
             voc_env_get_current(&env);
             voc_meas_get_current(&meas);
             voc_rec_get_current(&wspace->curr);
@@ -374,7 +413,6 @@ static esAction state_meas(void * space, const esEvent * event) {
             res.rmin    = wspace->curr.rmin;
             res.rmax    = wspace->curr.rmax;
             main_page_res(&res);
-            gui_exe();
             
             return (ES_STATE_HANDLED());
         }
@@ -398,13 +436,13 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
     switch (event->id) {
         case ES_ENTRY: {
             main_page_msg(MSG_BLOW_STOP);
-            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
             app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(10000u), EVENT_TIMEOUT_PREP_MEAS);
 
             return (ES_STATE_HANDLED());
         }
         case ES_EXIT: {
-            app_timer_cancel(&wspace->periodic);
+            app_timer_cancel(&wspace->refresh);
             app_timer_cancel(&wspace->timeout);
 
             return (ES_STATE_HANDLED());
@@ -414,7 +452,7 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
             struct voc_environment      env;
             struct voc_meas             meas;
 
-            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
             voc_env_get_current(&env);
             voc_meas_get_current(&meas);
             overview.resistance  = meas.rcurr;
@@ -497,17 +535,17 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
                     FSfclose(data_file);
                 }
             }
-            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_FAST, EVENT_REFRESH_LCD);
             
             return (ES_STATE_HANDLED());
         }
         case ES_EXIT: {
-            app_timer_cancel(&wspace->periodic);
+            app_timer_cancel(&wspace->refresh);
 
             return (ES_STATE_HANDLED());
         }
         case EVENT_REFRESH_LCD: {
-            app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(200u), EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_FAST, EVENT_REFRESH_LCD);
             gui_exe();
 
             return (ES_STATE_HANDLED());

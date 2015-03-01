@@ -22,7 +22,7 @@
 
 #define CONFIG_IC_SELECTION             4
 #define CONFIG_NUM_OF_SAMPLES           8
-#define CONFIG_VOC_VOLTAGE_COEF_100     300
+#define CONFIG_VOC_VOLTAGE_COEF_1000    255
 #define CONFIG_BUFFER_SIZE              2048
 
 #define ICxCON_ON                       (0x1u << 15)
@@ -324,16 +324,12 @@ esError voc_env_voltage_set(int voltage)
 {
     esError                     err;
 
-    if (voltage > 600) {
-        voltage = 600;
+    if (voltage > 70) {
+        voltage = 70;
     }
-    voltage *= 100;
-    err = ad5282_set_pot1(&g_ad5282, voltage / CONFIG_VOC_VOLTAGE_COEF_100);
-
-    if (err) {
-        return (err);
-    }
-    err = ad5282_set_pot2(&g_ad5282, voltage / CONFIG_VOC_VOLTAGE_COEF_100);
+    voltage *= CONFIG_VOC_VOLTAGE_COEF_1000;
+    voltage /= 100u;
+    err = ad5282_set_pot1(&g_ad5282, voltage);
 
     return (err);
 }
