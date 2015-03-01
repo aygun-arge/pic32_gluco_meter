@@ -2,6 +2,8 @@
 #include <xc.h>
 #include <plib.h>
 #include <string.h>
+
+#include "TimeDelay.h"
 #include <sys/attribs.h>
 
 #include "driver/clock.h"
@@ -174,7 +176,7 @@ int32_t adcReadChannelOneShot(uint32_t id) {
 
     gpioSetAsInput(&GpioB, id);
     AD1PCFGCLR = (0x1u << id);
-    
+    Delay10us(10);
     CloseADC10();
 
     AD1CHSbits.CH0NA  = 0;
