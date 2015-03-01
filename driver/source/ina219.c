@@ -50,7 +50,7 @@ esError ina219_get_current(struct ina219_handle * handle, float * value)
     uint8_t             buff[2];
     uint16_t            raw_value;
 
-    if (i2c_slave_read(&handle->comm, INA219_CURRENT, buff, sizeof(buff)) == true) {
+    if (i2c_slave_read(&handle->comm, INA219_SHUNT, buff, sizeof(buff)) == true) {
         raw_value = ((uint16_t)buff[0] << 8u) | (uint16_t)buff[1];
         *value = (float)raw_value * handle->current_lsb;
 
@@ -67,9 +67,28 @@ esError ina219_get_voltage(struct ina219_handle * handle, float * value)
     uint16_t            raw_value;
 
     if (i2c_slave_read(&handle->comm, INA219_BUS, buff, sizeof(buff)) == true) {
+        float   uncalib;
+
         raw_value = ((uint16_t)buff[0] << 8u) | (uint16_t)buff[1];
         raw_value >>= 3;
-        *value = (float)raw_value * 0.004;
+        
+        uncalib = (float)raw_value * 0.004;
+
+        if (uncalib < 1.0) {
+            *value = uncalib * 1.35;
+        } else if (uncalib < 2.0) {
+            *value = uncalib * 1.76;
+        } else if (uncalib < 3.0) {
+            *value = uncalib * 1.72;
+        } else if (uncalib < 4.0) {
+            *value = uncalib * 1.34;
+        } else if (uncalib < 5.0) {
+            *value = uncalib * 1.26;
+        } else if (uncalib < 6.0) {
+            *value = uncalib * 1.20;
+        } else {
+            *value = uncalib * 1.20;
+        }
 
         return (ES_ERROR_NONE);
     } else {
