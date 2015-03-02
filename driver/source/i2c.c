@@ -154,6 +154,9 @@ FAILURE:
 
 bool i2c_slave_write(struct i2c_slave * slave, uint8_t address, const void * data, size_t size)
 {
+    uint32_t            current_byte;
+    const uint8_t *     data_;
+
     i2c_bus_start(slave->bus);
 
     if (i2c_bus_write(slave->bus, slave->address) == false) {
@@ -164,8 +167,10 @@ bool i2c_slave_write(struct i2c_slave * slave, uint8_t address, const void * dat
         goto FAILURE;
     }
 
-    if (i2c_bus_write_array(slave->bus, data, size) == false) {
-        goto FAILURE;
+    for (data_ = data, current_byte = 0; current_byte < size; current_byte++) {
+        if (i2c_bus_write(slave->bus, data_[current_byte]) == false) {
+            goto FAILURE;
+        }
     }
     i2c_bus_stop(slave->bus);
 

@@ -501,7 +501,7 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
             prev.rRatio    = 0.0;
 
             if (wspace->prev.rmin > 0.0) {
-                curr.rRatio = wspace->prev.rmax / wspace->prev.rmin;
+                prev.rRatio = wspace->prev.rmax / wspace->prev.rmin;
             }
             meas_page_draw(&curr, &prev);
             
@@ -510,6 +510,7 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
             
             if (USBHostMSDSCSIMediaDetect()) {
                 if (FSInit()) {
+                    static uint32_t     file_num = 0;
                     uint32_t            records;
                     uint32_t            rec_no;
                     uint32_t            rec_txt_len;
@@ -517,17 +518,32 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
                     FSFILE *            data_file;
                     char                buffer[100];
 
-                    data_file = FSfopen("dataset.csv", "w");
+                    for (;;) {
+                        snprintf(buffer, sizeof(buffer), "log%d.csv", file_num);
+                        data_file = FSfopen(buffer, "r");
 
+                        if (data_file == NULL) {
+                            break;
+                        }
+                        FSfclose(data_file);
+                        file_num++;
+
+                        if (file_num == 99999) {
+                            break;
+                        }
+                    }
+                    snprintf(buffer, sizeof(buffer), "log%d.csv", file_num++);
+                    data_file = FSfopen(buffer, "w");
                     records = voc_rec_get_current_no();
 
                     for (rec_no = 0; rec_no < records; rec_no++) {
                         voc_rec_get_by_id(rec_no, &rec);
-                        snprintf(buffer, sizeof(buffer), "%d,%f,%f,%f,%f,\n",
+                        snprintf(buffer, sizeof(buffer), "%d,%f,%f,%f,%1.1f,%3.1f,\n",
                             rec_no * 10, 
                             (double)rec.rcurr,
                             (double)rec.rmax,
                             (double)rec.rmin,
+                            (double)rec.voltage,
                             (double)rec.temperature);
                         rec_txt_len = strlen(buffer);
                         FSfwrite(buffer, 1, rec_txt_len, data_file);

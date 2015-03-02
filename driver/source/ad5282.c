@@ -3,6 +3,7 @@
 #include "base/error.h"
 
 #define AD5282_ID                       0x58
+#define RETRY_COUNT                     5
 
 /*
  * Disable port
@@ -39,10 +40,21 @@ esError ad5282_term_driver(struct ad5282_handle * handle)
 
 esError ad5282_set_pot1(struct ad5282_handle * handle, uint8_t val)
 {
-    if (i2c_slave_write(&handle->comm, 0, &val, 1) == false) {
+    bool                is_successful;
+    uint32_t            retry;
+
+    is_successful = false;
+    retry = RETRY_COUNT;
+
+    while (!is_successful && retry--) {
+        is_successful = i2c_slave_write(&handle->comm, 0, &val, 1);
+    }
+
+    if (!is_successful) {
         return (ES_ERROR_DEVICE_FAIL);
-    } 
-    return (ES_ERROR_NONE);
+    } else {
+        return (ES_ERROR_NONE);
+    }
 }
 
 esError ad5282_set_pot2(struct ad5282_handle * handle, uint8_t val)

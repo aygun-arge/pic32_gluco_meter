@@ -33,8 +33,6 @@ enum voc_local_evt
 struct wspace
 {
     struct appTimer     periodic;
-    struct voc_meas     prev;
-    struct voc_meas     curr;
     bool                stabilisation_state;
 };
 
@@ -65,6 +63,49 @@ bool                            g_voc_is_stabilised;
 
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
+static bool is_sensor_stable(float value)
+{
+    static uint32_t     sample_no;
+    static float        sample_buff[10];
+    uint32_t            idx;
+    float               min_val;
+    float               max_val;
+    float               average_val;
+    
+    sample_buff[sample_no++] = value;
+
+    if (sample_no == 10) {
+        sample_no = 0;
+    }
+    average_val = 0;
+    min_val = value;
+    max_val = value;
+
+    for (idx = 0; idx < 10; idx++) {
+        average_val += sample_buff[idx];
+
+        if (min_val > sample_buff[idx]) {
+            min_val = sample_buff[idx];
+        }
+
+        if (max_val < sample_buff[idx]) {
+            max_val = sample_buff[idx];
+        }
+    }
+    average_val /= 10.0;
+
+    if (max_val > (average_val * 1.02)) {
+        return (false);
+    }
+
+    if (min_val < (average_val * 0.98)) {
+        return (false);
+    }
+
+    return (true);
+}
+
+
 static esAction state_init(void * space, const esEvent * event) {
     struct wspace * wspace = space;
 
@@ -73,28 +114,20 @@ static esAction state_init(void * space, const esEvent * event) {
             app_timer_init(&wspace->periodic);
             app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(1000), EVENT_REFRESH_STATE);
             voc_env_update();
-            voc_meas_get_current(&wspace->curr);
-            voc_meas_get_current(&wspace->prev);
 
             return (ES_STATE_HANDLED());
         }
         case EVENT_REFRESH_STATE: {
+            struct voc_meas     meas;
+
             app_timer_start(&wspace->periodic, ES_VTMR_TIME_TO_TICK_MS(1000), EVENT_REFRESH_STATE);
             voc_env_update();
-            voc_meas_get_current(&wspace->curr);
+            voc_meas_get_current(&meas);
 
-            g_voc_is_stabilised = false;
+            g_voc_is_stabilised = is_sensor_stable(meas.rcurr);
 
-            if (wspace->curr.rcurr > 0.001) {
-                float           d_rcurr;
-                float           rcurr_rel;
-
-                d_rcurr = fabsf(wspace->curr.rcurr - wspace->prev.rcurr);
-                rcurr_rel = d_rcurr / wspace->curr.rcurr;
-
-                if (rcurr_rel < (CONFIG_D_RCURR_PERCENT / 100.0)) {
-                    g_voc_is_stabilised = true;
-                }
+            if (meas.rcurr < 0.001) {
+                g_voc_is_stabilised = false;
             }
             
             if (wspace->stabilisation_state != g_voc_is_stabilised) {
@@ -113,7 +146,6 @@ static esAction state_init(void * space, const esEvent * event) {
                     esEpaSendEvent(g_gui, event);
                 }
             }
-            wspace->prev = wspace->curr;
 
             return (ES_STATE_HANDLED());
         }

@@ -156,14 +156,22 @@ static struct voc_environment   g_environment;
 
 static struct voc_cal           g_voc_cal[] =
 {
-    {
-        500,    1.0 / 15.3
-    }, {
-        1000,   1.0 / 15.2
-    }, {
-        2000,   1.0 / 14.8
-    },
-    { UINT32_MAX, 1.0 / 15.0}
+    { 850, 1.182 * 1e-6},
+    { 1650, 1.2203 * 1e-6},
+    { 3250, 1.2449 * 1e-6},
+    { 7837, 1.276 * 1e-6},
+    { 15470, 1.2928 * 1e-6},
+    { 30780, 1.2995 * 1e-6},
+    { 78535, 1.2733 * 1e-6},
+    { 155890, 1.283 * 1e-6},
+    { 309170, 1.2938 * 1e-6},
+    { 760200, 1.3154 * 1e-6},
+    { 1499100, 1.3341 * 1e-6},
+    { 2946300, 1.3576 * 1e-6},
+    { 7280600, 1.3735 * 1e-6},
+    { 14266140, 1.4019 * 1e-6},
+    { 28639120, 1.3967 * 1e-6},
+    { UINT32_MAX, 1.4675 * 1e-6},
 };
 
 /*======================================================  GLOBAL VARIABLES  ==*/
@@ -201,6 +209,19 @@ static void rec_init(void)
     ICxIEC |= (0x1u << ICxISR_BIT);
     FREQ_TMR_A_CON |= TxCON_ON;
     ICxCON         |= ICxCON_ON;
+}
+
+
+static void meas_init(void)
+{
+    MEAS_TMR_A_CON  = 0;
+    Delay10us(10);
+    MEAS_TMR_A_CON  = TxCON_TCKPS(7);
+    MEAS_TMR_A      = 0;
+    MEAS_TMR_A_PR   = GetPeripheralClock() / (256u * MEAS_PERIOD_HZ);
+    MEAS_TMR_IPC   &= ~(0x1fu << MEAS_TMR_PRIO_BIT);
+    MEAS_TMR_IPC   |=  (6u << (MEAS_TMR_PRIO_BIT + 2u));
+    MEAS_TMR_IFS   &= ~(0x1u << MEAS_TMR_ISR_BIT);
 }
 
 static esError env_init(void)
@@ -287,6 +308,7 @@ void __ISR(MEAS_TMR_VECTOR, IPL6SOFT) meas_tmr_isr(void)
     g_buffer[current_no].rcurr = value;
     g_buffer[current_no].rmin  = g_buffer[current_no - 1u].rmin;
     g_buffer[current_no].rmax  = g_buffer[current_no - 1u].rmax;
+    g_buffer[current_no].voltage     = g_environment.voltage;
     g_buffer[current_no].temperature = g_environment.temperature;
 
     if (g_buffer[current_no].rmin > g_buffer[current_no].rcurr) {
@@ -316,6 +338,7 @@ void __ISR(MEAS_TMR_VECTOR, IPL6SOFT) meas_tmr_isr(void)
 esError voc_init(void)
 {
     rec_init();
+    meas_init();
 
     return (env_init());
 }
@@ -334,17 +357,6 @@ esError voc_env_voltage_set(int voltage)
     return (err);
 }
 
-void voc_meas_init(void)
-{
-    MEAS_TMR_A_CON  = 0;
-    Delay10us(10);
-    MEAS_TMR_A_CON  = TxCON_TCKPS(7);
-    MEAS_TMR_A      = 0;
-    MEAS_TMR_A_PR   = GetPeripheralClock() / (256u * MEAS_PERIOD_HZ);
-    MEAS_TMR_IPC   &= ~(0x1fu << MEAS_TMR_PRIO_BIT);
-    MEAS_TMR_IPC   |=  (6u << (MEAS_TMR_PRIO_BIT + 2u));
-    MEAS_TMR_IFS   &= ~(0x1u << MEAS_TMR_ISR_BIT);
-}
 
 void voc_rec_start(void)
 {
@@ -355,6 +367,7 @@ void voc_rec_start(void)
     g_buffer[0].rcurr   = value;
     g_buffer[0].rmin    = value;
     g_buffer[0].rmax    = value;
+    g_buffer[0].voltage = g_environment.voltage;
     g_buffer[0].temperature = g_environment.temperature;
     MEAS_TMR_A_CON |= TxCON_ON;
     MEAS_TMR_IEC   |= (0x1u << MEAS_TMR_ISR_BIT);
