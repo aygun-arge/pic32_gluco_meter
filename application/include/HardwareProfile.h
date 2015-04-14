@@ -27,7 +27,8 @@
     #define USB_A0_SILICON_WORK_AROUND
     //#define RUN_AT_48MHZ
     //#define RUN_AT_24MHZ
-    #define RUN_AT_60MHZ
+    //#define RUN_AT_60MHZ
+    #define RUN_AT_80MHZ
     
     // Various clock values
     #if defined(RUN_AT_48MHZ)
@@ -39,9 +40,13 @@
         #define GetPeripheralClock()        24000000UL
         #define GetInstructionClock()       (GetSystemClock() / 2) ???
     #elif defined(RUN_AT_60MHZ)    
-        #define GetSystemClock()            80000000UL
+        #define GetSystemClock()            60000000UL
         #define GetPeripheralClock()        GetSystemClock()  // Will be divided down
         #define GetInstructionClock()       (GetSystemClock() / 2) 
+    #elif defined(RUN_AT_80MHZ)
+        #define GetSystemClock()            80000000UL
+        #define GetPeripheralClock()        GetSystemClock()  // Will be divided down
+        #define GetInstructionClock()       (GetSystemClock() / 2)
     #else
         #error Choose a speed
     #endif        
