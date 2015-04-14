@@ -1,4 +1,7 @@
 
+
+
+#include "voc_heater.h"
 /*=========================================================  INCLUDE FILES  ==*/
 
 #include <xc.h>
@@ -147,7 +150,6 @@ static esError env_init(void);
 static const ES_MODULE_INFO_CREATE("VOC", "VOC", "Nenad Radulovic");
 
 static uint32_t                 g_current_raw_val;
-static struct ad5282_handle     g_ad5282;
 static struct ina219_handle     g_ina219;
 static struct mlx90614_handle   g_mlx90614;
 static struct voc_record        g_buffer[CONFIG_BUFFER_SIZE];
@@ -234,11 +236,6 @@ static esError env_init(void)
         0.5,
         0.18
     };
-    err = ad5282_init_driver(&g_ad5282, &g_i2c_bus, 0);
-
-    if (err) {
-        return (err);
-    }
     err = ina219_init_driver(&g_ina219, &g_i2c_bus, 0, &ina219_config);
 
     if (err) {
@@ -249,12 +246,7 @@ static esError env_init(void)
     if (err) {
         return (err);
     }
-    err = ad5282_set_pot1(&g_ad5282, 0);
-
-    if (err) {
-        return (err);
-    }
-    err = ad5282_set_pot2(&g_ad5282, 0);
+    err = voc_heater_init();
 
     return (err);
 }
@@ -345,18 +337,27 @@ esError voc_init(void)
 
 esError voc_env_voltage_set(int voltage)
 {
-    esError                     err;
+    esError                     err = ES_ERROR_NONE;
 
-    if (voltage > 70) {
-        voltage = 70;
+    if (voltage == 0) {
+        voc_heater_off();
+    } else {
+        voc_heater_on();
+        err = voc_heater_set(voltage);
     }
-    voltage *= CONFIG_VOC_VOLTAGE_COEF_1000;
-    voltage /= 100u;
-    err = ad5282_set_pot1(&g_ad5282, voltage);
 
     return (err);
 }
 
+void voc_env_voltage_on(void)
+{
+    voc_heater_on();
+}
+
+void voc_env_voltage_off(void)
+{
+    voc_heater_off();
+}
 
 void voc_rec_start(void)
 {

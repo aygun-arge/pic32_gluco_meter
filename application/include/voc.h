@@ -49,6 +49,8 @@ struct voc_record
 esError voc_init(void);
 
 esError voc_env_voltage_set(int voltage);
+void voc_env_voltage_on(void);
+void voc_env_voltage_off(void);
 void voc_env_get_current(struct voc_environment * environment);
 void voc_env_update(void);
 
