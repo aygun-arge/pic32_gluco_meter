@@ -57,8 +57,8 @@ struct main_page_overview
 {
     float               resistance;
     float               voltage;
-    uint8_t             current;
-    uint8_t             temperature;
+    float               current;
+    float               temperature;
 };
 
 struct main_page_res

@@ -48,13 +48,13 @@
 static void curr_results(struct meas_page_data * result) {
 	char buff[6];
 
-	snprintf(buff, sizeof(buff), "%3.2f", (double)result->r0);
+	snprintf(buff, sizeof(buff), "%3.4f", (double)result->r0);
 	drawString(180, 60, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-	snprintf(buff, sizeof(buff), "%3.2f", (double)result->rmax);
+	snprintf(buff, sizeof(buff), "%3.4f", (double)result->rmax);
 	drawString(180, 80, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-	snprintf(buff, sizeof(buff), "%3.2f", (double)result->rmin);
+	snprintf(buff, sizeof(buff), "%3.4f", (double)result->rmin);
 	drawString(180, 100, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-	snprintf(buff, sizeof(buff), "%3.2f",(double)result->rRatio);
+	snprintf(buff, sizeof(buff), "%3.4f",(double)result->rRatio);
 	drawString(180, 120, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
 }
 
@@ -63,13 +63,13 @@ static void curr_results(struct meas_page_data * result) {
 static void prev_results(struct meas_page_data * result) {
 	char buff[6];
 
-	snprintf(buff, sizeof(buff), "%3.2f", (double)result->r0);
+	snprintf(buff, sizeof(buff), "%3.4f", (double)result->r0);
 	drawString(180, 165, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-	snprintf(buff, sizeof(buff), "%3.2f", (double)result->rmax);
+	snprintf(buff, sizeof(buff), "%3.4f", (double)result->rmax);
 	drawString(180, 185, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-	snprintf(buff, sizeof(buff), "%3.2f", (double)result->rmin);
+	snprintf(buff, sizeof(buff), "%3.4f", (double)result->rmin);
 	drawString(180, 205, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
-	snprintf(buff, sizeof(buff), "%3.2f", (double)result->rRatio);
+	snprintf(buff, sizeof(buff), "%3.4f", (double)result->rRatio);
 	drawString(180, 225, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
 }
 

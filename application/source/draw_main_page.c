@@ -177,9 +177,9 @@ void main_page_res(struct main_page_res * values)
     char rmax[8];
     char rmin[8];
 
-    snprintf(r0, sizeof(r0), "%3.1f", (double)values->r0);
-    snprintf(rmax, sizeof(rmax), "%3.1f", (double)values->rmax);
-    snprintf(rmin, sizeof(rmin), "%3.1f", (double)values->rmin);
+    snprintf(r0, sizeof(r0), "%3.3f", (double)values->r0);
+    snprintf(rmax, sizeof(rmax), "%3.3f", (double)values->rmax);
+    snprintf(rmin, sizeof(rmin), "%3.3f", (double)values->rmin);
 
     drawRectangleFilled(10, 210, 230, 220, COLOR_BLUE);
     drawString(11, 210, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Ro:       ,Rmax:       ,Rmin:    ");
@@ -197,10 +197,10 @@ void main_page_overview(struct main_page_overview * values)
     char current[8];
     char temperature[8];
 
-    snprintf(resistance, sizeof(resistance), "%3.3f", (double)values->resistance);
-    snprintf(voltage, sizeof(voltage), "%3.1f", (double)values->voltage);
-    snprintf(current, sizeof(current), "%3d", values->current);
-    snprintf(temperature, sizeof(temperature), "%3d", values->temperature);
+    snprintf(resistance, sizeof(resistance), "%3.4f", (double)values->resistance);
+    snprintf(voltage, sizeof(voltage), "%3.3f", (double)values->voltage);
+    snprintf(current, sizeof(current), "%3.3f", (double)values->current);
+    snprintf(temperature, sizeof(temperature), "%3.3f", (double)values->temperature);
     drawRectangleFilled(170, 120, 240, 190, COLOR_BLUE);
 	drawString(170, 120, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, resistance);
 	drawString(170, 140, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, voltage);
