@@ -15,6 +15,10 @@
 #include "base/error.h"
 
 /*===============================================================  MACRO's  ==*/
+
+#define PERIOD_20MS             0
+#define PERIOD_1S               1
+
 /*------------------------------------------------------  C++ extern begin  --*/
 #ifdef	__cplusplus
 extern "C" {
@@ -54,7 +58,7 @@ void voc_env_voltage_off(void);
 void voc_env_get_current(struct voc_environment * environment);
 void voc_env_update(void);
 
-void voc_rec_start(void);
+void voc_rec_start(int period);
 void voc_rec_stop(void);
 uint32_t voc_rec_get_remaining_no(void);
 void voc_rec_get_current(struct voc_record * record);

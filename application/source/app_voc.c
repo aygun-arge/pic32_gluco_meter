@@ -359,7 +359,7 @@ void voc_env_voltage_off(void)
     voc_heater_off();
 }
 
-void voc_rec_start(void)
+void voc_rec_start(int period)
 {
     float                    value;
 
@@ -370,6 +370,12 @@ void voc_rec_start(void)
     g_buffer[0].rmax    = value;
     g_buffer[0].voltage = g_environment.voltage;
     g_buffer[0].temperature = g_environment.temperature;
+    
+    if (period == PERIOD_20MS) {
+        MEAS_TMR_A_PR   = GetPeripheralClock() / (256u * MEAS_PERIOD_HZ);
+    } else {
+        MEAS_TMR_A_PR   = GetPeripheralClock() / (256u * 1u);
+    }
     MEAS_TMR_A_CON |= TxCON_ON;
     MEAS_TMR_IEC   |= (0x1u << MEAS_TMR_ISR_BIT);
 }

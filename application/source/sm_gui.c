@@ -215,7 +215,7 @@ static esAction state_main(void * space, const esEvent * event) {
                 main_page_switch_rec(&wspace->main_page_ctx);
                 voc_meas_get_current(&meas);
                 wspace->curr_r0 = meas.rcurr;
-                voc_rec_start();
+                voc_rec_start(PERIOD_1S);
 
                 return (ES_STATE_HANDLED());
             }
@@ -352,7 +352,7 @@ static esAction state_start_meas(void * space, const esEvent * event) {
             app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(3000), EVENT_TIMEOUT_PREP_MEAS);
             voc_meas_get_current(&meas);
             wspace->curr_r0 = meas.rcurr;
-            voc_rec_start();
+            voc_rec_start(PERIOD_20MS);
 
             return (ES_STATE_HANDLED());
         }
