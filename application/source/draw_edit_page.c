@@ -149,7 +149,7 @@ static void edit_page_events(tsTouchData_t * tsData)
 	if (tsData->xlcd > 130 && tsData->xlcd < 220) {
 		if (tsData->ylcd > 260 && tsData->ylcd < 300) {
 
-            if (gValString[1] == 0) {
+            if (!g_is_bigger_input && (gValString[1] == 0)) {
                 gValString[1] = '0';
             }
 			gEditValue = atoi(gValString);

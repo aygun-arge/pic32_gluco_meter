@@ -46,7 +46,7 @@
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
 static void curr_results(struct meas_page_data * result) {
-	char buff[6];
+	char buff[16];
 
 	snprintf(buff, sizeof(buff), "%3.4f", (double)result->r0);
 	drawString(180, 60, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);
@@ -61,7 +61,7 @@ static void curr_results(struct meas_page_data * result) {
 
 
 static void prev_results(struct meas_page_data * result) {
-	char buff[6];
+	char buff[16];
 
 	snprintf(buff, sizeof(buff), "%3.4f", (double)result->r0);
 	drawString(180, 165, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, buff);

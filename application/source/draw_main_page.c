@@ -173,13 +173,13 @@ void main_page_msg(enum main_page_msg message)
 
 void main_page_res(struct main_page_res * values)
 {
-    char r0[8];
-    char rmax[8];
-    char rmin[8];
+    char r0[16];
+    char rmax[16];
+    char rmin[16];
 
-    snprintf(r0, sizeof(r0), "%3.3f", (double)values->r0);
-    snprintf(rmax, sizeof(rmax), "%3.3f", (double)values->rmax);
-    snprintf(rmin, sizeof(rmin), "%3.3f", (double)values->rmin);
+    snprintf(r0, sizeof(r0), "%3.4f", (double)values->r0);
+    snprintf(rmax, sizeof(rmax), "%3.4f", (double)values->rmax);
+    snprintf(rmin, sizeof(rmin), "%3.4f", (double)values->rmin);
 
     drawRectangleFilled(10, 210, 230, 220, COLOR_BLUE);
     drawString(11, 210, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Ro:       ,Rmax:       ,Rmin:    ");
@@ -192,10 +192,10 @@ void main_page_res(struct main_page_res * values)
 
 void main_page_overview(struct main_page_overview * values)
 {
-    char resistance[8];
-    char voltage[8];
-    char current[8];
-    char temperature[8];
+    char resistance[16];
+    char voltage[16];
+    char current[16];
+    char temperature[16];
 
     snprintf(resistance, sizeof(resistance), "%3.4f", (double)values->resistance);
     snprintf(voltage, sizeof(voltage), "%3.3f", (double)values->voltage);
