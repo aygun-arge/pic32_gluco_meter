@@ -493,7 +493,7 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
             curr.rRatio    = 0.0;
 
             if (wspace->curr.rmin > 0.0) {
-                curr.rRatio = wspace->curr.rmax / wspace->curr.rmin;
+                curr.rRatio = wspace->curr_r0 / wspace->curr.rmin;
             }
             prev.r0        = wspace->prev_r0;
             prev.rmin      = wspace->prev.rmin;
@@ -501,7 +501,7 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
             prev.rRatio    = 0.0;
 
             if (wspace->prev.rmin > 0.0) {
-                prev.rRatio = wspace->prev.rmax / wspace->prev.rmin;
+                prev.rRatio = wspace->prev_r0 / wspace->prev.rmin;
             }
             meas_page_draw(&curr, &prev);
             
