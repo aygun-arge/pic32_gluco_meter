@@ -68,7 +68,7 @@
 #define MEAS_TMR_IPC                    IPC4
 #define MEAS_TMR_PRIO_BIT               0
 #define MEAS_TMR_ISR_BIT                16
-#define MEAS_PERIOD_HZ                  100
+#define MEAS_PERIOD_HZ                  50
 #define MEAS_TMR_VECTOR                 _TIMER_4_VECTOR
 
 #if (CONFIG_IC_SELECTION == 1)
