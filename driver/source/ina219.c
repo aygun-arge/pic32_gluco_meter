@@ -74,6 +74,7 @@ esError ina219_get_voltage(struct ina219_handle * handle, float * value)
         
         uncalib = (float)raw_value * 0.004;
 
+#if 0
         if (uncalib < 1.0) {
             *value = uncalib * 1.35;
         } else if (uncalib < 2.0) {
@@ -89,7 +90,9 @@ esError ina219_get_voltage(struct ina219_handle * handle, float * value)
         } else {
             *value = uncalib * 1.20;
         }
-
+#endif
+        *value = uncalib;
+        
         return (ES_ERROR_NONE);
     } else {
 

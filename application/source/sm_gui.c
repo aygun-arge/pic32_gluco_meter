@@ -236,6 +236,7 @@ static esAction state_main(void * space, const esEvent * event) {
                 gpioClrPin(VOC_PWR_SHDN_PORT, VOC_PWR_SHDN_PIN);
 #endif
                 voc_env_voltage_set(0);
+                voc_env_voltage_off();
 
                 return (ES_STATE_HANDLED());
             } else {
@@ -281,6 +282,7 @@ static esAction state_set_voltage(void * space, const esEvent * event) {
 #else
             gpioSetPin(VOC_PWR_SHDN_PORT, VOC_PWR_SHDN_PIN);
 #endif
+            voc_env_voltage_on();
             voc_env_voltage_set(edit_page_get_value());
 
             return (ES_STATE_TRANSITION(state_main));

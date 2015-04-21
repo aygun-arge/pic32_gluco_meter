@@ -17,6 +17,7 @@ extern "C" {
  */
 #define LMR_SHDN_PORT                   PORTD
 #define LMR_SHDN_TRIS                   TRISD
+#define LMR_SHDN_OD                     ODCD
 #define LMR_SHDN_PIN                    5
 
 /*
@@ -24,14 +25,14 @@ extern "C" {
  */
 #define LT_OUT_OFF_PORT                 PORTD
 #define LT_OUT_OFF_TRIS                 TRISD
-#define LT_OUT_OFF_PIN                  6
+#define LT_OUT_OFF_PIN                  10
 
 /*
  * AD5282 Digital potentiometer
  */
-#define AD_SHDN_PORT                    PORTB
-#define AD_SHDN_TRIS                    TRISB
-#define AD_SHDN_PIN                     3
+#define AD_SHDN_PORT                    PORTC
+#define AD_SHDN_TRIS                    TRISC
+#define AD_SHDN_PIN                     13
 
 /*
  * MCP73871 status pins

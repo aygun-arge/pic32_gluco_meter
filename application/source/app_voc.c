@@ -339,12 +339,7 @@ esError voc_env_voltage_set(int voltage)
 {
     esError                     err = ES_ERROR_NONE;
 
-    if (voltage == 0) {
-        voc_heater_off();
-    } else {
-        voc_heater_on();
-        err = voc_heater_set(voltage);
-    }
+    err = voc_heater_set(voltage);
 
     return (err);
 }

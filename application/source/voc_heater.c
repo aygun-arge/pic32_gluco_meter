@@ -4,6 +4,7 @@
 #include "bsp.h"
 #include "main.h"
 #include "driver/ad5282.h"
+#include "TimeDelay.h"
 
 #define CONFIG_VOC_VOLTAGE_COEF_1000    255
 
@@ -14,7 +15,8 @@ esError voc_heater_init(void)
     esError                     err;
 
     LMR_SHDN_PORT &= ~(0x1u << LMR_SHDN_PIN);
-    LMR_SHDN_TRIS &= ~(0x1u << LMR_SHDN_PIN);
+    LMR_SHDN_TRIS |=  (0x1u << LMR_SHDN_PIN);
+    LMR_SHDN_OD   |=  (0x1u << LMR_SHDN_PIN);
 
     LT_OUT_OFF_PORT |=   (0x1u << LT_OUT_OFF_PIN);
     LT_OUT_OFF_TRIS &=  ~(0x1u << LT_OUT_OFF_PIN);
@@ -36,16 +38,18 @@ esError voc_heater_init(void)
 
 void voc_heater_on(void)
 {
-    ad5282_operate(&g_ad5282);
+    LMR_SHDN_PORT   |=  (0x1u << LMR_SHDN_PIN);
+    Delay10us(100);
     LT_OUT_OFF_PORT &= ~(0x1u << LT_OUT_OFF_PIN);
-    LMR_SHDN_PORT   |= (0x1u << LMR_SHDN_PIN);
+    Delay10us(100);
+    ad5282_operate(&g_ad5282);
 }
 
 void voc_heater_off(void)
 {
-    LMR_SHDN_PORT   &= ~(0x1u << LMR_SHDN_PIN);
-    LT_OUT_OFF_PORT |=  (0x1u << LT_OUT_OFF_PIN);
     ad5282_shutdown(&g_ad5282);
+    LT_OUT_OFF_PORT |=  (0x1u << LT_OUT_OFF_PIN);
+    LMR_SHDN_PORT   &= ~(0x1u << LMR_SHDN_PIN);
 }
 
 esError voc_heater_set(int voltage)
