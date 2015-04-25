@@ -24,6 +24,8 @@
         <itemPath>application/include/voc.h</itemPath>
         <itemPath>application/include/voc_heater.h</itemPath>
         <itemPath>application/include/bsp.h</itemPath>
+        <itemPath>application/include/app_buzzer.h</itemPath>
+        <itemPath>application/include/draw_rtc_page.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/application/source/main.c</itemPath>
@@ -43,6 +45,8 @@
         <itemPath>application/source/app_voc.c</itemPath>
         <itemPath>application/source/draw_meas_page.c</itemPath>
         <itemPath>application/source/voc_heater.c</itemPath>
+        <itemPath>app_buzzer.c</itemPath>
+        <itemPath>application/source/draw_rtc_page.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="driver" displayName="driver" projectFiles="true">
@@ -264,11 +268,8 @@
           <linkerLibItems>
           </linkerLibItems>
         </linkerTool>
-        <archiverTool>
-        </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
-          <parseOnProdLoad>true</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
       </compileType>
@@ -305,9 +306,6 @@
         <property key="use-iar" value="false"/>
         <property key="use-indirect-calls" value="false"/>
       </C32>
-      <C32-AR>
-        <property key="additional-options-chop-files" value="false"/>
-      </C32-AR>
       <C32-AS>
         <property key="assembler-symbols" value=""/>
         <property key="enable-symbols" value="true"/>
@@ -340,7 +338,7 @@
         <property key="fill-flash-options-seq" value=""/>
         <property key="fill-flash-options-what" value="0"/>
         <property key="generate-16-bit-code" value="false"/>
-        <property key="generate-cross-reference-file" value="false"/>
+        <property key="generate-cross-reference-file" value="true"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="heap-size" value="4096"/>
         <property key="input-libraries" value=""/>
@@ -384,8 +382,6 @@
         <property key="use-indirect-calls" value="false"/>
       </C32CPP>
       <C32Global>
-        <property key="common-include-directories" value=""/>
-        <property key="gp-relative-option" value=""/>
         <property key="legacy-libc" value="false"/>
         <property key="save-temps" value="true"/>
         <property key="wpo-lto" value="false"/>
@@ -438,7 +434,6 @@
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="false"/>
         <property key="memories.configurationmemory" value="true"/>
-        <property key="memories.dataflash" value="true"/>
         <property key="memories.eeprom" value="true"/>
         <property key="memories.flashdata" value="true"/>
         <property key="memories.id" value="true"/>
@@ -446,7 +441,6 @@
         <property key="memories.programmemory.end" value="0x1d07ffff"/>
         <property key="memories.programmemory.start" value="0x1d000000"/>
         <property key="poweroptions.powerenable" value="true"/>
-        <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.preserveeeprom" value="false"/>
         <property key="programoptions.preserveprogramrange" value="false"/>
