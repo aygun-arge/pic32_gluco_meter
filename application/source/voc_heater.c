@@ -15,7 +15,7 @@ esError voc_heater_init(void)
     esError                     err;
 
     LMR_SHDN_PORT &= ~(0x1u << LMR_SHDN_PIN);
-    LMR_SHDN_TRIS |=  (0x1u << LMR_SHDN_PIN);
+    LMR_SHDN_TRIS |=  (0x1u << LMR_SHDN_PIN); /* Turn on at start-up */
     LMR_SHDN_OD   |=  (0x1u << LMR_SHDN_PIN);
 
     LT_OUT_OFF_PORT |=   (0x1u << LT_OUT_OFF_PIN);
@@ -38,7 +38,9 @@ esError voc_heater_init(void)
 
 void voc_heater_on(void)
 {
+#if 0
     LMR_SHDN_PORT   |=  (0x1u << LMR_SHDN_PIN);
+#endif
     Delay10us(100);
     LT_OUT_OFF_PORT &= ~(0x1u << LT_OUT_OFF_PIN);
     Delay10us(100);
@@ -49,7 +51,9 @@ void voc_heater_off(void)
 {
     ad5282_shutdown(&g_ad5282);
     LT_OUT_OFF_PORT |=  (0x1u << LT_OUT_OFF_PIN);
+#if 0
     LMR_SHDN_PORT   &= ~(0x1u << LMR_SHDN_PIN);
+#endif
 }
 
 esError voc_heater_set(int voltage)

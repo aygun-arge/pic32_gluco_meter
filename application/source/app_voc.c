@@ -63,13 +63,14 @@
 #define MEAS_TMR_A_CON                  T4CON
 #define MEAS_TMR_A                      TMR4
 #define MEAS_TMR_A_PR                   PR4
+#define MEAS_TMR_B_CON                  T4CON
 #define MEAS_TMR_IEC                    IEC0
 #define MEAS_TMR_IFS                    IFS0
-#define MEAS_TMR_IPC                    IPC4
+#define MEAS_TMR_IPC                    IPC5
 #define MEAS_TMR_PRIO_BIT               0
-#define MEAS_TMR_ISR_BIT                16
+#define MEAS_TMR_ISR_BIT                20
 #define MEAS_PERIOD_HZ                  50
-#define MEAS_TMR_VECTOR                 _TIMER_4_VECTOR
+#define MEAS_TMR_VECTOR                 _TIMER_5_VECTOR
 
 #if (CONFIG_IC_SELECTION == 1)
 #define IC_VECTOR                       _INPUT_CAPTURE_1_VECTOR
@@ -217,8 +218,9 @@ static void rec_init(void)
 static void meas_init(void)
 {
     MEAS_TMR_A_CON  = 0;
+    MEAS_TMR_B_CON  = 0;
     Delay10us(10);
-    MEAS_TMR_A_CON  = TxCON_TCKPS(7);
+    MEAS_TMR_A_CON  = TxCON_TCKPS(7) | TxCON_T32;
     MEAS_TMR_A      = 0;
     MEAS_TMR_A_PR   = GetPeripheralClock() / (256u * MEAS_PERIOD_HZ);
     MEAS_TMR_IPC   &= ~(0x1fu << MEAS_TMR_PRIO_BIT);

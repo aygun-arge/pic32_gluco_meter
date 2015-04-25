@@ -16,12 +16,15 @@
 #include "draw_measure_page.h"
 #include "MDD/FSIO.h"
 #include "main.h"
+#include "app_buzzer.h"
+#include "draw_rtc_page.h"
 
 /*=========================================================  LOCAL MACRO's  ==*/
 
 #define GUI_TABLE(entry)                                                        \
     entry(state_init,                TOP)                                       \
     entry(state_main,                TOP)                                       \
+    entry(state_set_rtc,             TOP)                                       \
     entry(state_set_voltage,         TOP)                                       \
     entry(state_set_meas_time,       TOP)                                       \
     entry(state_start_meas,          TOP)                                       \
@@ -73,6 +76,7 @@ struct wspace
 
 static esAction state_init              (void *, const esEvent *);
 static esAction state_main              (void *, const esEvent *);
+static esAction state_set_rtc           (void *, const esEvent *);
 static esAction state_set_voltage       (void *, const esEvent *);
 static esAction state_set_meas_time     (void *, const esEvent *);
 static esAction state_start_meas        (void *, const esEvent *);
@@ -120,7 +124,23 @@ static esAction state_init(void * space, const esEvent * event) {
             gui_init();
             gui_start();
 
-            return (ES_STATE_TRANSITION(state_main));
+            return (ES_STATE_TRANSITION(state_set_rtc));
+        }
+        default: {
+
+            return (ES_STATE_IGNORED());
+        }
+    }
+}
+
+static esAction state_set_rtc(void * space, const esEvent * event) {
+    struct wspace * wspace = space;
+
+    switch (event->id) {
+        case ES_ENTRY: {
+            rtc_page_draw();
+            
+            return (ES_STATE_HANDLED());
         }
         default: {
 
@@ -372,7 +392,8 @@ static esAction state_start_meas(void * space, const esEvent * event) {
 }
 
 static esAction state_meas(void * space, const esEvent * event) {
-    struct wspace * wspace = space;
+    struct wspace *             wspace = space;
+    static bool                 every_second;
 
     switch (event->id) {
         case ES_ENTRY: {
@@ -380,6 +401,8 @@ static esAction state_meas(void * space, const esEvent * event) {
             app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(wspace->blowing_time), EVENT_TIMEOUT_PREP_MEAS);
             app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
             app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
+            buzzer_beep(400);
+            every_second = false;
 
             return (ES_STATE_HANDLED());
         }
@@ -415,7 +438,12 @@ static esAction state_meas(void * space, const esEvent * event) {
             res.rmin    = wspace->curr.rmin;
             res.rmax    = wspace->curr.rmax;
             main_page_res(&res);
-            
+
+            if (every_second) {
+                buzzer_beep(10);
+            }
+            every_second = !every_second;
+
             return (ES_STATE_HANDLED());
         }
         case EVENT_VOC_REC_HAS_FINISHED:
@@ -439,7 +467,8 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
         case ES_ENTRY: {
             main_page_msg(MSG_BLOW_STOP);
             app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
-            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(10000u), EVENT_TIMEOUT_PREP_MEAS);
+            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(2000u), EVENT_TIMEOUT_PREP_MEAS);
+            buzzer_beep(500);
 
             return (ES_STATE_HANDLED());
         }

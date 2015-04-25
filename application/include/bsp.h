@@ -47,6 +47,10 @@ extern "C" {
 #define MCP_PG_TRIS                     TRISB
 #define MCP_PG_PIN                      2
 
+#define BUZZER_PORT                     PORTF
+#define BUZZER_LAT                      LATF
+#define BUZZER_TRIS                     TRISF
+#define BUZZER_PIN                      0
 
 #ifdef	__cplusplus
 }

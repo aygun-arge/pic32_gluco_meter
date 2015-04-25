@@ -32,12 +32,14 @@
 
 #include "USB/usb.h"
 #include "USB/usb_host_msd.h"
+#include "app_buzzer.h"
+#include "TimeDelay.h"
 
 /*=========================================================  LOCAL MACRO's  ==*/
 /*======================================================  LOCAL DATA TYPES  ==*/
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
 
-static void board_init(void);
+static void board_init_early(void);
 static void idle_hook(void);
 
 /*=======================================================  LOCAL VARIABLES  ==*/
@@ -54,7 +56,18 @@ struct i2c_bus                  g_i2c_bus;
 
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
-static void board_init(void)
+static void board_init_early(void)
+{
+    /* Turn off FUCKING JTAG. */
+    DDPCONbits.JTAGEN = 0;
+
+    initIntrDriver();
+    initClockDriver();
+    initSysTickDriver();
+    initGpioDriver();
+}
+
+static void board_init_late(void)
 {
     static const struct i2c_bus_config i2c_bus_config =
     {
@@ -63,18 +76,13 @@ static void board_init(void)
         100000,
         CONFIG_INTR_MAX_ISR_PRIO
     };
-
-    /* Turn off FUCKING JTAG. */
-    DDPCONbits.JTAGEN = 0;
-
-    initIntrDriver();
-    initClockDriver();
-    initSysTickDriver();
-    initGpioDriver();
     i2c_driver_init();
     i2c_bus_open(&g_i2c_bus, &i2c_bus_config);
     rtc_init_driver(&g_i2c_bus);
+    voc_init();
     USBInitialize(0);
+    buzzer_init();
+    buzzer_beep(40);
 }
 
 static void idle_hook(void)
@@ -90,15 +98,17 @@ int main(int argc, char** argv)
     (void)argc;
     (void)argv;
 
-    board_init();
-    ES_ENSURE(voc_init());
+    board_init_early();
 
     /*-- eSolid --------------------------------------------------------------*/
     esEdsInit();
     esEdsSetIdle(idle_hook);
-    esModuleVTimerInit();
     esMemInit(&esGlobalStaticMemClass, &g_static_mem, g_static_storage, sizeof(g_static_storage), 0);
     esMemInit(&esGlobalHeapMemClass, &g_heap_mem, g_heap_storage, sizeof(g_heap_storage), 0);
+
+    board_init_late();
+    DelayMs(100);
+    
     esEventRegisterMem(&g_heap_mem);
     esEpaCreate(&g_gui_epa, &g_gui_sm, &g_static_mem, &g_gui);
     esEpaCreate(&g_voc_epa, &g_voc_sm, &g_static_mem, &g_voc);
