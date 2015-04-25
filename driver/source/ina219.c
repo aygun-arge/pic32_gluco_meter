@@ -49,13 +49,14 @@ esError ina219_get_current(struct ina219_handle * handle, float * value)
 {
     uint8_t             buff[2];
     uint16_t            raw_value;
-
+    
     if (i2c_slave_read(&handle->comm, INA219_SHUNT, buff, sizeof(buff)) == true) {
         raw_value = ((uint16_t)buff[0] << 8u) | (uint16_t)buff[1];
         *value = (float)raw_value * handle->current_lsb;
 
         return (ES_ERROR_NONE);
     } else {
+        *value = 0.0;
 
         return (ES_ERROR_DEVICE_FAIL);
     }
@@ -95,6 +96,7 @@ esError ina219_get_voltage(struct ina219_handle * handle, float * value)
         
         return (ES_ERROR_NONE);
     } else {
+        *value = 0.0;
 
         return (ES_ERROR_DEVICE_FAIL);
     }

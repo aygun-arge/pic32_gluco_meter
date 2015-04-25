@@ -22,6 +22,8 @@
         <itemPath>application/include/FSconfig.h</itemPath>
         <itemPath>application/include/sm_voc.h</itemPath>
         <itemPath>application/include/voc.h</itemPath>
+        <itemPath>application/include/voc_heater.h</itemPath>
+        <itemPath>application/include/bsp.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
         <itemPath>/home/nenad/workspace/mplabx/gluco_meter/application/source/main.c</itemPath>
@@ -40,6 +42,7 @@
         <itemPath>application/source/sm_voc.c</itemPath>
         <itemPath>application/source/app_voc.c</itemPath>
         <itemPath>application/source/draw_meas_page.c</itemPath>
+        <itemPath>application/source/voc_heater.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="driver" displayName="driver" projectFiles="true">
@@ -291,7 +294,7 @@
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>
         <property key="make-warnings-into-errors" value="false"/>
-        <property key="optimization-level" value="-O1"/>
+        <property key="optimization-level" value=""/>
         <property key="place-data-into-section" value="true"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
@@ -442,7 +445,7 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.end" value="0x1d07ffff"/>
         <property key="memories.programmemory.start" value="0x1d000000"/>
-        <property key="poweroptions.powerenable" value="false"/>
+        <property key="poweroptions.powerenable" value="true"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.preserveeeprom" value="false"/>
@@ -453,7 +456,7 @@
         <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
         <property key="programoptions.usehighvoltageonmclr" value="false"/>
         <property key="programoptions.uselvpprogramming" value="false"/>
-        <property key="voltagevalue" value="3.25"/>
+        <property key="voltagevalue" value="3.0"/>
       </ICD3PlatformTool>
     </conf>
   </confs>

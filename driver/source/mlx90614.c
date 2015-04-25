@@ -35,6 +35,7 @@ esError mlx_read_temp(
         
         return (ES_ERROR_NONE);
     } else {
+        *temp = 0.0;
 
         return (ES_ERROR_DEVICE_FAIL);
     }
