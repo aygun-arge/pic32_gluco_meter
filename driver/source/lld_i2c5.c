@@ -9,6 +9,7 @@
 #include "driver/clock.h"
 #include "driver/gpio.h"
 #include "TimeDelay.h"
+#include "vtimer/vtimer.h"
 
 /*=========================================================  LOCAL MACRO's  ==*/
 
@@ -63,16 +64,36 @@ const struct i2c_id g_I2C5 = {
 
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
+static void timeout_handle(void * arg)
+{
+    bool * flag = arg;
+    
+    *flag = false;
+}
+
+static bool wait_for_idle(void)
+{
+    struct esVTimer             timeout;
+    bool                        timer_counting = true;
+    
+    esVTimerInit(&timeout);
+    esVTimerStart(&timeout, ES_VTMR_TIME_TO_TICK_MS(20), &timeout_handle, &timer_counting);
+
+    while (((I2C5CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0) && timer_counting);
+
+    esVTimerCancel(&timeout);
+    
+    return (timer_counting);
+}
+
 static void open(const struct i2c_bus_config * config, struct i2c_bus * handle) {
     uint32_t        pbclk;
     uint32_t        brg;
 
-    TRISF           &= ~(0x1u << 4);
-    TRISF           &= ~(0x1u << 5);
-
     CONFIG_HELPER_GPIO &= ~(0x1u << CONFIG_HELPER_PIN);
     CONFIG_HELPER_TRIS &= ~(0x1u << CONFIG_HELPER_PIN);
-    
+    CONFIG_HELPER_GPIO |=  (0x1u << CONFIG_HELPER_PIN);
+    CONFIG_HELPER_GPIO &= ~(0x1u << CONFIG_HELPER_PIN);
     I2C5CON         = 0;
     Delay10us(100);
 
@@ -88,8 +109,8 @@ static void open(const struct i2c_bus_config * config, struct i2c_bus * handle) 
     CONFIG_HELPER_TRIS |= 0x1u << CONFIG_HELPER_PIN;
     Delay10us(100);
     I2C5BRG = brg;
-    start(handle);
-    stop(handle);
+    wait_for_idle();
+    I2C5CONSET = I2C_CON_SEN;
     I2C5STAT = 0;
 }
 
@@ -103,7 +124,9 @@ static void close(struct i2c_bus * handle) {
 
 static bool write(struct i2c_bus * handle, uint8_t data) {
 
-    while ((I2C5CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
+    if (!wait_for_idle()) {
+        return (false);
+    }
 
     I2C5TRN = data;
 
@@ -120,7 +143,9 @@ static bool write(struct i2c_bus * handle, uint8_t data) {
 
 static uint8_t read(struct i2c_bus * handle) {
 
-    while ((I2C5CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
+    if (!wait_for_idle()) {
+        return (0);
+    }
     I2C5CON |= I2C_CON_RCEN;
 
     while ((I2C5STAT & I2C_STAT_RBF) == 0);
@@ -133,7 +158,9 @@ static uint8_t read(struct i2c_bus * handle) {
 static void start(struct i2c_bus * handle) {
     (void)handle;
 
-    while ((I2C5CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
+    if (!wait_for_idle()) {
+        return;
+    }
 
     I2C5CONSET = I2C_CON_SEN;
 }
@@ -141,7 +168,9 @@ static void start(struct i2c_bus * handle) {
 static void restart(struct i2c_bus * handle) {
     (void)handle;
     
-    while ((I2C5CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
+    if (!wait_for_idle()) {
+        return;
+    }
 
     I2C5CONSET = I2C_CON_RSEN;
 }
@@ -149,7 +178,9 @@ static void restart(struct i2c_bus * handle) {
 static void stop(struct i2c_bus * handle) {
     (void)handle;
 
-    while ((I2C5CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
+    if (!wait_for_idle()) {
+        return;
+    }
 
     I2C5CONSET = I2C_CON_PEN;
     I2C5STATCLR = I2C_STAT_BCL;
@@ -158,7 +189,9 @@ static void stop(struct i2c_bus * handle) {
 static void ack(struct i2c_bus * handle) {
     (void)handle;
 
-    while ((I2C5CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
+    if (!wait_for_idle()) {
+        return;
+    }
 
     I2C5CONCLR = I2C_CON_ACKDT;
     I2C5CONSET = I2C_CON_ACKEN;
@@ -167,7 +200,9 @@ static void ack(struct i2c_bus * handle) {
 static void nack(struct i2c_bus * handle) {
     (void)handle;
 
-    while ((I2C5CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
+    if (!wait_for_idle()) {
+        return;
+    }
 
     I2C5CONSET = I2C_CON_ACKDT;
     I2C5CONSET = I2C_CON_ACKEN;
