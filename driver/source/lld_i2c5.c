@@ -41,7 +41,7 @@ static void open(const struct i2c_bus_config *, struct i2c_bus *);
 static void close(struct i2c_bus *);
 static bool write(struct i2c_bus *, uint8_t);
 static uint8_t read(struct i2c_bus *);
-static void start(struct i2c_bus *);
+static bool start(struct i2c_bus *);
 static void restart(struct i2c_bus *);
 static void stop(struct i2c_bus *);
 static void ack(struct i2c_bus *);
@@ -155,14 +155,16 @@ static uint8_t read(struct i2c_bus * handle) {
     return (I2C5RCV);
 }
 
-static void start(struct i2c_bus * handle) {
+static bool start(struct i2c_bus * handle) {
     (void)handle;
 
     if (!wait_for_idle()) {
-        return;
+        return (false);
     }
 
     I2C5CONSET = I2C_CON_SEN;
+
+    return (true);
 }
 
 static void restart(struct i2c_bus * handle) {

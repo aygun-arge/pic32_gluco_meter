@@ -8,11 +8,22 @@
 #ifndef DRAW_RTC_PAGE_H
 #define	DRAW_RTC_PAGE_H
 
+#include <stdint.h>
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-void rtc_page_draw(void);
+struct rtc_page_data
+{
+    uint32_t                    year;
+    uint8_t                     month;
+    uint8_t                     day;
+    uint8_t                     hour;
+    uint8_t                     minute;
+};
+
+void rtc_page_draw(const struct rtc_page_data * data);
 
 
 #ifdef	__cplusplus

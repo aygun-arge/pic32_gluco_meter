@@ -238,17 +238,9 @@ static esError env_init(void)
         0.5,
         0.18
     };
-    err = ina219_init_driver(&g_ina219, &g_i2c_bus, 0, &ina219_config);
-
-    if (err) {
-        return (err);
-    }
-    err = mlx_init_driver(&g_mlx90614, &g_i2c_bus, 0);
-
-    if (err) {
-        return (err);
-    }
-    err = voc_heater_init();
+    err  = ina219_init_driver(&g_ina219, &g_i2c_bus, 0, &ina219_config);
+    err |= mlx_init_driver(&g_mlx90614, &g_i2c_bus, 0);
+    err |= voc_heater_init();
 
     return (err);
 }

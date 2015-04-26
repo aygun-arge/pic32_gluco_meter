@@ -36,7 +36,7 @@ static void open(const struct i2c_bus_config *, struct i2c_bus *);
 static void close(struct i2c_bus *);
 static bool write(struct i2c_bus *, uint8_t);
 static uint8_t read(struct i2c_bus *);
-static void start(struct i2c_bus *);
+static bool start(struct i2c_bus *);
 static void restart(struct i2c_bus *);
 static void stop(struct i2c_bus *);
 static void ack(struct i2c_bus *);
@@ -115,12 +115,14 @@ static uint8_t read(struct i2c_bus * handle) {
     return (I2C1RCV);
 }
 
-static void start(struct i2c_bus * handle) {
+static bool start(struct i2c_bus * handle) {
     (void)handle;
 
     while ((I2C1CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0);
 
     I2C1CONSET = I2C_CON_SEN;
+
+    return (true);
 }
 
 static void restart(struct i2c_bus * handle) {

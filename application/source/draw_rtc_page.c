@@ -53,25 +53,49 @@
 
 static void rtc_page_events(tsTouchData_t * tsData)
 {
-	if (tsData->xlcd > 20 && tsData->xlcd < 110) {								/* sensor ON/OFF button */
-		if (tsData->ylcd > 260 && tsData->ylcd < 300) {
-		    gui_event(GUI_BTN_BACK);
-		}
-	}
+    if (tsData->xlcd > 60 && tsData->xlcd < 180) {								/* sensor ON/OFF button */
+        if (tsData->ylcd > 260 && tsData->ylcd < 300) {
+            gui_event(GUI_BTN_OK);
+        }
+    }
 }
 
 /*===================================  GLOBAL PRIVATE FUNCTION DEFINITIONS  ==*/
 /*====================================  GLOBAL PUBLIC FUNCTION DEFINITIONS  ==*/
 
-void rtc_page_draw(void)
+void rtc_page_draw(const struct rtc_page_data * data)
 {
+    char buff[64];
+
     drawFill(COLOR_BLUE);
 
-    drawString(15, 35, COLOR_WHITE, &verdanabold14ptFontInfo, "Set time/date");
+    drawString(65, 15, COLOR_WHITE, &verdanabold14ptFontInfo, "Time/date");
 
-    drawButton(100 - 15, 30, 30, 30, &KEYS_FONT, 10, KEYS_FONT_COLOR, KEYS_COLOR, KEYS_FONT_COLOR, "+");
-    drawButton(140 - 15, 30, 30, 30, &KEYS_FONT, 10, KEYS_FONT_COLOR, KEYS_COLOR, KEYS_FONT_COLOR, "+");
-    drawButton(20, 260, 90, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, COLOR_RED, COLOR_WHITE, "BACK");
+    drawButton(80 - 15, 40, 30, 30, &KEYS_FONT, 10, KEYS_FONT_COLOR, KEYS_COLOR, KEYS_FONT_COLOR, "+");
+    drawButton(160 - 15, 40, 30, 30, &KEYS_FONT, 10, KEYS_FONT_COLOR, KEYS_COLOR, KEYS_FONT_COLOR, "+");
+    snprintf(buff, sizeof(buff), "%02d", data->hour);
+    drawString(68, 76, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+    snprintf(buff, sizeof(buff), "%02d", data->minute);
+    drawString(148, 76, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+    drawString(117, 76, COLOR_WHITE, &verdanabold14ptFontInfo, ":");
+    drawButton(80 - 15, 100, 30, 30, &KEYS_FONT, 10, KEYS_FONT_COLOR, KEYS_COLOR, KEYS_FONT_COLOR, "-");
+    drawButton(160 - 15, 100, 30, 30, &KEYS_FONT, 10, KEYS_FONT_COLOR, KEYS_COLOR, KEYS_FONT_COLOR, "-");
+    drawButton(37,  160, 30, 30, &KEYS_FONT, 10, KEYS_FONT_COLOR, KEYS_COLOR, KEYS_FONT_COLOR, "+");
+    drawButton(104, 160, 30, 30, &KEYS_FONT, 10, KEYS_FONT_COLOR, KEYS_COLOR, KEYS_FONT_COLOR, "+");
+    drawButton(171, 160, 30, 30, &KEYS_FONT, 10, KEYS_FONT_COLOR, KEYS_COLOR, KEYS_FONT_COLOR, "+");
+    snprintf(buff, sizeof(buff), "%4d", data->year);
+    drawString(29, 196, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+    snprintf(buff, sizeof(buff), "%02d", data->month);
+    drawString(107, 196, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+    snprintf(buff, sizeof(buff), "%02d", data->day);
+    drawString(174, 196, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+    snprintf(buff, sizeof(buff), "-");
+    drawString(87, 196, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+    drawString(150, 196, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+    drawButton(37,  220, 30, 30, &KEYS_FONT, 10, KEYS_FONT_COLOR, KEYS_COLOR, KEYS_FONT_COLOR, "-");
+    drawButton(104, 220, 30, 30, &KEYS_FONT, 10, KEYS_FONT_COLOR, KEYS_COLOR, KEYS_FONT_COLOR, "-");
+    drawButton(171, 220, 30, 30, &KEYS_FONT, 10, KEYS_FONT_COLOR, KEYS_COLOR, KEYS_FONT_COLOR, "-");
+    drawButton(60, 260, 120, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, COLOR_RED, COLOR_WHITE, "Continue");
     gui_set_update(rtc_page_events);
 }
 

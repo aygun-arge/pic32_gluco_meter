@@ -101,7 +101,10 @@ const struct i2c_slave_config rtc_i2c_config =
 };
 
 static esError rtc_read_array(uint8_t address, uint8_t * data, size_t size) {
-    i2c_bus_start(g_i2c_rtc_bus);
+    
+    if (!i2c_bus_start(g_i2c_rtc_bus)) {
+        goto FAILURE;
+    }
 
     if (i2c_bus_write(g_i2c_rtc_bus, RTC_WRITE_CMD) == false) {
         goto FAILURE;
@@ -134,7 +137,9 @@ FAILURE:
 
 static esError rtc_write_array(uint8_t address, const uint8_t * data, size_t size) {
 
-    i2c_bus_start(g_i2c_rtc_bus);
+    if (!i2c_bus_start(g_i2c_rtc_bus)) {
+        goto FAILURE;
+    };
 
     if (i2c_bus_write(g_i2c_rtc_bus, RTC_WRITE_CMD) == false) {
         goto FAILURE;

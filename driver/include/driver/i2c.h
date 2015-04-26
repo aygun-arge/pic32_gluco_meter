@@ -68,7 +68,7 @@ struct i2c_id {
     void             (* close)(struct i2c_bus *);
     bool             (* write)(struct i2c_bus *, uint8_t);
     uint8_t          (* read)(struct i2c_bus *);
-    void             (* start)(struct i2c_bus *);
+    bool             (* start)(struct i2c_bus *);
     void             (* restart)(struct i2c_bus *);
     void             (* stop)(struct i2c_bus *);
     void             (* ack)(struct i2c_bus *);
@@ -107,7 +107,7 @@ void i2c_bus_read_array(
 uint8_t i2c_bus_read(
     struct i2c_bus *            bus);
 
-void i2c_bus_start(
+bool i2c_bus_start(
     struct i2c_bus *            bus);
 
 void i2c_bus_restart(

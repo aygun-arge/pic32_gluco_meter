@@ -79,10 +79,10 @@ uint8_t i2c_bus_read(
     return (handle->id->read(handle));
 }
 
-void i2c_bus_start(
+bool i2c_bus_start(
     struct i2c_bus *          handle) {
 
-    handle->id->start(handle);
+    return (handle->id->start(handle));
 }
 
 void i2c_bus_restart(
@@ -111,7 +111,9 @@ void i2c_slave_close(struct i2c_slave * slave)
 
 bool i2c_slave_read(struct i2c_slave * slave, uint8_t address, void * data, size_t size)
 {
-    i2c_bus_start(slave->bus);
+    if (!i2c_bus_start(slave->bus)) {
+        goto FAILURE;
+    }
     
     if (!((slave->flags & I2C_SLAVE_RD_REPEAT) && (address == I2C_REPEAT_LAST_ADDRESS))) {
         if (i2c_bus_write(slave->bus, slave->address) == false) {
@@ -157,7 +159,9 @@ bool i2c_slave_write(struct i2c_slave * slave, uint8_t address, const void * dat
     uint32_t            current_byte;
     const uint8_t *     data_;
 
-    i2c_bus_start(slave->bus);
+    if (!i2c_bus_start(slave->bus)) {
+        goto FAILURE;
+    }
 
     if (i2c_bus_write(slave->bus, slave->address) == false) {
         goto FAILURE;

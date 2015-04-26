@@ -18,6 +18,7 @@
 #include "main.h"
 #include "app_buzzer.h"
 #include "draw_rtc_page.h"
+#include "driver/rtc.h"
 
 /*=========================================================  LOCAL MACRO's  ==*/
 
@@ -138,9 +139,28 @@ static esAction state_set_rtc(void * space, const esEvent * event) {
 
     switch (event->id) {
         case ES_ENTRY: {
-            rtc_page_draw();
+            struct rtc_time time;
+            struct rtc_page_data data;
+
+            rtc_get_time_i(&time);
+            data.year   = time.year;
+            data.month  = time.month;
+            data.day    = time.day;
+            data.hour   = time.hour;
+            data.minute = time.minute;
+            rtc_page_draw(&data);
+            app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
             
             return (ES_STATE_HANDLED());
+        }
+        case EVENT_TOUCH_POLL: {
+            app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
+            gui_exe();
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_BTN_OK: {
+            return (ES_STATE_TRANSITION(state_main));
         }
         default: {
 
