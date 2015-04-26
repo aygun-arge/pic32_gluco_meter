@@ -40,6 +40,7 @@
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
 
 static void board_init_early(void);
+static void board_init_late(void);
 static void idle_hook(void);
 
 /*=======================================================  LOCAL VARIABLES  ==*/
