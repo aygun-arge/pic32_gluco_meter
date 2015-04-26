@@ -590,7 +590,7 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
                     for (rec_no = 0; rec_no < records; rec_no++) {
                         voc_rec_get_by_id(rec_no, &rec);
                         snprintf(buffer, sizeof(buffer), "%d,%f,%f,%f,%1.1f,%3.1f,\n",
-                            rec_no * 10, 
+                            rec_no * 20,
                             (double)rec.rcurr,
                             (double)rec.rmax,
                             (double)rec.rmin,
