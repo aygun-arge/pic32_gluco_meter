@@ -156,6 +156,7 @@ static struct mlx90614_handle   g_mlx90614;
 static struct voc_record        g_buffer[CONFIG_BUFFER_SIZE];
 static uint32_t                 g_buffer_current;
 static struct voc_environment   g_environment;
+static int                      g_time_period;
 
 static struct voc_cal           g_voc_cal[] =
 {
@@ -367,6 +368,7 @@ void voc_rec_start(int period)
     }
     MEAS_TMR_A_CON |= TxCON_ON;
     MEAS_TMR_IEC   |= (0x1u << MEAS_TMR_ISR_BIT);
+    g_time_period = period;
 }
 
 void voc_rec_stop(void)
@@ -413,6 +415,11 @@ uint32_t voc_rec_get_current_no(void)
 void voc_rec_get_by_id(uint32_t rec_no, struct voc_record * record)
 {
     *record = g_buffer[rec_no];
+}
+
+int voc_reg_get_period(void)
+{
+    return (g_time_period);
 }
 
 /*================================*//** @cond *//*==  CONFIGURATION ERRORS  ==*/

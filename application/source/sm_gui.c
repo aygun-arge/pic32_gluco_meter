@@ -588,9 +588,17 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
                     records = voc_rec_get_current_no();
 
                     for (rec_no = 0; rec_no < records; rec_no++) {
+                        uint32_t timestamp;
+
                         voc_rec_get_by_id(rec_no, &rec);
+
+                        if (voc_reg_get_period() == PERIOD_20MS) {
+                            timestamp = rec_no * 20;
+                        } else {
+                            timestamp = rec_no * 1000;
+                        }
                         snprintf(buffer, sizeof(buffer), "%d,%f,%f,%f,%1.1f,%3.1f,\n",
-                            rec_no * 20,
+                            timestamp,
                             (double)rec.rcurr,
                             (double)rec.rmax,
                             (double)rec.rmin,
