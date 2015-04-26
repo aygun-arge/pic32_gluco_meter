@@ -3,9 +3,6 @@
 
 #define TFT_LCD_DATA_PORT     GpioE
 
-#define TFT_LCD_FMARK_PIN     6
-#define TFT_LCD_FMARK_PORT    GpioE
-
 #define TFT_LCD_CS_PIN        7
 #define TFT_LCD_CS_PORT       GpioG
 

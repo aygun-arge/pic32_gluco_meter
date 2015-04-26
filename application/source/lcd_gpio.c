@@ -22,7 +22,6 @@ The MicroBuilder license is provided below and is alos located under .\MicroBuil
 
 void lcdGpioInit(){
   gpioSetAllAsOutput(&GpioE);
-  gpioSetAsOutput(&TFT_LCD_FMARK_PORT, TFT_LCD_FMARK_PIN);
   // Initialize the LCD control lines
   gpioSetAsOutput(&TFT_LCD_CS_PORT, TFT_LCD_CS_PIN);
   gpioSetAsOutput(&TFT_LCD_DC_PORT, TFT_LCD_DC_PIN);
