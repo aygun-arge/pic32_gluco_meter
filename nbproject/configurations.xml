@@ -3,8 +3,6 @@
   <logicalFolder name="root" displayName="root" projectFiles="true">
     <logicalFolder name="application" displayName="application" projectFiles="true">
       <logicalFolder name="include" displayName="include" projectFiles="true">
-        <itemPath>/home/nenad/workspace/mplabx/gluco_meter/application/include/main.h</itemPath>
-        <itemPath>/home/nenad/workspace/mplabx/gluco_meter/application/include/mcu_config.h</itemPath>
         <itemPath>application/include/verdanabold14.h</itemPath>
         <itemPath>application/include/draw_edit_page.h</itemPath>
         <itemPath>application/include/draw_main_page.h</itemPath>
@@ -26,10 +24,10 @@
         <itemPath>application/include/bsp.h</itemPath>
         <itemPath>application/include/app_buzzer.h</itemPath>
         <itemPath>application/include/draw_rtc_page.h</itemPath>
+        <itemPath>application/include/main.h</itemPath>
+        <itemPath>application/include/mcu_config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
-        <itemPath>/home/nenad/workspace/mplabx/gluco_meter/application/source/main.c</itemPath>
-        <itemPath>/home/nenad/workspace/mplabx/gluco_meter/application/source/support.c</itemPath>
         <itemPath>application/source/dejavusansbold9.c</itemPath>
         <itemPath>application/source/verdanabold14.c</itemPath>
         <itemPath>application/source/draw_edit_page.c</itemPath>
@@ -47,20 +45,13 @@
         <itemPath>application/source/voc_heater.c</itemPath>
         <itemPath>app_buzzer.c</itemPath>
         <itemPath>application/source/draw_rtc_page.c</itemPath>
+        <itemPath>application/source/support.c</itemPath>
+        <itemPath>application/source/main.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="driver" displayName="driver" projectFiles="true">
       <logicalFolder name="include" displayName="include" projectFiles="true">
         <logicalFolder name="driver" displayName="driver" projectFiles="true">
-          <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/include/driver/adc.h</itemPath>
-          <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/include/driver/clock.h</itemPath>
-          <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/include/driver/gpio.h</itemPath>
-          <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/include/driver/i2c.h</itemPath>
-          <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/include/driver/intr.h</itemPath>
-          <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/include/driver/lld_i2c1.h</itemPath>
-          <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/include/driver/rtc.h</itemPath>
-          <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/include/driver/spi.h</itemPath>
-          <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/include/driver/systick.h</itemPath>
           <itemPath>driver/include/driver/ina219.h</itemPath>
           <itemPath>driver/include/driver/s25fl.h</itemPath>
           <itemPath>driver/include/driver/lld_spi2.h</itemPath>
@@ -71,17 +62,18 @@
           <itemPath>driver/include/driver/lcd.h</itemPath>
           <itemPath>driver/include/driver/ad5282.h</itemPath>
           <itemPath>driver/include/driver/mlx90614.h</itemPath>
+          <itemPath>driver/include/driver/adc.h</itemPath>
+          <itemPath>driver/include/driver/clock.h</itemPath>
+          <itemPath>driver/include/driver/gpio.h</itemPath>
+          <itemPath>driver/include/driver/i2c.h</itemPath>
+          <itemPath>driver/include/driver/intr.h</itemPath>
+          <itemPath>driver/include/driver/lld_i2c1.h</itemPath>
+          <itemPath>driver/include/driver/rtc.h</itemPath>
+          <itemPath>driver/include/driver/spi.h</itemPath>
+          <itemPath>driver/include/driver/systick.h</itemPath>
         </logicalFolder>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
-        <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/intr.c</itemPath>
-        <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/adc.c</itemPath>
-        <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/systick.c</itemPath>
-        <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/gpio.c</itemPath>
-        <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/lld_i2c1.c</itemPath>
-        <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/clock.c</itemPath>
-        <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/rtc.c</itemPath>
-        <itemPath>/home/nenad/workspace/mplabx/gluco_meter/driver/source/i2c.c</itemPath>
         <itemPath>driver/source/ina219.c</itemPath>
         <itemPath>driver/source/ILI9341.c</itemPath>
         <itemPath>driver/source/eeprom.c</itemPath>
@@ -89,6 +81,14 @@
         <itemPath>driver/source/lld_i2c5.c</itemPath>
         <itemPath>driver/source/ad5282.c</itemPath>
         <itemPath>driver/source/mlx90614.c</itemPath>
+        <itemPath>driver/source/adc.c</itemPath>
+        <itemPath>driver/source/clock.c</itemPath>
+        <itemPath>driver/source/gpio.c</itemPath>
+        <itemPath>driver/source/i2c.c</itemPath>
+        <itemPath>driver/source/intr.c</itemPath>
+        <itemPath>driver/source/lld_i2c1.c</itemPath>
+        <itemPath>driver/source/rtc.c</itemPath>
+        <itemPath>driver/source/systick.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="esolid-base" displayName="esolid-base" projectFiles="true">
@@ -260,16 +260,19 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC32</languageToolchain>
-        <languageToolchainVersion>1.21</languageToolchainVersion>
-        <platform>2</platform>
+        <languageToolchainVersion>1.34</languageToolchainVersion>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
           <linkerLibItems>
           </linkerLibItems>
         </linkerTool>
+        <archiverTool>
+        </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
+          <parseOnProdLoad>false</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
       </compileType>
@@ -299,13 +302,17 @@
         <property key="place-data-into-section" value="true"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value=""/>
+        <property key="preprocessor-macros"
+                  value="_SUPPRESS_PLIB_WARNING;_DISABLE_OPENADC10_CONFIGPORT_WARNING"/>
         <property key="strict-ansi" value="false"/>
         <property key="support-ansi" value="false"/>
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
         <property key="use-indirect-calls" value="false"/>
       </C32>
+      <C32-AR>
+        <property key="additional-options-chop-files" value="false"/>
+      </C32-AR>
       <C32-AS>
         <property key="assembler-symbols" value=""/>
         <property key="enable-symbols" value="true"/>
@@ -382,7 +389,10 @@
         <property key="use-indirect-calls" value="false"/>
       </C32CPP>
       <C32Global>
+        <property key="common-include-directories" value=""/>
+        <property key="gp-relative-option" value=""/>
         <property key="legacy-libc" value="false"/>
+        <property key="relaxed-math" value="false"/>
         <property key="save-temps" value="true"/>
         <property key="wpo-lto" value="false"/>
       </C32Global>
@@ -434,19 +444,30 @@
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="false"/>
         <property key="memories.configurationmemory" value="true"/>
+        <property key="memories.configurationmemory2" value="true"/>
+        <property key="memories.dataflash" value="true"/>
         <property key="memories.eeprom" value="true"/>
         <property key="memories.flashdata" value="true"/>
         <property key="memories.id" value="true"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.end" value="0x1d07ffff"/>
+        <property key="memories.programmemory.partition2" value="true"/>
+        <property key="memories.programmemory.partition2.end"
+                  value="${memories.programmemory.partition2.end.value}"/>
+        <property key="memories.programmemory.partition2.start"
+                  value="${memories.programmemory.partition2.start.value}"/>
         <property key="memories.programmemory.start" value="0x1d000000"/>
-        <property key="poweroptions.powerenable" value="true"/>
+        <property key="poweroptions.powerenable" value="false"/>
+        <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
+        <property key="programoptions.preservedataflash" value="false"/>
         <property key="programoptions.preserveeeprom" value="false"/>
         <property key="programoptions.preserveprogramrange" value="false"/>
         <property key="programoptions.preserveprogramrange.end" value="0x1d07ffff"/>
         <property key="programoptions.preserveprogramrange.start" value="0x1d000000"/>
         <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.programcalmem" value="false"/>
+        <property key="programoptions.programuserotp" value="false"/>
         <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
         <property key="programoptions.usehighvoltageonmclr" value="false"/>
         <property key="programoptions.uselvpprogramming" value="false"/>
