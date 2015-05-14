@@ -333,9 +333,13 @@ bool isRtcActive(void) {
 }
 
 esError rtc_set_time_i(const struct rtc_time * time) {
-    esError             err;
+    esError                     err;
+    uint32_t                    retry;
 
-    err = rtc_put_time(time);
+
+    retry = 5;
+    
+    while ((err = rtc_put_time(time) != ES_ERROR_NONE) && retry--);
     
 #if (CONFIG_USE_EXT_INT == 1)
     if (err == ES_ERROR_NONE) {
@@ -349,11 +353,14 @@ esError rtc_set_time_i(const struct rtc_time * time) {
 esError rtc_get_time_i(struct rtc_time * time)
 {
     esError                     err;
+    uint32_t                    retry;
 
 #if (CONFIG_USE_EXT_INT == 1)
     *time = g_current_time;
 #else
-    err = rtc_fetch_time(time);
+    retry = 5;
+    
+    while ((err = rtc_fetch_time(time) != ES_ERROR_NONE) && retry--);
 #endif
 
     return (err);
@@ -362,8 +369,12 @@ esError rtc_get_time_i(struct rtc_time * time)
 void rtc_tick_i(void)
 {
 #if (CONFIG_USE_EXT_INT == 1)
-    rtc_write(REG_CONTROL_INT_FLAG, 0);
-    rtc_fetch_time(&g_current_time);
+    esError                     err;
+    uint32_t                    retry;
+    
+    retry = 5;
+    
+    while ((err = rtc_fetch_time(&g_current_time) != ES_ERROR_NONE) && retry--);
 #endif
 }
 
