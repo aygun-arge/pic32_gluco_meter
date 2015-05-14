@@ -199,10 +199,14 @@ void main_page_overview(struct main_page_overview * values)
     char current[16];
     char temperature[16];
 
-    snprintf(resistance, sizeof(resistance), "%3.4f", (double)values->resistance);
-    snprintf(voltage, sizeof(voltage), "%3.3f", (double)values->voltage);
-    snprintf(current, sizeof(current), "%3.3f", (double)values->current);
-    snprintf(temperature, sizeof(temperature), "%3.3f", (double)values->temperature);
+    if (values->resistance > 100.0) {
+        snprintf(resistance, sizeof(resistance), "N/A");
+    } else {
+        snprintf(resistance, sizeof(resistance), "%03.4f", (double)values->resistance);
+    }
+    snprintf(voltage, sizeof(voltage), "%03.3f", (double)values->voltage);
+    snprintf(current, sizeof(current), "%03.3f", (double)values->current);
+    snprintf(temperature, sizeof(temperature), "%03.3f", (double)values->temperature);
     drawRectangleFilled(170, 120, 240, 190, COLOR_BLUE);
 	drawString(170, 120, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, resistance);
 	drawString(170, 140, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, voltage);

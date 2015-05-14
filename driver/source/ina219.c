@@ -47,10 +47,19 @@ void ina219_term_driver(struct ina219_handle * handle)
 
 esError ina219_get_current(struct ina219_handle * handle, float * value)
 {
+    bool                is_successful;
     uint8_t             buff[2];
+    uint32_t            retry;
     uint16_t            raw_value;
+
+    is_successful = false;
+    retry         = 5;
+
+    while (!is_successful && retry--) {
+        is_successful = i2c_slave_read(&handle->comm, INA219_CURRENT, buff, sizeof(buff));
+    }
     
-    if (i2c_slave_read(&handle->comm, INA219_CURRENT, buff, sizeof(buff)) == true) {
+    if (is_successful) {
         raw_value = ((uint16_t)buff[0] << 8u) | (uint16_t)buff[1];
         *value = (float)raw_value * handle->current_lsb;
 
