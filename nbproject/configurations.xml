@@ -26,6 +26,8 @@
         <itemPath>application/include/draw_rtc_page.h</itemPath>
         <itemPath>application/include/main.h</itemPath>
         <itemPath>application/include/mcu_config.h</itemPath>
+        <itemPath>application/include/draw_init_log_page.h</itemPath>
+        <itemPath>application/include/flash_log.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
         <itemPath>application/source/dejavusansbold9.c</itemPath>
@@ -47,6 +49,8 @@
         <itemPath>application/source/draw_rtc_page.c</itemPath>
         <itemPath>application/source/support.c</itemPath>
         <itemPath>application/source/main.c</itemPath>
+        <itemPath>application/source/draw_init_log_page.c</itemPath>
+        <itemPath>application/source/flash_log.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="driver" displayName="driver" projectFiles="true">
@@ -54,7 +58,6 @@
         <logicalFolder name="driver" displayName="driver" projectFiles="true">
           <itemPath>driver/include/driver/ina219.h</itemPath>
           <itemPath>driver/include/driver/s25fl.h</itemPath>
-          <itemPath>driver/include/driver/lld_spi2.h</itemPath>
           <itemPath>driver/include/driver/lld_spis.h</itemPath>
           <itemPath>driver/include/driver/eeprom.h</itemPath>
           <itemPath>driver/include/driver/ILI9341.h</itemPath>
@@ -71,6 +74,7 @@
           <itemPath>driver/include/driver/rtc.h</itemPath>
           <itemPath>driver/include/driver/spi.h</itemPath>
           <itemPath>driver/include/driver/systick.h</itemPath>
+          <itemPath>driver/include/driver/lld_spi3.h</itemPath>
         </logicalFolder>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
@@ -89,6 +93,9 @@
         <itemPath>driver/source/lld_i2c1.c</itemPath>
         <itemPath>driver/source/rtc.c</itemPath>
         <itemPath>driver/source/systick.c</itemPath>
+        <itemPath>driver/source/lld_spi3.c</itemPath>
+        <itemPath>driver/source/spi.c</itemPath>
+        <itemPath>driver/source/s25fl.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="esolid-base" displayName="esolid-base" projectFiles="true">
@@ -273,7 +280,7 @@
         </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
-          <parseOnProdLoad>false</parseOnProdLoad>
+          <parseOnProdLoad>true</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
       </compileType>
@@ -299,7 +306,7 @@
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>
         <property key="make-warnings-into-errors" value="false"/>
-        <property key="optimization-level" value=""/>
+        <property key="optimization-level" value="-O1"/>
         <property key="place-data-into-section" value="true"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
