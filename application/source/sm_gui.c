@@ -14,11 +14,14 @@
 #include "draw_main_page.h"
 #include "draw_edit_page.h"
 #include "draw_measure_page.h"
+#include "draw_init_log_page.h"
 #include "MDD/FSIO.h"
 #include "main.h"
 #include "app_buzzer.h"
 #include "draw_rtc_page.h"
 #include "driver/rtc.h"
+#include "driver/s25fl.h"
+#include "flash_log.h"
 
 /*=========================================================  LOCAL MACRO's  ==*/
 
@@ -26,6 +29,7 @@
     entry(state_init,                TOP)                                       \
     entry(state_main,                TOP)                                       \
     entry(state_set_rtc,             TOP)                                       \
+    entry(state_init_log,            TOP)                                       \
     entry(state_set_voltage,         TOP)                                       \
     entry(state_set_meas_time,       TOP)                                       \
     entry(state_start_meas,          TOP)                                       \
@@ -37,6 +41,7 @@
 #define VOC_PWR_SHDN_PORT               &GpioD
 #define VOC_PWR_SHDN_PIN                1
 
+#define LCD_REFRESH_RATE_VERY_SLOW      ES_VTMR_TIME_TO_TICK_MS(1000)
 #define LCD_REFRESH_RATE_SLOW           ES_VTMR_TIME_TO_TICK_MS(500)
 #define LCD_REFRESH_RATE_FAST           ES_VTMR_TIME_TO_TICK_MS(100)
 #define LCD_GUI_TOUCH_POLL              ES_VTMR_TIME_TO_TICK_MS(100)
@@ -57,7 +62,17 @@ enum gui_local_evt
     EVENT_GUI_SWITCH_SS,
     EVENT_GUI_SWITCH_REC,
     EVENT_GUI_BTN_BACK,
-    EVENT_GUI_BTN_OK
+    EVENT_GUI_BTN_OK,
+    EVENT_GUI_RTC_HOUR_UP,
+    EVENT_GUI_RTC_HOUR_DOWN,
+    EVENT_GUI_RTC_MIN_UP,
+    EVENT_GUI_RTC_MIN_DOWN,
+    EVENT_GUI_RTC_YEAR_UP,
+    EVENT_GUI_RTC_YEAR_DOWN,
+    EVENT_GUI_RTC_MONTH_UP,
+    EVENT_GUI_RTC_MONTH_DOWN,
+    EVENT_GUI_RTC_DAY_UP,
+    EVENT_GUI_RTC_DAY_DOWN
 };
 
 struct wspace
@@ -78,6 +93,7 @@ struct wspace
 static esAction state_init              (void *, const esEvent *);
 static esAction state_main              (void *, const esEvent *);
 static esAction state_set_rtc           (void *, const esEvent *);
+static esAction state_init_log          (void *, const esEvent *);
 static esAction state_set_voltage       (void *, const esEvent *);
 static esAction state_set_meas_time     (void *, const esEvent *);
 static esAction state_start_meas        (void *, const esEvent *);
@@ -150,12 +166,272 @@ static esAction state_set_rtc(void * space, const esEvent * event) {
             data.minute = time.minute;
             rtc_page_draw(&data);
             app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_VERY_SLOW, EVENT_REFRESH_LCD);
             
+            return (ES_STATE_HANDLED());
+        }
+        case ES_EXIT: {
+            app_timer_cancel(&wspace->poll);
+            app_timer_cancel(&wspace->refresh);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_REFRESH_LCD: {
+            struct rtc_time time;
+            struct rtc_page_data data;
+
+            rtc_get_time_i(&time);
+            data.year   = time.year;
+            data.month  = time.month;
+            data.day    = time.day;
+            data.hour   = time.hour;
+            data.minute = time.minute;
+            rtc_page_refresh(&data);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_VERY_SLOW, EVENT_REFRESH_LCD);
+
             return (ES_STATE_HANDLED());
         }
         case EVENT_TOUCH_POLL: {
             app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
             gui_exe();
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_RTC_DAY_DOWN: {
+            struct rtc_time time;
+            struct rtc_page_data data;
+
+            rtc_get_time_i(&time);
+
+            if (time.day) {
+                time.day--;
+            }
+            data.year   = time.year;
+            data.month  = time.month;
+            data.day    = time.day;
+            data.hour   = time.hour;
+            data.minute = time.minute;
+            rtc_page_refresh(&data);
+            rtc_set_time_i(&time);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_RTC_DAY_UP: {
+            struct rtc_time time;
+            struct rtc_page_data data;
+
+            rtc_get_time_i(&time);
+
+            if (time.day < 31) {
+                time.day++;
+            }
+            data.year   = time.year;
+            data.month  = time.month;
+            data.day    = time.day;
+            data.hour   = time.hour;
+            data.minute = time.minute;
+            rtc_page_refresh(&data);
+            rtc_set_time_i(&time);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_RTC_HOUR_DOWN: {
+            struct rtc_time time;
+            struct rtc_page_data data;
+
+            rtc_get_time_i(&time);
+
+            if (time.hour) {
+                time.hour--;
+            }
+            data.year   = time.year;
+            data.month  = time.month;
+            data.day    = time.day;
+            data.hour   = time.hour;
+            data.minute = time.minute;
+            rtc_page_refresh(&data);
+            rtc_set_time_i(&time);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_RTC_HOUR_UP: {
+            struct rtc_time time;
+            struct rtc_page_data data;
+
+            rtc_get_time_i(&time);
+
+            if (time.hour < 24) {
+                time.hour++;
+            }
+            data.year   = time.year;
+            data.month  = time.month;
+            data.day    = time.day;
+            data.hour   = time.hour;
+            data.minute = time.minute;
+            rtc_page_refresh(&data);
+            rtc_set_time_i(&time);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_RTC_MIN_DOWN: {
+            struct rtc_time time;
+            struct rtc_page_data data;
+
+            rtc_get_time_i(&time);
+
+            if (time.minute) {
+                time.minute--;
+            }
+            data.year   = time.year;
+            data.month  = time.month;
+            data.day    = time.day;
+            data.hour   = time.hour;
+            data.minute = time.minute;
+            rtc_page_refresh(&data);
+            rtc_set_time_i(&time);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_RTC_MIN_UP: {
+            struct rtc_time time;
+            struct rtc_page_data data;
+
+            rtc_get_time_i(&time);
+
+            if (time.minute < 59) {
+                time.minute++;
+            }
+            data.year   = time.year;
+            data.month  = time.month;
+            data.day    = time.day;
+            data.hour   = time.hour;
+            data.minute = time.minute;
+            rtc_page_refresh(&data);
+            rtc_set_time_i(&time);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_RTC_MONTH_DOWN: {
+            struct rtc_time time;
+            struct rtc_page_data data;
+
+            rtc_get_time_i(&time);
+
+            if (time.month) {
+                time.month--;
+            }
+            data.year   = time.year;
+            data.month  = time.month;
+            data.day    = time.day;
+            data.hour   = time.hour;
+            data.minute = time.minute;
+            rtc_page_refresh(&data);
+            rtc_set_time_i(&time);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_RTC_MONTH_UP: {
+            struct rtc_time time;
+            struct rtc_page_data data;
+
+            rtc_get_time_i(&time);
+
+            if (time.month < 12) {
+                time.month++;
+            }
+            data.year   = time.year;
+            data.month  = time.month;
+            data.day    = time.day;
+            data.hour   = time.hour;
+            data.minute = time.minute;
+            rtc_page_refresh(&data);
+            rtc_set_time_i(&time);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_RTC_YEAR_DOWN: {
+            struct rtc_time time;
+            struct rtc_page_data data;
+
+            rtc_get_time_i(&time);
+
+            if (time.year > 2014) {
+                time.year--;
+            }
+            data.year   = time.year;
+            data.month  = time.month;
+            data.day    = time.day;
+            data.hour   = time.hour;
+            data.minute = time.minute;
+            rtc_page_refresh(&data);
+            rtc_set_time_i(&time);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_RTC_YEAR_UP: {
+            struct rtc_time time;
+            struct rtc_page_data data;
+
+            rtc_get_time_i(&time);
+
+            if (time.year < 2020) {
+                time.year++;
+            }
+            data.year   = time.year;
+            data.month  = time.month;
+            data.day    = time.day;
+            data.hour   = time.hour;
+            data.minute = time.minute;
+            rtc_page_refresh(&data);
+            rtc_set_time_i(&time);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_BTN_OK: {
+            return (ES_STATE_TRANSITION(state_init_log));
+        }
+        default: {
+
+            return (ES_STATE_IGNORED());
+        }
+    }
+}
+
+
+static esAction state_init_log(void * space, const esEvent * event) {
+    struct wspace * wspace = space;
+    
+    switch (event->id) {
+        case ES_ENTRY: {
+            esError             error;
+            struct init_log_page_data data;
+
+            app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
+            
+            error = flash_log_init();
+
+            if (error) {
+                data.num_of_logs = -1;
+            } else {
+                data.num_of_logs = flash_log_num_of_logs();
+            }
+            init_log_page_draw(&data);
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_TOUCH_POLL: {
+            app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
+            gui_exe();
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_BTN_BACK: {
+            struct init_log_page_data data;
+
+            flash_log_erase();
+            data.num_of_logs    = 0;
+
+            init_log_page_draw(&data);
 
             return (ES_STATE_HANDLED());
         }
@@ -246,6 +522,7 @@ static esAction state_main(void * space, const esEvent * event) {
                 wspace->main_page_ctx.is_switch_rec_on = false;
 
                 voc_rec_stop();
+                flash_log_save(voc_rec_get_buffer(), sizeof(struct voc_buffer));
 
                 return (ES_STATE_TRANSITION(state_meas_overview));
             } else {
@@ -262,8 +539,7 @@ static esAction state_main(void * space, const esEvent * event) {
         }
         case EVENT_GUI_SWITCH_SS: {
             wspace->main_page_ctx.is_switch_rec_on = false;
-            voc_rec_stop();
-
+            
             return (ES_STATE_TRANSITION(state_set_meas_time));
         }
         case EVENT_GUI_SWITCH_SENSOR: {
@@ -368,8 +644,8 @@ static esAction state_set_meas_time(void * space, const esEvent * event) {
                 wspace->blowing_time = 30;
             }
 
-            if (wspace->blowing_time < 4) {
-                wspace->blowing_time = 4;
+            if (wspace->blowing_time < 1) {
+                wspace->blowing_time = 1;
             }
             wspace->blowing_time *= 1000;
 
@@ -413,7 +689,7 @@ static esAction state_start_meas(void * space, const esEvent * event) {
 
 static esAction state_meas(void * space, const esEvent * event) {
     struct wspace *             wspace = space;
-    static bool                 every_second;
+    static bool                 even_second;
 
     switch (event->id) {
         case ES_ENTRY: {
@@ -422,7 +698,7 @@ static esAction state_meas(void * space, const esEvent * event) {
             app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
             app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
             buzzer_beep(400);
-            every_second = false;
+            even_second = false;
 
             return (ES_STATE_HANDLED());
         }
@@ -459,10 +735,10 @@ static esAction state_meas(void * space, const esEvent * event) {
             res.rmax    = wspace->curr.rmax;
             main_page_res(&res);
 
-            if (every_second) {
+            if (even_second) {
                 buzzer_beep(10);
             }
-            every_second = !every_second;
+            even_second = !even_second;
 
             return (ES_STATE_HANDLED());
         }
@@ -471,6 +747,9 @@ static esAction state_meas(void * space, const esEvent * event) {
         case EVENT_GUI_SWITCH_SS: {
             wspace->main_page_ctx.is_switch_rec_on = false;
             wspace->main_page_ctx.is_switch_ss_on = false;
+
+            voc_rec_stop();
+            flash_log_save(voc_rec_get_buffer(), sizeof(struct voc_buffer));
 
             return (ES_STATE_TRANSITION(state_stop_meas));
         }
@@ -562,52 +841,64 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
             if (USBHostMSDSCSIMediaDetect()) {
                 if (FSInit()) {
                     static uint32_t     file_num = 0;
-                    uint32_t            records;
+                    uint32_t            logs;
                     uint32_t            rec_no;
                     uint32_t            rec_txt_len;
                     struct voc_record   rec;
                     FSFILE *            data_file;
                     char                buffer[100];
 
-                    for (;;) {
+                    logs = flash_log_num_of_logs();
+
+                    for (file_num = 0; file_num < logs; file_num++) {
+                        uint32_t            records;
+                        struct rtc_time     time;
+
                         snprintf(buffer, sizeof(buffer), "log%d.csv", file_num);
                         data_file = FSfopen(buffer, "r");
 
-                        if (data_file == NULL) {
-                            break;
+                        if (data_file != NULL) {
+                            FSfclose(data_file);
+                            continue;
                         }
-                        FSfclose(data_file);
-                        file_num++;
+                        data_file = FSfopen(buffer, "w");
+                        flash_log_restore(voc_rec_get_buffer(), sizeof(struct voc_buffer), file_num);
 
-                        if (file_num == 99999) {
-                            break;
-                        }
-                    }
-                    snprintf(buffer, sizeof(buffer), "log%d.csv", file_num++);
-                    data_file = FSfopen(buffer, "w");
-                    records = voc_rec_get_current_no();
+                        voc_rec_get_time(&time);
 
-                    for (rec_no = 0; rec_no < records; rec_no++) {
-                        uint32_t timestamp;
-
-                        voc_rec_get_by_id(rec_no, &rec);
-
-                        if (voc_reg_get_period() == PERIOD_20MS) {
-                            timestamp = rec_no * 20;
-                        } else {
-                            timestamp = rec_no * 1000;
-                        }
-                        snprintf(buffer, sizeof(buffer), "%d,%f,%f,%f,%1.1f,%3.1f,\n",
-                            timestamp,
-                            (double)rec.rcurr,
-                            (double)rec.rmax,
-                            (double)rec.rmin,
-                            (double)rec.voltage,
-                            (double)rec.temperature);
+                        snprintf(buffer, sizeof(buffer), "Date & time: %d-%d-%d %02d:%02d:%02d\n\n",
+                            time.year,
+                            time.month,
+                            time.day,
+                            time.hour,
+                            time.minute,
+                            time.second);
                         rec_txt_len = strlen(buffer);
                         FSfwrite(buffer, 1, rec_txt_len, data_file);
+                        records = voc_rec_get_current_no();
+
+                        for (rec_no = 0; rec_no < records; rec_no++) {
+                            uint32_t timestamp;
+
+                            voc_rec_get_by_id(rec_no, &rec);
+
+                            if (voc_reg_get_period() == PERIOD_20MS) {
+                                timestamp = rec_no * 20;
+                            } else {
+                                timestamp = rec_no * 1000;
+                            }
+                            snprintf(buffer, sizeof(buffer), "%d,%f,%f,%f,%1.1f,%3.1f,\n",
+                                timestamp,
+                                (double)rec.rcurr,
+                                (double)rec.rmax,
+                                (double)rec.rmin,
+                                (double)rec.voltage,
+                                (double)rec.temperature);
+                            rec_txt_len = strlen(buffer);
+                            FSfwrite(buffer, 1, rec_txt_len, data_file);
+                        }
+                        FSfclose(data_file);
                     }
-                    FSfclose(data_file);
                 }
             }
             app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_FAST, EVENT_REFRESH_LCD);
@@ -664,6 +955,46 @@ void gui_event(enum gui_action action)
         }
         case GUI_BTN_OK: {
             id = EVENT_GUI_BTN_OK;
+            break;
+        }
+        case GUI_RTC_DAY_DOWN: {
+            id = EVENT_GUI_RTC_DAY_DOWN;
+            break;
+        }
+        case GUI_RTC_DAY_UP: {
+            id = EVENT_GUI_RTC_DAY_UP;
+            break;
+        }
+        case GUI_RTC_HOUR_DOWN: {
+            id = EVENT_GUI_RTC_HOUR_DOWN;
+            break;
+        }
+        case GUI_RTC_HOUR_UP: {
+            id = EVENT_GUI_RTC_HOUR_UP;
+            break;
+        }
+        case GUI_RTC_MIN_DOWN: {
+            id = EVENT_GUI_RTC_MIN_DOWN;
+            break;
+        }
+        case GUI_RTC_MIN_UP: {
+            id = EVENT_GUI_RTC_MIN_UP;
+            break;
+        }
+        case GUI_RTC_MONTH_DOWN: {
+            id = EVENT_GUI_RTC_MONTH_DOWN;
+            break;
+        }
+        case GUI_RTC_MONTH_UP: {
+            id = EVENT_GUI_RTC_MONTH_UP;
+            break;
+        }
+        case GUI_RTC_YEAR_DOWN: {
+            id = EVENT_GUI_RTC_YEAR_DOWN;
+            break;
+        }
+        case GUI_RTC_YEAR_UP: {
+            id = EVENT_GUI_RTC_YEAR_UP;
             break;
         }
         default: {

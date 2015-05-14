@@ -3,9 +3,10 @@
 #include "driver/ad5282.h"
 #include "base/error.h"
 #include "bsp.h"
+#include "TimeDelay.h"
 
 #define AD5282_ID                       0x58
-#define RETRY_COUNT                     5
+#define RETRY_COUNT                     10
 
 /*
  * Disable port
@@ -78,6 +79,7 @@ esError ad5282_set_pot1(struct ad5282_handle * handle, uint8_t val)
 
     while (!is_successful && retry--) {
         is_successful = i2c_slave_write(&handle->comm, 0, &val, 1);
+        DelayMs(100);
     }
 
     if (!is_successful) {

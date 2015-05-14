@@ -24,7 +24,7 @@ struct rtc_page_data
 };
 
 void rtc_page_draw(const struct rtc_page_data * data);
-
+void rtc_page_refresh(const struct rtc_page_data * data);
 
 #ifdef	__cplusplus
 }

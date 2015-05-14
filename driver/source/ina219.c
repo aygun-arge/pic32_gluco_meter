@@ -50,7 +50,7 @@ esError ina219_get_current(struct ina219_handle * handle, float * value)
     uint8_t             buff[2];
     uint16_t            raw_value;
     
-    if (i2c_slave_read(&handle->comm, INA219_SHUNT, buff, sizeof(buff)) == true) {
+    if (i2c_slave_read(&handle->comm, INA219_CURRENT, buff, sizeof(buff)) == true) {
         raw_value = ((uint16_t)buff[0] << 8u) | (uint16_t)buff[1];
         *value = (float)raw_value * handle->current_lsb;
 

@@ -180,6 +180,7 @@ bool i2c_slave_write(struct i2c_slave * slave, uint8_t address, const void * dat
 
     return (true);
 FAILURE:
+    i2c_bus_start(slave->bus);
     i2c_bus_stop(slave->bus);
 
     return (false);

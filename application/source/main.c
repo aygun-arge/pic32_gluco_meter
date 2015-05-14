@@ -19,6 +19,7 @@
 #include "driver/intr.h"
 #include "driver/rtc.h"
 #include "driver/systick.h"
+#include "driver/s25fl.h"
 #include "arch/intr_config.h"
 #include "main.h"
 #include "voc.h"
@@ -66,6 +67,8 @@ static void board_init_early(void)
     initClockDriver();
     initSysTickDriver();
     initGpioDriver();
+    buzzer_init();
+    buzzer_beep(20);
 }
 
 static void board_init_late(void)
@@ -82,8 +85,7 @@ static void board_init_late(void)
     rtc_init_driver(&g_i2c_bus);
     voc_init();
     USBInitialize(0);
-    buzzer_init();
-    buzzer_beep(40);
+    initFlashDriver();
 }
 
 static void idle_hook(void)

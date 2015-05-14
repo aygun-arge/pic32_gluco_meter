@@ -15,7 +15,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "driver/lld_spi2.h"
+#include "driver/lld_spi3.h"
 #include "driver/lld_spis.h"
 
 /*===============================================================  MACRO's  ==*/

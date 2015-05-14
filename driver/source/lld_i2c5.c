@@ -180,9 +180,7 @@ static void restart(struct i2c_bus * handle) {
 static void stop(struct i2c_bus * handle) {
     (void)handle;
 
-    if (!wait_for_idle()) {
-        return;
-    }
+    while (((I2C5CON & (I2C_CON_SEN | I2C_CON_RSEN | I2C_CON_PEN | I2C_CON_RCEN | I2C_CON_ACKEN)) != 0));
 
     I2C5CONSET = I2C_CON_PEN;
     I2C5STATCLR = I2C_STAT_BCL;

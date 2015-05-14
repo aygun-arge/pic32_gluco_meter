@@ -52,6 +52,12 @@ extern "C" {
 #define BUZZER_TRIS                     TRISF
 #define BUZZER_PIN                      0
 
+#define CONFIG_S25_SPI_MODULE           &GlobalSpi3
+#define CONFIG_S25FL_SDI                0
+#define CONFIG_S25FL_SDO                0
+#define CONFIG_S25FL_SCK                0
+#define CONFIG_S25FL_SS                 SPI3_SS_RPD4_GPIO
+    
 #ifdef	__cplusplus
 }
 #endif

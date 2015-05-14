@@ -6,7 +6,7 @@
 #include "base/bitop.h"
 #include "base/error.h"
 
-#include "config/pinout_config.h"
+#include "bsp.h"
 
 
 #define CFI_MANUFACTURER_Pos            0x00u
@@ -422,4 +422,25 @@ uint32_t flashNSectors(uint32_t address) {
             return (FlashPhy.ebr[1].nSectors);
         }
     }
+}
+
+uint32_t flashGetNBigSector(void)
+{
+    if (FlashPhy.nEraseBlockRegions == 1) {
+
+        return (FlashPhy.ebr[0].nSectors);
+    } else {
+
+        return (FlashPhy.ebr[1].nSectors);
+    }
+}
+
+uint32_t flashGetBigSectorAddress(void)
+{
+    return (FlashPhy.ebr[0].sectorSize * FlashPhy.ebr[0].nSectors);
+}
+
+uint32_t flashGetBigSectorSize(void)
+{
+    return (FlashPhy.ebr[1].sectorSize);
 }

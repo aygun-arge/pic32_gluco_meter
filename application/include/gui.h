@@ -53,7 +53,17 @@ enum gui_action {
 	GUI_SWITCH_SS,
 	GUI_SWITCH_REC,
         GUI_BTN_BACK,
-	GUI_BTN_OK
+	GUI_BTN_OK,
+        GUI_RTC_HOUR_UP,
+        GUI_RTC_HOUR_DOWN,
+        GUI_RTC_MIN_UP,
+        GUI_RTC_MIN_DOWN,
+        GUI_RTC_YEAR_UP,
+        GUI_RTC_YEAR_DOWN,
+        GUI_RTC_MONTH_UP,
+        GUI_RTC_MONTH_DOWN,
+        GUI_RTC_DAY_UP,
+        GUI_RTC_DAY_DOWN
 };
 
 /*======================================================  GLOBAL VARIABLES  ==*/

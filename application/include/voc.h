@@ -12,13 +12,14 @@
 
 #include <stdint.h>
 
+#include "driver/rtc.h"
 #include "base/error.h"
 
 /*===============================================================  MACRO's  ==*/
 
 #define PERIOD_20MS             0
 #define PERIOD_1S               1
-
+#define CONFIG_BUFFER_SIZE              2048
 /*------------------------------------------------------  C++ extern begin  --*/
 #ifdef	__cplusplus
 extern "C" {
@@ -40,11 +41,20 @@ struct voc_meas
 
 struct voc_record
 {
-    float           rcurr;
-    float           rmin;
-    float           rmax;
-    float           voltage;
-    float           temperature;
+    float                       rcurr;
+    float                       rmin;
+    float                       rmax;
+    float                       voltage;
+    float                       temperature;
+};
+
+struct voc_buffer
+{
+    int                         period;
+    uint32_t                    current;
+    struct rtc_time             time;
+    struct voc_record           data[CONFIG_BUFFER_SIZE];
+
 };
 
 /*======================================================  GLOBAL VARIABLES  ==*/
@@ -64,6 +74,9 @@ uint32_t voc_rec_get_remaining_no(void);
 void voc_rec_get_current(struct voc_record * record);
 uint32_t voc_rec_get_current_no(void);
 void voc_rec_get_by_id(uint32_t rec_no, struct voc_record * record);
+int voc_reg_get_period(void);
+struct voc_buffer * voc_rec_get_buffer(void);
+void voc_rec_get_time(struct rtc_time * time);
 
 void voc_meas_get_current(struct voc_meas * meas);
 

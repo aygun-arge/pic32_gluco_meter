@@ -1,7 +1,5 @@
 
 
-
-#include "voc_heater.h"
 /*=========================================================  INCLUDE FILES  ==*/
 
 #include <xc.h>
@@ -14,8 +12,10 @@
 #include "driver/mlx90614.h"
 #include "driver/ad5282.h"
 #include "driver/ina219.h"
+#include "driver/rtc.h"
 #include "main.h"
 #include "voc.h"
+#include "voc_heater.h"
 #include "eds/epa.h"
 #include "base/error.h"
 #include "base/debug.h"
@@ -26,7 +26,7 @@
 #define CONFIG_IC_SELECTION             4
 #define CONFIG_NUM_OF_SAMPLES           8
 #define CONFIG_VOC_VOLTAGE_COEF_1000    255
-#define CONFIG_BUFFER_SIZE              2048
+
 
 #define ICxCON_ON                       (0x1u << 15)
 #define ICxCON_FEDGE                    (0x1u << 9)
@@ -153,10 +153,8 @@ static const ES_MODULE_INFO_CREATE("VOC", "VOC", "Nenad Radulovic");
 static uint32_t                 g_current_raw_val;
 static struct ina219_handle     g_ina219;
 static struct mlx90614_handle   g_mlx90614;
-static struct voc_record        g_buffer[CONFIG_BUFFER_SIZE];
-static uint32_t                 g_buffer_current;
+static struct voc_buffer        g_record;
 static struct voc_environment   g_environment;
-static int                      g_time_period;
 
 static struct voc_cal           g_voc_cal[] =
 {
@@ -290,20 +288,20 @@ void __ISR(MEAS_TMR_VECTOR, IPL6SOFT) meas_tmr_isr(void)
     uint32_t                    current_no;
 
     value = current_value();
-    current_no = g_buffer_current;
+    current_no = g_record.current;
     current_no++;
-    g_buffer[current_no].rcurr = value;
-    g_buffer[current_no].rmin  = g_buffer[current_no - 1u].rmin;
-    g_buffer[current_no].rmax  = g_buffer[current_no - 1u].rmax;
-    g_buffer[current_no].voltage     = g_environment.voltage;
-    g_buffer[current_no].temperature = g_environment.temperature;
+    g_record.data[current_no].rcurr = value;
+    g_record.data[current_no].rmin  = g_record.data[current_no - 1u].rmin;
+    g_record.data[current_no].rmax  = g_record.data[current_no - 1u].rmax;
+    g_record.data[current_no].voltage     = g_environment.voltage;
+    g_record.data[current_no].temperature = g_environment.temperature;
 
-    if (g_buffer[current_no].rmin > g_buffer[current_no].rcurr) {
-        g_buffer[current_no].rmin = g_buffer[current_no].rcurr;
+    if (g_record.data[current_no].rmin > g_record.data[current_no].rcurr) {
+        g_record.data[current_no].rmin = g_record.data[current_no].rcurr;
     }
 
-    if (g_buffer[current_no].rmax < g_buffer[current_no].rcurr) {
-        g_buffer[current_no].rmax = g_buffer[current_no].rcurr;
+    if (g_record.data[current_no].rmax < g_record.data[current_no].rcurr) {
+        g_record.data[current_no].rmax = g_record.data[current_no].rcurr;
     }
 
     if (current_no == (CONFIG_BUFFER_SIZE - 1u)) {
@@ -319,7 +317,7 @@ void __ISR(MEAS_TMR_VECTOR, IPL6SOFT) meas_tmr_isr(void)
             esEpaSendEventI(g_gui, event);
         }
     }
-    g_buffer_current = current_no;
+    g_record.current = current_no;
 }
 
 esError voc_init(void)
@@ -354,12 +352,14 @@ void voc_rec_start(int period)
     float                    value;
 
     value = current_value();
-    g_buffer_current    = 0;
-    g_buffer[0].rcurr   = value;
-    g_buffer[0].rmin    = value;
-    g_buffer[0].rmax    = value;
-    g_buffer[0].voltage = g_environment.voltage;
-    g_buffer[0].temperature = g_environment.temperature;
+    g_record.current    = 0;
+    g_record.data[0].rcurr   = value;
+    g_record.data[0].rmin    = value;
+    g_record.data[0].rmax    = value;
+    g_record.data[0].voltage = g_environment.voltage;
+    g_record.data[0].temperature = g_environment.temperature;
+    g_record.period = period;
+    rtc_get_time_i(&g_record.time);
     
     if (period == PERIOD_20MS) {
         MEAS_TMR_A_PR   = GetPeripheralClock() / (256u * MEAS_PERIOD_HZ);
@@ -368,7 +368,7 @@ void voc_rec_start(int period)
     }
     MEAS_TMR_A_CON |= TxCON_ON;
     MEAS_TMR_IEC   |= (0x1u << MEAS_TMR_ISR_BIT);
-    g_time_period = period;
+    
 }
 
 void voc_rec_stop(void)
@@ -379,15 +379,15 @@ void voc_rec_stop(void)
 
 uint32_t voc_rec_get_remaining_no(void)
 {
-    return ((CONFIG_BUFFER_SIZE - 1u) - g_buffer_current);
+    return ((CONFIG_BUFFER_SIZE - 1u) - g_record.current);
 }
 
 void voc_rec_get_current(struct voc_record * record)
 {
     uint32_t                current;
     
-    current = g_buffer_current;
-    *record = g_buffer[current];
+    current = g_record.current;
+    *record = g_record.data[current];
 }
 
 void voc_env_get_current(struct voc_environment * environment)
@@ -409,17 +409,27 @@ void voc_meas_get_current(struct voc_meas * meas)
 
 uint32_t voc_rec_get_current_no(void)
 {
-    return (g_buffer_current);
+    return (g_record.current);
 }
 
 void voc_rec_get_by_id(uint32_t rec_no, struct voc_record * record)
 {
-    *record = g_buffer[rec_no];
+    *record = g_record.data[rec_no];
 }
 
 int voc_reg_get_period(void)
 {
-    return (g_time_period);
+    return (g_record.period);
+}
+
+struct voc_buffer * voc_rec_get_buffer(void)
+{
+    return (&g_record);
+}
+
+void voc_rec_get_time(struct rtc_time * time)
+{
+    *time = g_record.time;
 }
 
 /*================================*//** @cond *//*==  CONFIGURATION ERRORS  ==*/

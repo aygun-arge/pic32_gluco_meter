@@ -29,6 +29,9 @@ size_t flashGetSectorSize(uint32_t address);
 uint32_t flashGetNextSector(uint32_t address);
 uint32_t flashGetSectorBase(uint32_t address);
 uint32_t flashNSectors(uint32_t address);
+uint32_t flashGetNBigSector(void);
+uint32_t flashGetBigSectorAddress(void);
+uint32_t flashGetBigSectorSize(void);
 
 #ifdef	__cplusplus
 }

@@ -1,31 +1,27 @@
 /* 
- * File:    lld_spi1.h
+ * File:    lld_spi3.h
  * Author:  nenad
- * Details: Low Level Driver for SPI2
+ * Details: Low Level Driver for SPI3
  *
  * Created on March 31, 2014, 9:38 PM
  */
 
-#ifndef LLD_SPI2_H_
-#define	LLD_SPI2_H_
+#ifndef LLD_SPI3_H_
+#define	LLD_SPI3_H_
 
 /*=========================================================  INCLUDE FILES  ==*/
 /*===============================================================  MACRO's  ==*/
 
 #if   (((__PIC32_FEATURE_SET__ >= 100) && (__PIC32_FEATURE_SET__ <= 299)))
-#define SPI2_PIN_TABLE(entry)                                                   \
-    entry(SPI2_SDI_RPB2,            0x04,           NULL)                       \
-    entry(SPI2_SDI_RPB6,            0x01,           NULL)                       \
-    entry(SPI2_SDI_RPC4,            0x01,           NULL)                       \
-    entry(SPI2_SDO_RPB5,            0,              &RPB5R)                     \
-    entry(SPI2_SDO_RPC3,            0,              &RPC3R)                     \
-    entry(SPI2_SS_RPC2,             0,              &RPC2R)                     \
-    entry(SPI2_SS_RPC2_GPIO,        2,              &GpioC)
 #elif (((__PIC32_FEATURE_SET__ >= 300) && (__PIC32_FEATURE_SET__ <= 499)))
 #elif (((__PIC32_FEATURE_SET__ >= 500) && (__PIC32_FEATURE_SET__ <= 799)))
+#define SPI3_PIN_TABLE(entry)                                                   \
+    entry(SPI3_SDI_RPD2,            0,              NULL)                       \
+    entry(SPI3_SDO_RPD3,            0,              NULL)                     \
+    entry(SPI3_SS_RPD4_GPIO,        4,              &GpioD)
 #endif
 
-#define SPI2_PIN_ID(id, value, address)                                         \
+#define SPI3_PIN_ID(id, value, address)                                         \
     id,
 
 /*------------------------------------------------------  C++ extern begin  --*/
@@ -35,16 +31,16 @@ extern "C" {
 
 /*============================================================  DATA TYPES  ==*/
 
-enum spi2PinId {
-    SPI2_PIN_TABLE(SPI2_PIN_ID)
-    SPI2_LAST_PIN_ID
+enum spi3PinId {
+    SPI3_PIN_TABLE(SPI3_PIN_ID)
+    SPI3_LAST_PIN_ID
 };
 
 /*======================================================  GLOBAL VARIABLES  ==*/
 
 /**@brief       Hardware SPI2 identificator
  */
-extern const struct spiId GlobalSpi2;
+extern const struct spiId GlobalSpi3;
 
 /*===================================================  FUNCTION PROTOTYPES  ==*/
 

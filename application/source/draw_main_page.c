@@ -119,18 +119,18 @@ void main_page_init(struct main_page_ctx * ctx)
 
 void main_page_draw(struct main_page_ctx * ctx)
 {
-	drawFill(COLOR_BLUE);
+    drawFill(COLOR_BLUE);
     draw_switch_sensor(ctx);
     draw_switch_ss(ctx);
     draw_switch_rec(ctx);
     drawString(13, 120, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Resistance");
-	drawString(13, 140, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Voltage");
-	drawString(13, 160, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Current");
-	drawString(13, 180, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Temperature");
+    drawString(13, 140, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Voltage");
+    drawString(13, 160, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Current");
+    drawString(13, 180, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Temperature");
     drawString(120, 120, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[Meg]:");
-	drawString(120, 140, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[V]:");
-	drawString(120, 160, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[mA]:");
-	drawString(120, 180, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[C]:");
+    drawString(120, 140, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[V]:");
+    drawString(120, 160, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[A]:");
+    drawString(120, 180, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "[C]:");
     gui_set_update(main_page_events);
 }
 
@@ -182,10 +182,12 @@ void main_page_res(struct main_page_res * values)
     snprintf(rmin, sizeof(rmin), "%3.4f", (double)values->rmin);
 
     drawRectangleFilled(10, 210, 230, 220, COLOR_BLUE);
-    drawString(11, 210, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Ro:       ,Rmax:       ,Rmin:    ");
-	drawString(35, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, r0);
-	drawString(120, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, rmax);
-	drawString(200, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, rmin);
+    drawString(11, 210, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Rmax:            Rmin:          ");
+    
+    drawString(53, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, rmax);
+    drawString(160, 210, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, rmin);
+    drawString(100, 220, COLOR_CYAN, &dejaVuSansBold9ptFontInfo, "Ro:          ");
+    drawString(125, 220, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, r0);
 }
 
 
