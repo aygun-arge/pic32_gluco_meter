@@ -719,13 +719,13 @@ static esAction state_meas(void * space, const esEvent * event) {
             struct main_page_overview   overview;
             struct main_page_res        res;
             struct voc_environment      env;
-            struct voc_meas             meas;
+            //struct voc_meas             meas;
 
             app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
             voc_env_get_current(&env);
-            voc_meas_get_current(&meas);
+            //voc_meas_get_current(&meas);
             voc_rec_get_current(&wspace->curr);
-            overview.resistance  = meas.rcurr;
+            overview.resistance  = wspace->curr.rcurr;
             overview.current     = env.current;
             overview.voltage     = env.voltage;
             overview.temperature = env.temperature;
@@ -742,15 +742,17 @@ static esAction state_meas(void * space, const esEvent * event) {
 
             return (ES_STATE_HANDLED());
         }
-        case EVENT_VOC_REC_HAS_FINISHED:
-        case EVENT_TIMEOUT_PREP_MEAS:
-        case EVENT_GUI_SWITCH_SS: {
+        case EVENT_VOC_REC_HAS_FINISHED: {
             wspace->main_page_ctx.is_switch_rec_on = false;
             wspace->main_page_ctx.is_switch_ss_on = false;
 
             voc_rec_stop();
             flash_log_save(voc_rec_get_buffer(), sizeof(struct voc_buffer));
 
+            return (ES_STATE_TRANSITION(state_meas_overview));
+        }
+        case EVENT_TIMEOUT_PREP_MEAS:
+        case EVENT_GUI_SWITCH_SS: {
             return (ES_STATE_TRANSITION(state_stop_meas));
         }
         default: {
@@ -766,7 +768,7 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
         case ES_ENTRY: {
             main_page_msg(MSG_BLOW_STOP);
             app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
-            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(2000u), EVENT_TIMEOUT_PREP_MEAS);
+            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(20000u), EVENT_TIMEOUT_PREP_MEAS);
             buzzer_beep(500);
 
             return (ES_STATE_HANDLED());
@@ -774,6 +776,11 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
         case ES_EXIT: {
             app_timer_cancel(&wspace->refresh);
             app_timer_cancel(&wspace->timeout);
+            wspace->main_page_ctx.is_switch_rec_on = false;
+            wspace->main_page_ctx.is_switch_ss_on = false;
+
+            voc_rec_stop();
+            flash_log_save(voc_rec_get_buffer(), sizeof(struct voc_buffer));
 
             return (ES_STATE_HANDLED());
         }
@@ -794,10 +801,7 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
 
             return (ES_STATE_HANDLED());
         }
-        case EVENT_VOC_REC_HAS_FINISHED: {
-
-            return (ES_STATE_TRANSITION(state_meas_overview));
-        }
+        case EVENT_VOC_REC_HAS_FINISHED: 
         case EVENT_TIMEOUT_PREP_MEAS: {
 
             return (ES_STATE_TRANSITION(state_meas_overview));
