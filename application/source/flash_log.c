@@ -60,6 +60,7 @@ esError flash_log_save(void * data, size_t size)
     }
     address = flashGetBigSectorAddress() + (g_table.num_of_logs * flashGetBigSectorSize());
 
+    flashEraseSector(address);
     error = flashWrite(address, data, size);
 
     if (error) {

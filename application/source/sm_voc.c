@@ -126,7 +126,7 @@ static esAction state_init(void * space, const esEvent * event) {
 
             g_voc_is_stabilised = is_sensor_stable(meas.rcurr);
 
-            if (meas.rcurr < 0.001) {
+            if ((meas.rcurr < 0.001) || (meas.rcurr > 99.0)) {
                 g_voc_is_stabilised = false;
             }
             

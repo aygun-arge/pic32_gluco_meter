@@ -15,6 +15,7 @@
 #include "draw_edit_page.h"
 #include "draw_measure_page.h"
 #include "draw_init_log_page.h"
+#include "draw_save_page.h"
 #include "MDD/FSIO.h"
 #include "main.h"
 #include "app_buzzer.h"
@@ -22,6 +23,7 @@
 #include "driver/rtc.h"
 #include "driver/s25fl.h"
 #include "flash_log.h"
+#include "TimeDelay.h"
 
 /*=========================================================  LOCAL MACRO's  ==*/
 
@@ -121,6 +123,81 @@ const struct esSmDefine         g_gui_sm = ES_SM_DEFINE(
 struct esEpa *                  g_gui;
 
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
+
+
+static void save_logs(void)
+{
+    if (USBHostMSDSCSIMediaDetect()) {
+
+        save_page_draw();
+
+        if (FSInit()) {
+            static uint32_t     file_num = 0;
+            uint32_t            logs;
+            uint32_t            rec_no;
+            uint32_t            rec_txt_len;
+            struct voc_record   rec;
+            FSFILE *            data_file;
+            char                buffer[100];
+
+            logs = flash_log_num_of_logs();
+
+            for (file_num = 0; file_num < logs; file_num++) {
+                uint32_t            records;
+                struct rtc_time     time;
+
+                snprintf(buffer, sizeof(buffer), "log%d.csv", file_num);
+                data_file = FSfopen(buffer, "r");
+
+                if (data_file != NULL) {
+                    FSfclose(data_file);
+                    continue;
+                }
+                save_page_refresh(buffer);
+                data_file = FSfopen(buffer, "w");
+                flash_log_restore(voc_rec_get_buffer(), sizeof(struct voc_buffer), file_num);
+
+                voc_rec_get_time(&time);
+
+                snprintf(buffer, sizeof(buffer), "Date & time: %d-%d-%d %02d:%02d:%02d\n\n",
+                    time.year,
+                    time.month,
+                    time.day,
+                    time.hour,
+                    time.minute,
+                    time.second);
+                rec_txt_len = strlen(buffer);
+                FSfwrite(buffer, 1, rec_txt_len, data_file);
+                records = voc_rec_get_current_no();
+
+                for (rec_no = 0; rec_no < records; rec_no++) {
+                    uint32_t timestamp;
+
+                    voc_rec_get_by_id(rec_no, &rec);
+
+                    if (voc_reg_get_period() == PERIOD_20MS) {
+                        timestamp = rec_no * 20;
+                    } else {
+                        timestamp = rec_no * 1000;
+                    }
+                    snprintf(buffer, sizeof(buffer), "%d,%f,%f,%f,%1.1f,%3.1f,\n",
+                        timestamp,
+                        (double)rec.rcurr,
+                        (double)rec.rmax,
+                        (double)rec.rmin,
+                        (double)rec.voltage,
+                        (double)rec.temperature);
+                    rec_txt_len = strlen(buffer);
+                    FSfwrite(buffer, 1, rec_txt_len, data_file);
+                }
+                FSfclose(data_file);
+            }
+        } else {
+            save_page_fail_draw();
+            DelayMs(1000);
+        }
+    }
+}
 
 static esAction state_init(void * space, const esEvent * event) {
     struct wspace * wspace = space;
@@ -436,6 +513,7 @@ static esAction state_init_log(void * space, const esEvent * event) {
             return (ES_STATE_HANDLED());
         }
         case EVENT_GUI_BTN_OK: {
+            save_logs();
             return (ES_STATE_TRANSITION(state_main));
         }
         default: {
@@ -719,13 +797,13 @@ static esAction state_meas(void * space, const esEvent * event) {
             struct main_page_overview   overview;
             struct main_page_res        res;
             struct voc_environment      env;
-            struct voc_meas             meas;
+            //struct voc_meas             meas;
 
             app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
             voc_env_get_current(&env);
-            voc_meas_get_current(&meas);
+            //voc_meas_get_current(&meas);
             voc_rec_get_current(&wspace->curr);
-            overview.resistance  = meas.rcurr;
+            overview.resistance  = wspace->curr.rcurr;
             overview.current     = env.current;
             overview.voltage     = env.voltage;
             overview.temperature = env.temperature;
@@ -742,15 +820,17 @@ static esAction state_meas(void * space, const esEvent * event) {
 
             return (ES_STATE_HANDLED());
         }
-        case EVENT_VOC_REC_HAS_FINISHED:
-        case EVENT_TIMEOUT_PREP_MEAS:
-        case EVENT_GUI_SWITCH_SS: {
+        case EVENT_VOC_REC_HAS_FINISHED: {
             wspace->main_page_ctx.is_switch_rec_on = false;
             wspace->main_page_ctx.is_switch_ss_on = false;
 
             voc_rec_stop();
             flash_log_save(voc_rec_get_buffer(), sizeof(struct voc_buffer));
 
+            return (ES_STATE_TRANSITION(state_meas_overview));
+        }
+        case EVENT_TIMEOUT_PREP_MEAS:
+        case EVENT_GUI_SWITCH_SS: {
             return (ES_STATE_TRANSITION(state_stop_meas));
         }
         default: {
@@ -766,7 +846,7 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
         case ES_ENTRY: {
             main_page_msg(MSG_BLOW_STOP);
             app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
-            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(2000u), EVENT_TIMEOUT_PREP_MEAS);
+            app_timer_start(&wspace->timeout, ES_VTMR_TIME_TO_TICK_MS(20000u), EVENT_TIMEOUT_PREP_MEAS);
             buzzer_beep(500);
 
             return (ES_STATE_HANDLED());
@@ -774,6 +854,11 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
         case ES_EXIT: {
             app_timer_cancel(&wspace->refresh);
             app_timer_cancel(&wspace->timeout);
+            wspace->main_page_ctx.is_switch_rec_on = false;
+            wspace->main_page_ctx.is_switch_ss_on = false;
+
+            voc_rec_stop();
+            flash_log_save(voc_rec_get_buffer(), sizeof(struct voc_buffer));
 
             return (ES_STATE_HANDLED());
         }
@@ -794,10 +879,7 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
 
             return (ES_STATE_HANDLED());
         }
-        case EVENT_VOC_REC_HAS_FINISHED: {
-
-            return (ES_STATE_TRANSITION(state_meas_overview));
-        }
+        case EVENT_VOC_REC_HAS_FINISHED: 
         case EVENT_TIMEOUT_PREP_MEAS: {
 
             return (ES_STATE_TRANSITION(state_meas_overview));
@@ -809,6 +891,7 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
     }
 }
 
+
 static esAction state_meas_overview(void * space, const esEvent * event) {
     struct wspace * wspace = space;
 
@@ -817,6 +900,7 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
             struct meas_page_data curr;
             struct meas_page_data prev;
 
+            save_logs();
             curr.r0        = wspace->curr_r0;
             curr.rmin      = wspace->curr.rmin;
             curr.rmax      = wspace->curr.rmax;
@@ -834,73 +918,9 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
                 prev.rRatio = wspace->prev_r0 / wspace->prev.rmin;
             }
             meas_page_draw(&curr, &prev);
-            
+
             wspace->prev    = wspace->curr;
             wspace->prev_r0 = wspace->curr_r0;
-            
-            if (USBHostMSDSCSIMediaDetect()) {
-                if (FSInit()) {
-                    static uint32_t     file_num = 0;
-                    uint32_t            logs;
-                    uint32_t            rec_no;
-                    uint32_t            rec_txt_len;
-                    struct voc_record   rec;
-                    FSFILE *            data_file;
-                    char                buffer[100];
-
-                    logs = flash_log_num_of_logs();
-
-                    for (file_num = 0; file_num < logs; file_num++) {
-                        uint32_t            records;
-                        struct rtc_time     time;
-
-                        snprintf(buffer, sizeof(buffer), "log%d.csv", file_num);
-                        data_file = FSfopen(buffer, "r");
-
-                        if (data_file != NULL) {
-                            FSfclose(data_file);
-                            continue;
-                        }
-                        data_file = FSfopen(buffer, "w");
-                        flash_log_restore(voc_rec_get_buffer(), sizeof(struct voc_buffer), file_num);
-
-                        voc_rec_get_time(&time);
-
-                        snprintf(buffer, sizeof(buffer), "Date & time: %d-%d-%d %02d:%02d:%02d\n\n",
-                            time.year,
-                            time.month,
-                            time.day,
-                            time.hour,
-                            time.minute,
-                            time.second);
-                        rec_txt_len = strlen(buffer);
-                        FSfwrite(buffer, 1, rec_txt_len, data_file);
-                        records = voc_rec_get_current_no();
-
-                        for (rec_no = 0; rec_no < records; rec_no++) {
-                            uint32_t timestamp;
-
-                            voc_rec_get_by_id(rec_no, &rec);
-
-                            if (voc_reg_get_period() == PERIOD_20MS) {
-                                timestamp = rec_no * 20;
-                            } else {
-                                timestamp = rec_no * 1000;
-                            }
-                            snprintf(buffer, sizeof(buffer), "%d,%f,%f,%f,%1.1f,%3.1f,\n",
-                                timestamp,
-                                (double)rec.rcurr,
-                                (double)rec.rmax,
-                                (double)rec.rmin,
-                                (double)rec.voltage,
-                                (double)rec.temperature);
-                            rec_txt_len = strlen(buffer);
-                            FSfwrite(buffer, 1, rec_txt_len, data_file);
-                        }
-                        FSfclose(data_file);
-                    }
-                }
-            }
             app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_FAST, EVENT_REFRESH_LCD);
             
             return (ES_STATE_HANDLED());

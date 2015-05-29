@@ -218,12 +218,22 @@ static float current_value(void)
 {
     uint32_t                    sec_no;
     uint32_t                    value;
+    float                       retval;
 
     value = g_current_raw_val;
-    
+
+    if (value == 0) {
+        return (100.0);
+    }
     for (sec_no = 0; g_voc_cal[sec_no].section <= value; sec_no++);
 
-    return (value * g_voc_cal[sec_no].coef);
+    retval = (float)value * g_voc_cal[sec_no].coef;
+
+    if (retval > 100.0) {
+        retval = 100.0;
+    }
+
+    return (retval);
 }
 
 static void rec_init(void)
@@ -322,8 +332,8 @@ void __ISR(MEAS_TMR_VECTOR, IPL6SOFT) meas_tmr_isr(void)
     float                       value;
     uint32_t                    current_no;
 
-    value = current_value();
-    current_no = g_record.current;
+    value       = current_value();
+    current_no  = g_record.current;
     current_no++;
     g_record.data[current_no].rcurr = value;
     g_record.data[current_no].rmin  = g_record.data[current_no - 1u].rmin;
@@ -395,6 +405,8 @@ void voc_rec_start(int period)
     g_record.data[0].temperature = g_environment.temperature;
     g_record.period = period;
     rtc_get_time_i(&g_record.time);
+
+    meas_init();
     
     if (period == PERIOD_20MS) {
         MEAS_TMR_A_PR   = GetPeripheralClock() / (256u * MEAS_PERIOD_HZ);

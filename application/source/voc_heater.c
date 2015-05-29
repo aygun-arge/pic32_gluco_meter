@@ -6,7 +6,7 @@
 #include "driver/ad5282.h"
 #include "TimeDelay.h"
 
-#define CONFIG_VOC_VOLTAGE_COEF_1000    255
+#define CONFIG_VOC_VOLTAGE_COEF_1000    275
 
 static struct ad5282_handle     g_ad5282;
 
@@ -60,8 +60,8 @@ esError voc_heater_set(int voltage)
 {
     esError                     err;
 
-    if (voltage > 70) {
-        voltage = 70;
+    if (voltage > 60) {
+        voltage = 60;
     }
     voltage *= CONFIG_VOC_VOLTAGE_COEF_1000;
     voltage /= 100u;

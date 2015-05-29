@@ -110,7 +110,6 @@ int main(int argc, char** argv)
     esMemInit(&esGlobalHeapMemClass, &g_heap_mem, g_heap_storage, sizeof(g_heap_storage), 0);
 
     board_init_late();
-    DelayMs(100);
     
     esEventRegisterMem(&g_heap_mem);
     esEpaCreate(&g_gui_epa, &g_gui_sm, &g_static_mem, &g_gui);
