@@ -864,17 +864,21 @@ static esAction state_stop_meas(void * space, const esEvent * event) {
         }
         case EVENT_REFRESH_LCD: {
             struct main_page_overview   overview;
+            struct main_page_res        res;
             struct voc_environment      env;
-            struct voc_meas             meas;
 
             app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
             voc_env_get_current(&env);
-            voc_meas_get_current(&meas);
-            overview.resistance  = meas.rcurr;
+            voc_rec_get_current(&wspace->curr);
+            overview.resistance  = wspace->curr.rcurr;
             overview.current     = env.current;
             overview.voltage     = env.voltage;
             overview.temperature = env.temperature;
             main_page_overview(&overview);
+            res.r0      = wspace->curr_r0;
+            res.rmin    = wspace->curr.rmin;
+            res.rmax    = wspace->curr.rmax;
+            main_page_res(&res);
             gui_exe();
 
             return (ES_STATE_HANDLED());
