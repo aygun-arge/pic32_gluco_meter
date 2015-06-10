@@ -58,6 +58,8 @@ void voc_heater_off(void)
 
 esError voc_heater_set(int voltage)
 {
+    static int                  old_voltage;
+    int                         curr_voltage;
     esError                     err;
 
     if (voltage > 60) {
@@ -65,7 +67,19 @@ esError voc_heater_set(int voltage)
     }
     voltage *= CONFIG_VOC_VOLTAGE_COEF_1000;
     voltage /= 100u;
-    err = ad5282_set_pot1(&g_ad5282, voltage);
+
+    if (old_voltage < voltage) {
+        for (curr_voltage = old_voltage; curr_voltage <= voltage; curr_voltage++) {
+            err = ad5282_set_pot1(&g_ad5282, curr_voltage);
+            DelayMs(4);
+        }
+    } else {
+        for (curr_voltage = old_voltage; curr_voltage >= voltage; curr_voltage--) {
+            err = ad5282_set_pot1(&g_ad5282, curr_voltage);
+            DelayMs(4);
+        }
+    }
+    old_voltage = voltage;
 
     return (err);
 }

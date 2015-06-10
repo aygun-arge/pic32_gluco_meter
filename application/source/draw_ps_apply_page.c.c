@@ -42,8 +42,8 @@
 /*=========================================================  LOCAL MACRO's  ==*/
 
 #define KEYS_COLOR			COLOR_CYAN
-#define KEYS_FRAME_COLOR	COLOR_WHITE
-#define KEYS_FONT_COLOR		COLOR_DARK_BLUE
+#define KEYS_FRAME_COLOR                COLOR_WHITE
+#define KEYS_FONT_COLOR                 COLOR_DARK_BLUE
 #define KEYS_FONT			verdanabold14ptFontInfo
 
 /*======================================================  LOCAL DATA TYPES  ==*/
@@ -52,7 +52,7 @@
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
-static void save_page_events(tsTouchData_t * tsData)
+static void ps_apply_events(tsTouchData_t * tsData)
 {
     (void)tsData;
 }
@@ -60,35 +60,12 @@ static void save_page_events(tsTouchData_t * tsData)
 /*===================================  GLOBAL PRIVATE FUNCTION DEFINITIONS  ==*/
 /*====================================  GLOBAL PUBLIC FUNCTION DEFINITIONS  ==*/
 
-void save_page_draw(void)
-{
-    char buff[64];
 
+void ps_apply_draw(void)
+{
     drawFill(COLOR_BLUE);
-    drawString(45, 15, COLOR_WHITE, &verdanabold14ptFontInfo, "Exporting logs");
-    snprintf(buff, sizeof(buff), "Synchronizing...");
-    drawString(10, 100, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
-    gui_set_update(save_page_events);
-}
-
-void save_page_fail_draw(void)
-{
-    char buff[64];
-
-    drawFill(COLOR_RED);
-    drawString(45, 15, COLOR_WHITE, &verdanabold14ptFontInfo, "Exporting logs");
-    snprintf(buff, sizeof(buff), "Failed to access USB");
-    drawString(10, 100, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
-    gui_set_update(save_page_events);
-}
-
-void save_page_refresh(const char * name)
-{
-    char buff[64];
-
-    snprintf(buff, sizeof(buff), "File name: %s", name);
-    drawRectangleFilled(10,100,230,120, COLOR_BLUE);
-    drawString(10, 100, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+    drawString(45, 15, COLOR_WHITE, &verdanabold14ptFontInfo, "Applying power");
+    gui_set_update(ps_apply_events);
 }
 
 /*================================*//** @cond *//*==  CONFIGURATION ERRORS  ==*/

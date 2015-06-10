@@ -16,6 +16,7 @@
 #include "draw_measure_page.h"
 #include "draw_init_log_page.h"
 #include "draw_save_page.h"
+#include "draw_ps_apply_page.h"
 #include "MDD/FSIO.h"
 #include "main.h"
 #include "app_buzzer.h"
@@ -624,13 +625,21 @@ static esAction state_main(void * space, const esEvent * event) {
 
             if (wspace->main_page_ctx.is_switch_sensor_on) {
                 wspace->main_page_ctx.is_switch_sensor_on = false;
-                main_page_switch_sensor(&wspace->main_page_ctx);
+                
 #if VOC_PWR_ERRATA_0
 #else
                 gpioClrPin(VOC_PWR_SHDN_PORT, VOC_PWR_SHDN_PIN);
 #endif
+                ps_apply_draw();
                 voc_env_voltage_set(0);
                 voc_env_voltage_off();
+                main_page_draw(&wspace->main_page_ctx);
+
+                if (g_voc_is_stabilised) {
+                    main_page_msg(MSG_STABLE);
+                } else {
+                    main_page_msg(MSG_UNSTABLE);
+                }
 
                 return (ES_STATE_HANDLED());
             } else {
@@ -676,6 +685,7 @@ static esAction state_set_voltage(void * space, const esEvent * event) {
 #else
             gpioSetPin(VOC_PWR_SHDN_PORT, VOC_PWR_SHDN_PIN);
 #endif
+            ps_apply_draw();
             voc_env_voltage_on();
             voc_env_voltage_set(edit_page_get_value());
 
