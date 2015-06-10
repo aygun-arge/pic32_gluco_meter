@@ -28,6 +28,7 @@
         <itemPath>application/include/mcu_config.h</itemPath>
         <itemPath>application/include/draw_init_log_page.h</itemPath>
         <itemPath>application/include/flash_log.h</itemPath>
+        <itemPath>application/include/draw_ps_apply_page.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
         <itemPath>application/source/dejavusansbold9.c</itemPath>
@@ -51,6 +52,8 @@
         <itemPath>application/source/main.c</itemPath>
         <itemPath>application/source/draw_init_log_page.c</itemPath>
         <itemPath>application/source/flash_log.c</itemPath>
+        <itemPath>application/source/draw_save_page.c</itemPath>
+        <itemPath>application/source/draw_ps_apply_page.c.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="driver" displayName="driver" projectFiles="true">
