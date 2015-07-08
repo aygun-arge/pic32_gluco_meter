@@ -10,7 +10,7 @@
 
 #include "arch/intr.h"
 #include "driver/mlx90614.h"
-#include "driver/ad5282.h"
+#include "driver/ad5272.h"
 #include "driver/ina219.h"
 #include "driver/rtc.h"
 #include "main.h"

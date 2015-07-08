@@ -67,8 +67,8 @@ static void board_init_early(void)
     initClockDriver();
     initSysTickDriver();
     initGpioDriver();
-    buzzer_init();
-    buzzer_beep(20);
+    //buzzer_init();
+    //buzzer_beep(20);
 }
 
 static void board_init_late(void)
