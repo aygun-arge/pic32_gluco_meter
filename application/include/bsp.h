@@ -21,13 +21,6 @@ extern "C" {
 #define LMR_SHDN_PIN                    5
 
 /*
- * LT3083 Linear Power Supply
- */
-#define LT_OUT_OFF_PORT                 PORTD
-#define LT_OUT_OFF_TRIS                 TRISD
-#define LT_OUT_OFF_PIN                  10
-
-/*
  * AD5282 Digital potentiometer
  */
 #define AD_SHDN_PORT                    PORTC

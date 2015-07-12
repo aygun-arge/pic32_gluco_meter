@@ -71,6 +71,7 @@ static esError ad5272_write(struct ad5272_handle * handle, const uint8_t * data,
     is_successful = i2c_bus_write(handle->comm.bus, handle->comm.address);
     
     if (!is_successful) {
+        i2c_bus_stop(handle->comm.bus);
         return (ES_ERROR_DEVICE_FAIL);
     }
 
@@ -86,6 +87,10 @@ static esError ad5272_write(struct ad5272_handle * handle, const uint8_t * data,
     return (is_successful ? ES_ERROR_NONE : ES_ERROR_DEVICE_FAIL);
 }
 
+/* NOTE:
+ * Not used
+ */
+#if 0
 static esError ad5272_read(struct ad5272_handle * handle, uint8_t * data, uint8_t size)
 {
     esError                    is_succesful;
@@ -108,6 +113,7 @@ static esError ad5272_read(struct ad5272_handle * handle, uint8_t * data, uint8_
 
     return (ES_ERROR_NONE);
 }
+#endif
 
 esError ad5272_init_driver(struct ad5272_handle * handle, struct i2c_bus * bus, uint8_t id)
 {
@@ -116,6 +122,7 @@ esError ad5272_init_driver(struct ad5272_handle * handle, struct i2c_bus * bus, 
 
     i2c_slave_open(&handle->comm, &g_ad5272_i2c_config, bus, id);
     shdn_init();
+    DelayMs(10);
 
     /* NOTE:
      * Enable control of pot by removing write protection
@@ -125,20 +132,6 @@ esError ad5272_init_driver(struct ad5272_handle * handle, struct i2c_bus * bus, 
     
     error = ad5272_write(handle, data, 2);
 
-    if (!error) {
-        data[0] = (uint8_t)AD5272_CMD_RD_CONTROL << 2u;
-        data[1] = 0;
-
-        error = ad5272_write(handle, data, 2);
-        if (error)
-            return error;
-
-        error = ad5272_read(handle, data, 2);
-
-        if (error)
-            return error;
-        (void)data[0];
-    }
     /* NOTE:
      * Set maximum resistance to get minimum voltage
      */
@@ -162,16 +155,23 @@ esError ad5272_set_pot1(struct ad5272_handle * handle, uint16_t val)
     bool                is_successful;
     uint32_t            retry;
 
-    is_successful = false;
     retry         = RETRY_COUNT;
+    is_successful = false;
 
-    while (!is_successful && retry--) {
+    while (retry--) {
         uint8_t         data[2];
+        esError         error;
 
         data[0] = (AD5272_CMD_WR_RDAC << 2u) | ((val & 0x03ffu) >> 8u);
         data[1] = val & 0xffu;
-        is_successful = ad5272_write(handle, data, 2);
-        DelayMs(10);
+
+        error = ad5272_write(handle, data, 2);
+        
+        if (!error) {
+            is_successful = true;
+            break;
+        }
+        DelayMs(1);
     }
 
     if (!is_successful) {

@@ -79,6 +79,7 @@ struct voc_buffer * voc_rec_get_buffer(void);
 void voc_rec_get_time(struct rtc_time * time);
 
 void voc_meas_get_current(struct voc_meas * meas);
+uint32_t voc_meas_get_current_raw(void);
 
 /*--------------------------------------------------------  C++ extern end  --*/
 #ifdef __cplusplus
