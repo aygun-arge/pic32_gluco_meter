@@ -29,6 +29,7 @@
         <itemPath>application/include/draw_init_log_page.h</itemPath>
         <itemPath>application/include/flash_log.h</itemPath>
         <itemPath>application/include/draw_ps_apply_page.h</itemPath>
+        <itemPath>application/include/draw_calib_page.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
         <itemPath>application/source/dejavusansbold9.c</itemPath>
@@ -53,7 +54,8 @@
         <itemPath>application/source/draw_init_log_page.c</itemPath>
         <itemPath>application/source/flash_log.c</itemPath>
         <itemPath>application/source/draw_save_page.c</itemPath>
-        <itemPath>application/source/draw_ps_apply_page.c.c</itemPath>
+        <itemPath>application/source/draw_ps_apply_page.c</itemPath>
+        <itemPath>application/source/draw_calib_page.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="driver" displayName="driver" projectFiles="true">
@@ -309,7 +311,7 @@
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>
         <property key="make-warnings-into-errors" value="false"/>
-        <property key="optimization-level" value=""/>
+        <property key="optimization-level" value="-O1"/>
         <property key="place-data-into-section" value="true"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
@@ -484,6 +486,489 @@
         <property key="programoptions.uselvpprogramming" value="false"/>
         <property key="voltagevalue" value="3.0"/>
       </ICD3PlatformTool>
+      <item path="application/source/app_voc.c" ex="false" overriding="true">
+        <C32>
+          <property key="additional-warnings" value="true"/>
+          <property key="enable-app-io" value="false"/>
+          <property key="enable-omit-frame-pointer" value="false"/>
+          <property key="enable-symbols" value="false"/>
+          <property key="enable-unroll-loops" value="false"/>
+          <property key="exclude-floating-point" value="false"/>
+          <property key="extra-include-directories"
+                    value="driver/include;application/include;esolid-base/inc;esolid-base/port/pic32-none-gcc/common;esolid-base/port/pic32-none-gcc/mips-m4k;esolid-base/port/pic32-none-gcc/pic32mx675f512h;esolid-eds/inc;esolid-mem/inc;esolid-vtimer/inc;mla/Common;mla/USB;mla"/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="isolate-each-function" value="true"/>
+          <property key="make-warnings-into-errors" value="false"/>
+          <property key="optimization-level" value=""/>
+          <property key="place-data-into-section" value="true"/>
+          <property key="post-instruction-scheduling" value="default"/>
+          <property key="pre-instruction-scheduling" value="default"/>
+          <property key="preprocessor-macros"
+                    value="_SUPPRESS_PLIB_WARNING;_DISABLE_OPENADC10_CONFIGPORT_WARNING"/>
+          <property key="strict-ansi" value="false"/>
+          <property key="support-ansi" value="false"/>
+          <property key="use-cci" value="false"/>
+          <property key="use-iar" value="false"/>
+          <property key="use-indirect-calls" value="false"/>
+        </C32>
+        <C32-AR>
+          <property key="additional-options-chop-files" value="false"/>
+        </C32-AR>
+        <C32-AS>
+        </C32-AS>
+        <C32-LD>
+          <property key="additional-options-use-response-files" value="false"/>
+          <property key="enable-check-sections" value="false"/>
+          <property key="exclude-floating-point-library" value="false"/>
+          <property key="exclude-standard-libraries" value="false"/>
+          <property key="extra-lib-directories" value=""/>
+          <property key="fill-flash-options-addr" value=""/>
+          <property key="fill-flash-options-const" value=""/>
+          <property key="fill-flash-options-how" value="0"/>
+          <property key="fill-flash-options-inc-const" value="1"/>
+          <property key="fill-flash-options-increment" value=""/>
+          <property key="fill-flash-options-seq" value=""/>
+          <property key="fill-flash-options-what" value="0"/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-cross-reference-file" value="true"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="heap-size" value="4096"/>
+          <property key="input-libraries" value=""/>
+          <property key="linker-symbols" value=""/>
+          <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
+          <property key="no-startup-files" value="false"/>
+          <property key="oXC32ld-extra-opts" value=""/>
+          <property key="optimization-level" value=""/>
+          <property key="preprocessor-macros" value=""/>
+          <property key="remove-unused-sections" value="false"/>
+          <property key="report-memory-usage" value="true"/>
+          <property key="stack-size" value=""/>
+          <property key="symbol-stripping" value=""/>
+          <property key="trace-symbols" value=""/>
+          <property key="warn-section-align" value="false"/>
+        </C32-LD>
+        <C32CPP>
+          <property key="additional-warnings" value="false"/>
+          <property key="check-new" value="false"/>
+          <property key="eh-specs" value="true"/>
+          <property key="enable-app-io" value="false"/>
+          <property key="enable-omit-frame-pointer" value="false"/>
+          <property key="enable-symbols" value="true"/>
+          <property key="enable-unroll-loops" value="false"/>
+          <property key="exceptions" value="true"/>
+          <property key="exclude-floating-point" value="false"/>
+          <property key="extra-include-directories" value=""/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="isolate-each-function" value="false"/>
+          <property key="make-warnings-into-errors" value="false"/>
+          <property key="optimization-level" value=""/>
+          <property key="place-data-into-section" value="false"/>
+          <property key="post-instruction-scheduling" value="default"/>
+          <property key="pre-instruction-scheduling" value="default"/>
+          <property key="preprocessor-macros" value=""/>
+          <property key="rtti" value="true"/>
+          <property key="strict-ansi" value="false"/>
+          <property key="use-cci" value="false"/>
+          <property key="use-iar" value="false"/>
+          <property key="use-indirect-calls" value="false"/>
+        </C32CPP>
+        <C32Global>
+          <property key="common-include-directories" value=""/>
+          <property key="gp-relative-option" value=""/>
+          <property key="legacy-libc" value="false"/>
+          <property key="relaxed-math" value="false"/>
+          <property key="save-temps" value="true"/>
+          <property key="wpo-lto" value="false"/>
+        </C32Global>
+      </item>
+      <item path="application/source/voc_heater.c" ex="false" overriding="false">
+        <C32>
+          <property key="additional-warnings" value="true"/>
+          <property key="enable-app-io" value="false"/>
+          <property key="enable-omit-frame-pointer" value="false"/>
+          <property key="enable-symbols" value="false"/>
+          <property key="enable-unroll-loops" value="false"/>
+          <property key="exclude-floating-point" value="false"/>
+          <property key="extra-include-directories"
+                    value="driver/include;application/include;esolid-base/inc;esolid-base/port/pic32-none-gcc/common;esolid-base/port/pic32-none-gcc/mips-m4k;esolid-base/port/pic32-none-gcc/pic32mx675f512h;esolid-eds/inc;esolid-mem/inc;esolid-vtimer/inc;mla/Common;mla/USB;mla"/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="isolate-each-function" value="true"/>
+          <property key="make-warnings-into-errors" value="false"/>
+          <property key="optimization-level" value=""/>
+          <property key="place-data-into-section" value="true"/>
+          <property key="post-instruction-scheduling" value="default"/>
+          <property key="pre-instruction-scheduling" value="default"/>
+          <property key="preprocessor-macros"
+                    value="_SUPPRESS_PLIB_WARNING;_DISABLE_OPENADC10_CONFIGPORT_WARNING"/>
+          <property key="strict-ansi" value="false"/>
+          <property key="support-ansi" value="false"/>
+          <property key="use-cci" value="false"/>
+          <property key="use-iar" value="false"/>
+          <property key="use-indirect-calls" value="false"/>
+        </C32>
+        <C32-AR>
+          <property key="additional-options-chop-files" value="false"/>
+        </C32-AR>
+        <C32-AS>
+        </C32-AS>
+        <C32-LD>
+          <property key="additional-options-use-response-files" value="false"/>
+          <property key="enable-check-sections" value="false"/>
+          <property key="exclude-floating-point-library" value="false"/>
+          <property key="exclude-standard-libraries" value="false"/>
+          <property key="extra-lib-directories" value=""/>
+          <property key="fill-flash-options-addr" value=""/>
+          <property key="fill-flash-options-const" value=""/>
+          <property key="fill-flash-options-how" value="0"/>
+          <property key="fill-flash-options-inc-const" value="1"/>
+          <property key="fill-flash-options-increment" value=""/>
+          <property key="fill-flash-options-seq" value=""/>
+          <property key="fill-flash-options-what" value="0"/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-cross-reference-file" value="true"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="heap-size" value="4096"/>
+          <property key="input-libraries" value=""/>
+          <property key="linker-symbols" value=""/>
+          <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
+          <property key="no-startup-files" value="false"/>
+          <property key="oXC32ld-extra-opts" value=""/>
+          <property key="optimization-level" value=""/>
+          <property key="preprocessor-macros" value=""/>
+          <property key="remove-unused-sections" value="false"/>
+          <property key="report-memory-usage" value="true"/>
+          <property key="stack-size" value=""/>
+          <property key="symbol-stripping" value=""/>
+          <property key="trace-symbols" value=""/>
+          <property key="warn-section-align" value="false"/>
+        </C32-LD>
+        <C32CPP>
+          <property key="additional-warnings" value="false"/>
+          <property key="check-new" value="false"/>
+          <property key="eh-specs" value="true"/>
+          <property key="enable-app-io" value="false"/>
+          <property key="enable-omit-frame-pointer" value="false"/>
+          <property key="enable-symbols" value="true"/>
+          <property key="enable-unroll-loops" value="false"/>
+          <property key="exceptions" value="true"/>
+          <property key="exclude-floating-point" value="false"/>
+          <property key="extra-include-directories" value=""/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="isolate-each-function" value="false"/>
+          <property key="make-warnings-into-errors" value="false"/>
+          <property key="optimization-level" value=""/>
+          <property key="place-data-into-section" value="false"/>
+          <property key="post-instruction-scheduling" value="default"/>
+          <property key="pre-instruction-scheduling" value="default"/>
+          <property key="preprocessor-macros" value=""/>
+          <property key="rtti" value="true"/>
+          <property key="strict-ansi" value="false"/>
+          <property key="use-cci" value="false"/>
+          <property key="use-iar" value="false"/>
+          <property key="use-indirect-calls" value="false"/>
+        </C32CPP>
+        <C32Global>
+          <property key="common-include-directories" value=""/>
+          <property key="gp-relative-option" value=""/>
+          <property key="legacy-libc" value="false"/>
+          <property key="relaxed-math" value="false"/>
+          <property key="save-temps" value="true"/>
+          <property key="wpo-lto" value="false"/>
+        </C32Global>
+      </item>
+      <item path="driver/source/i2c.c" ex="false" overriding="false">
+        <C32>
+          <property key="additional-warnings" value="true"/>
+          <property key="enable-app-io" value="false"/>
+          <property key="enable-omit-frame-pointer" value="false"/>
+          <property key="enable-symbols" value="false"/>
+          <property key="enable-unroll-loops" value="false"/>
+          <property key="exclude-floating-point" value="false"/>
+          <property key="extra-include-directories"
+                    value="driver/include;application/include;esolid-base/inc;esolid-base/port/pic32-none-gcc/common;esolid-base/port/pic32-none-gcc/mips-m4k;esolid-base/port/pic32-none-gcc/pic32mx675f512h;esolid-eds/inc;esolid-mem/inc;esolid-vtimer/inc;mla/Common;mla/USB;mla"/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="isolate-each-function" value="true"/>
+          <property key="make-warnings-into-errors" value="false"/>
+          <property key="optimization-level" value=""/>
+          <property key="place-data-into-section" value="true"/>
+          <property key="post-instruction-scheduling" value="default"/>
+          <property key="pre-instruction-scheduling" value="default"/>
+          <property key="preprocessor-macros"
+                    value="_SUPPRESS_PLIB_WARNING;_DISABLE_OPENADC10_CONFIGPORT_WARNING"/>
+          <property key="strict-ansi" value="false"/>
+          <property key="support-ansi" value="false"/>
+          <property key="use-cci" value="false"/>
+          <property key="use-iar" value="false"/>
+          <property key="use-indirect-calls" value="false"/>
+        </C32>
+        <C32-AR>
+          <property key="additional-options-chop-files" value="false"/>
+        </C32-AR>
+        <C32-AS>
+        </C32-AS>
+        <C32-LD>
+          <property key="additional-options-use-response-files" value="false"/>
+          <property key="enable-check-sections" value="false"/>
+          <property key="exclude-floating-point-library" value="false"/>
+          <property key="exclude-standard-libraries" value="false"/>
+          <property key="extra-lib-directories" value=""/>
+          <property key="fill-flash-options-addr" value=""/>
+          <property key="fill-flash-options-const" value=""/>
+          <property key="fill-flash-options-how" value="0"/>
+          <property key="fill-flash-options-inc-const" value="1"/>
+          <property key="fill-flash-options-increment" value=""/>
+          <property key="fill-flash-options-seq" value=""/>
+          <property key="fill-flash-options-what" value="0"/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-cross-reference-file" value="true"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="heap-size" value="4096"/>
+          <property key="input-libraries" value=""/>
+          <property key="linker-symbols" value=""/>
+          <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
+          <property key="no-startup-files" value="false"/>
+          <property key="oXC32ld-extra-opts" value=""/>
+          <property key="optimization-level" value=""/>
+          <property key="preprocessor-macros" value=""/>
+          <property key="remove-unused-sections" value="false"/>
+          <property key="report-memory-usage" value="true"/>
+          <property key="stack-size" value=""/>
+          <property key="symbol-stripping" value=""/>
+          <property key="trace-symbols" value=""/>
+          <property key="warn-section-align" value="false"/>
+        </C32-LD>
+        <C32CPP>
+          <property key="additional-warnings" value="false"/>
+          <property key="check-new" value="false"/>
+          <property key="eh-specs" value="true"/>
+          <property key="enable-app-io" value="false"/>
+          <property key="enable-omit-frame-pointer" value="false"/>
+          <property key="enable-symbols" value="true"/>
+          <property key="enable-unroll-loops" value="false"/>
+          <property key="exceptions" value="true"/>
+          <property key="exclude-floating-point" value="false"/>
+          <property key="extra-include-directories" value=""/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="isolate-each-function" value="false"/>
+          <property key="make-warnings-into-errors" value="false"/>
+          <property key="optimization-level" value=""/>
+          <property key="place-data-into-section" value="false"/>
+          <property key="post-instruction-scheduling" value="default"/>
+          <property key="pre-instruction-scheduling" value="default"/>
+          <property key="preprocessor-macros" value=""/>
+          <property key="rtti" value="true"/>
+          <property key="strict-ansi" value="false"/>
+          <property key="use-cci" value="false"/>
+          <property key="use-iar" value="false"/>
+          <property key="use-indirect-calls" value="false"/>
+        </C32CPP>
+        <C32Global>
+          <property key="common-include-directories" value=""/>
+          <property key="gp-relative-option" value=""/>
+          <property key="legacy-libc" value="false"/>
+          <property key="relaxed-math" value="false"/>
+          <property key="save-temps" value="true"/>
+          <property key="wpo-lto" value="false"/>
+        </C32Global>
+      </item>
+      <item path="driver/source/lld_i2c5.c" ex="false" overriding="false">
+        <C32>
+          <property key="additional-warnings" value="true"/>
+          <property key="enable-app-io" value="false"/>
+          <property key="enable-omit-frame-pointer" value="false"/>
+          <property key="enable-symbols" value="false"/>
+          <property key="enable-unroll-loops" value="false"/>
+          <property key="exclude-floating-point" value="false"/>
+          <property key="extra-include-directories"
+                    value="driver/include;application/include;esolid-base/inc;esolid-base/port/pic32-none-gcc/common;esolid-base/port/pic32-none-gcc/mips-m4k;esolid-base/port/pic32-none-gcc/pic32mx675f512h;esolid-eds/inc;esolid-mem/inc;esolid-vtimer/inc;mla/Common;mla/USB;mla"/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="isolate-each-function" value="true"/>
+          <property key="make-warnings-into-errors" value="false"/>
+          <property key="optimization-level" value=""/>
+          <property key="place-data-into-section" value="true"/>
+          <property key="post-instruction-scheduling" value="default"/>
+          <property key="pre-instruction-scheduling" value="default"/>
+          <property key="preprocessor-macros"
+                    value="_SUPPRESS_PLIB_WARNING;_DISABLE_OPENADC10_CONFIGPORT_WARNING"/>
+          <property key="strict-ansi" value="false"/>
+          <property key="support-ansi" value="false"/>
+          <property key="use-cci" value="false"/>
+          <property key="use-iar" value="false"/>
+          <property key="use-indirect-calls" value="false"/>
+        </C32>
+        <C32-AR>
+          <property key="additional-options-chop-files" value="false"/>
+        </C32-AR>
+        <C32-AS>
+        </C32-AS>
+        <C32-LD>
+          <property key="additional-options-use-response-files" value="false"/>
+          <property key="enable-check-sections" value="false"/>
+          <property key="exclude-floating-point-library" value="false"/>
+          <property key="exclude-standard-libraries" value="false"/>
+          <property key="extra-lib-directories" value=""/>
+          <property key="fill-flash-options-addr" value=""/>
+          <property key="fill-flash-options-const" value=""/>
+          <property key="fill-flash-options-how" value="0"/>
+          <property key="fill-flash-options-inc-const" value="1"/>
+          <property key="fill-flash-options-increment" value=""/>
+          <property key="fill-flash-options-seq" value=""/>
+          <property key="fill-flash-options-what" value="0"/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-cross-reference-file" value="true"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="heap-size" value="4096"/>
+          <property key="input-libraries" value=""/>
+          <property key="linker-symbols" value=""/>
+          <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
+          <property key="no-startup-files" value="false"/>
+          <property key="oXC32ld-extra-opts" value=""/>
+          <property key="optimization-level" value=""/>
+          <property key="preprocessor-macros" value=""/>
+          <property key="remove-unused-sections" value="false"/>
+          <property key="report-memory-usage" value="true"/>
+          <property key="stack-size" value=""/>
+          <property key="symbol-stripping" value=""/>
+          <property key="trace-symbols" value=""/>
+          <property key="warn-section-align" value="false"/>
+        </C32-LD>
+        <C32CPP>
+          <property key="additional-warnings" value="false"/>
+          <property key="check-new" value="false"/>
+          <property key="eh-specs" value="true"/>
+          <property key="enable-app-io" value="false"/>
+          <property key="enable-omit-frame-pointer" value="false"/>
+          <property key="enable-symbols" value="true"/>
+          <property key="enable-unroll-loops" value="false"/>
+          <property key="exceptions" value="true"/>
+          <property key="exclude-floating-point" value="false"/>
+          <property key="extra-include-directories" value=""/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="isolate-each-function" value="false"/>
+          <property key="make-warnings-into-errors" value="false"/>
+          <property key="optimization-level" value=""/>
+          <property key="place-data-into-section" value="false"/>
+          <property key="post-instruction-scheduling" value="default"/>
+          <property key="pre-instruction-scheduling" value="default"/>
+          <property key="preprocessor-macros" value=""/>
+          <property key="rtti" value="true"/>
+          <property key="strict-ansi" value="false"/>
+          <property key="use-cci" value="false"/>
+          <property key="use-iar" value="false"/>
+          <property key="use-indirect-calls" value="false"/>
+        </C32CPP>
+        <C32Global>
+          <property key="common-include-directories" value=""/>
+          <property key="gp-relative-option" value=""/>
+          <property key="legacy-libc" value="false"/>
+          <property key="relaxed-math" value="false"/>
+          <property key="save-temps" value="true"/>
+          <property key="wpo-lto" value="false"/>
+        </C32Global>
+      </item>
+      <item path="mla/Common/TimeDelay.c" ex="false" overriding="true">
+        <C32>
+          <property key="additional-warnings" value="true"/>
+          <property key="enable-app-io" value="false"/>
+          <property key="enable-omit-frame-pointer" value="false"/>
+          <property key="enable-symbols" value="false"/>
+          <property key="enable-unroll-loops" value="false"/>
+          <property key="exclude-floating-point" value="false"/>
+          <property key="extra-include-directories"
+                    value="driver/include;application/include;esolid-base/inc;esolid-base/port/pic32-none-gcc/common;esolid-base/port/pic32-none-gcc/mips-m4k;esolid-base/port/pic32-none-gcc/pic32mx675f512h;esolid-eds/inc;esolid-mem/inc;esolid-vtimer/inc;mla/Common;mla/USB;mla"/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="isolate-each-function" value="true"/>
+          <property key="make-warnings-into-errors" value="false"/>
+          <property key="optimization-level" value=""/>
+          <property key="place-data-into-section" value="true"/>
+          <property key="post-instruction-scheduling" value="default"/>
+          <property key="pre-instruction-scheduling" value="default"/>
+          <property key="preprocessor-macros"
+                    value="_SUPPRESS_PLIB_WARNING;_DISABLE_OPENADC10_CONFIGPORT_WARNING"/>
+          <property key="strict-ansi" value="false"/>
+          <property key="support-ansi" value="false"/>
+          <property key="use-cci" value="false"/>
+          <property key="use-iar" value="false"/>
+          <property key="use-indirect-calls" value="false"/>
+        </C32>
+        <C32-AR>
+          <property key="additional-options-chop-files" value="false"/>
+        </C32-AR>
+        <C32-LD>
+          <property key="additional-options-use-response-files" value="false"/>
+          <property key="enable-check-sections" value="false"/>
+          <property key="exclude-floating-point-library" value="false"/>
+          <property key="exclude-standard-libraries" value="false"/>
+          <property key="extra-lib-directories" value=""/>
+          <property key="fill-flash-options-addr" value=""/>
+          <property key="fill-flash-options-const" value=""/>
+          <property key="fill-flash-options-how" value="0"/>
+          <property key="fill-flash-options-inc-const" value="1"/>
+          <property key="fill-flash-options-increment" value=""/>
+          <property key="fill-flash-options-seq" value=""/>
+          <property key="fill-flash-options-what" value="0"/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-cross-reference-file" value="true"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="heap-size" value="4096"/>
+          <property key="input-libraries" value=""/>
+          <property key="linker-symbols" value=""/>
+          <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
+          <property key="no-startup-files" value="false"/>
+          <property key="oXC32ld-extra-opts" value=""/>
+          <property key="optimization-level" value=""/>
+          <property key="preprocessor-macros" value=""/>
+          <property key="remove-unused-sections" value="false"/>
+          <property key="report-memory-usage" value="true"/>
+          <property key="stack-size" value=""/>
+          <property key="symbol-stripping" value=""/>
+          <property key="trace-symbols" value=""/>
+          <property key="warn-section-align" value="false"/>
+        </C32-LD>
+        <C32CPP>
+          <property key="additional-warnings" value="false"/>
+          <property key="check-new" value="false"/>
+          <property key="eh-specs" value="true"/>
+          <property key="enable-app-io" value="false"/>
+          <property key="enable-omit-frame-pointer" value="false"/>
+          <property key="enable-symbols" value="true"/>
+          <property key="enable-unroll-loops" value="false"/>
+          <property key="exceptions" value="true"/>
+          <property key="exclude-floating-point" value="false"/>
+          <property key="extra-include-directories" value=""/>
+          <property key="generate-16-bit-code" value="false"/>
+          <property key="generate-micro-compressed-code" value="false"/>
+          <property key="isolate-each-function" value="false"/>
+          <property key="make-warnings-into-errors" value="false"/>
+          <property key="optimization-level" value=""/>
+          <property key="place-data-into-section" value="false"/>
+          <property key="post-instruction-scheduling" value="default"/>
+          <property key="pre-instruction-scheduling" value="default"/>
+          <property key="preprocessor-macros" value=""/>
+          <property key="rtti" value="true"/>
+          <property key="strict-ansi" value="false"/>
+          <property key="use-cci" value="false"/>
+          <property key="use-iar" value="false"/>
+          <property key="use-indirect-calls" value="false"/>
+        </C32CPP>
+        <C32Global>
+          <property key="common-include-directories" value=""/>
+          <property key="gp-relative-option" value=""/>
+          <property key="legacy-libc" value="false"/>
+          <property key="relaxed-math" value="false"/>
+          <property key="save-temps" value="true"/>
+          <property key="wpo-lto" value="false"/>
+        </C32Global>
+      </item>
     </conf>
   </confs>
 </configurationDescriptor>
