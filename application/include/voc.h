@@ -45,6 +45,7 @@ struct voc_record
     float                       rmin;
     float                       rmax;
     float                       voltage;
+    float                       current;
     float                       temperature;
 };
 

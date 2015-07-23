@@ -183,12 +183,13 @@ static void save_logs(void)
                     } else {
                         timestamp = rec_no * 1000;
                     }
-                    snprintf(buffer, sizeof(buffer), "%d,%f,%f,%f,%1.1f,%3.1f,\n",
+                    snprintf(buffer, sizeof(buffer), "%d,%f,%f,%f,%1.1f,%3.1f,%3.1f,\n",
                         timestamp,
                         (double)rec.rcurr,
                         (double)rec.rmax,
                         (double)rec.rmin,
                         (double)rec.voltage,
+                        (double)rec.current,
                         (double)rec.temperature);
                     rec_txt_len = strlen(buffer);
                     FSfwrite(buffer, 1, rec_txt_len, data_file);

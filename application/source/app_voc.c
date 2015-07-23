@@ -22,7 +22,7 @@
 /*=========================================================  LOCAL MACRO's  ==*/
 
 #define CONFIG_IC_SELECTION             4
-#define CONFIG_NUM_OF_SAMPLES           16
+#define CONFIG_NUM_OF_SAMPLES           8
 #define CONFIG_VOC_VOLTAGE_COEF_1000    255
 
 
@@ -407,6 +407,7 @@ void __ISR(MEAS_TMR_VECTOR, IPL6SOFT) meas_tmr_isr(void)
     g_record.data[current_no].rmin  = g_record.data[current_no - 1u].rmin;
     g_record.data[current_no].rmax  = g_record.data[current_no - 1u].rmax;
     g_record.data[current_no].voltage     = g_environment.voltage;
+    g_record.data[current_no].current     = g_environment.current;
     g_record.data[current_no].temperature = g_environment.temperature;
 
     if (g_record.data[current_no].rmin > g_record.data[current_no].rcurr) {
@@ -505,6 +506,7 @@ void voc_rec_start(int period)
     g_record.data[0].rmin    = value;
     g_record.data[0].rmax    = value;
     g_record.data[0].voltage = g_environment.voltage;
+    g_record.data[0].current = g_environment.current;
     g_record.data[0].temperature = g_environment.temperature;
     g_record.period = period;
     rtc_get_time_i(&g_record.time);
@@ -549,7 +551,7 @@ void voc_env_update(void)
 {
     ina219_get_current(&g_ina219, &g_environment.current);
 
-    if (g_environment.current > 0.8) {
+    if (g_environment.current > 0.9) {
         g_environment.current = 0.0;
     }
     ina219_get_voltage(&g_ina219, &g_environment.voltage);
