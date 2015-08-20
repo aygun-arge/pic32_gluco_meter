@@ -183,7 +183,7 @@ static void save_logs(void)
                     } else {
                         timestamp = rec_no * 1000;
                     }
-                    snprintf(buffer, sizeof(buffer), "%d,%f,%f,%f,%1.1f,%3.1f,%3.1f,\n",
+                    snprintf(buffer, sizeof(buffer), "%d,%f,%f,%f,%f,%f,%3.1f,\n",
                         timestamp,
                         (double)rec.rcurr,
                         (double)rec.rmax,
