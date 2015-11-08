@@ -81,6 +81,8 @@ void voc_rec_get_time(struct rtc_time * time);
 
 void voc_meas_get_current(struct voc_meas * meas);
 uint32_t voc_meas_get_current_raw(void);
+void voc_set_profile(unsigned int profile_no);
+unsigned int voc_get_profile(void);
 
 /*--------------------------------------------------------  C++ extern end  --*/
 #ifdef __cplusplus

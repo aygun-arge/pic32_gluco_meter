@@ -11,6 +11,7 @@
 #include "driver/ad5272.h"
 #include "driver/ina219.h"
 #include "driver/rtc.h"
+#include "base/bitop.h"
 #include "main.h"
 #include "voc.h"
 #include "voc_heater.h"
@@ -18,6 +19,7 @@
 #include "base/error.h"
 #include "base/debug.h"
 #include "sm_gui.h"
+#include "driver/gpio.h"
 
 /*=========================================================  LOCAL MACRO's  ==*/
 
@@ -25,6 +27,9 @@
 #define CONFIG_NUM_OF_SAMPLES           8
 #define CONFIG_VOC_VOLTAGE_COEF_1000    255
 
+#define RANGE_
+#define RANGE_GPIO                      &GpioB
+#define RANGE_PIN                       0
 
 #define ICxCON_ON                       (0x1u << 15)
 #define ICxCON_FEDGE                    (0x1u << 9)
@@ -138,6 +143,12 @@ struct voc_cal
     float                       coef;
 };
 
+struct voc_profile
+{
+    const struct voc_cal *      cal;
+    uint32_t                    gpio_val;
+};
+
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
 
 static float current_value(void);
@@ -153,6 +164,8 @@ static struct ina219_handle     g_ina219;
 static struct mlx90614_handle   g_mlx90614;
 static struct voc_buffer        g_record;
 static struct voc_environment   g_environment;
+static uint32_t                 g_profile_no;
+
 
 #if 0
 static struct voc_cal           g_voc_cal[] =
@@ -239,7 +252,39 @@ static struct voc_cal           g_voc_cal[] =
     { UINT32_MAX, 1.0},
 };
 #else
-static struct voc_cal           g_voc_cal[] =
+static const struct voc_cal     g_higher_voc_cal[] =
+{
+    {830,       1.205 * 1e-6},
+    {1604,      1.247 * 1e-6},
+    {2378,      1.262 * 1e-6},
+    {3148,      1.271 * 1e-6},
+    {3923,      1.275 * 1e-6},
+    {4685,      1.281 * 1e-6},
+    {5450,      1.284 * 1e-6},
+    {6230,      1.284 * 1e-6},
+    {7685,      1.301 * 1e-6},
+    {15209,     1.307 * 1e-6},
+    {22727,     1.314 * 1e-6},
+    {30260,     1.321 * 1e-6},
+    {37840,     1.321 * 1e-6},
+    {45610,     1.315 * 1e-6},
+    {77385,     1.302 * 1e-6},
+    {154140,    1.303 * 1e-6},
+    {229814,    1.305 * 1e-6},
+    {305453,    1.309 * 1e-6},
+    {753600,    1.327 * 1e-6},
+    {1483815,   1.348 * 1e-6},
+    {2221456,   1.350 * 1e-6},
+    {2924758,   1.367 * 1e-6},
+    {7229046,   1.383 * 1e-6},
+    {14204148,  1.408 * 1e-6},
+    {27961409,  1.430 * 1e-6},
+    {54836088,  1.458 * 1e-6},
+    {68109660,  1.468 * 1e-6},
+    { UINT32_MAX, 1.0},
+};
+
+static const struct voc_cal     g_lower_voc_cal[] =
 {
     {830,       1.205 * 1e-6},
     {1604,      1.247 * 1e-6},
@@ -272,8 +317,22 @@ static struct voc_cal           g_voc_cal[] =
 };
 #endif
 
+static struct voc_profile       g_profile[2] =
+{
+    [1] = {
+        .cal = &g_higher_voc_cal[0],
+        .gpio_val = 0
+    },
+    [0] = {
+        .cal = &g_lower_voc_cal[0],
+        .gpio_val = 1
+    }
+};
+
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
+
+#define g_voc_cal g_profile[g_profile_no].cal
 
 static float current_value(void)
 {
@@ -436,6 +495,7 @@ void __ISR(MEAS_TMR_VECTOR, IPL6SOFT) meas_tmr_isr(void)
 
 esError voc_init(void)
 {
+    gpioSetAsOutput(RANGE_GPIO, RANGE_PIN);
     rec_init();
     meas_init();
 
@@ -591,6 +651,29 @@ struct voc_buffer * voc_rec_get_buffer(void)
 void voc_rec_get_time(struct rtc_time * time)
 {
     *time = g_record.time;
+}
+
+void voc_set_profile(unsigned int profile_no)
+{
+    unsigned int                max_profile;
+
+    max_profile = ES_ARRAY_DIMENSION(g_profile);
+
+    if (profile_no >= max_profile) {
+        return;
+    }
+    
+    if (g_profile[profile_no].gpio_val) {
+        gpioSetPin(RANGE_GPIO, RANGE_PIN);
+    } else {
+        gpioClrPin(RANGE_GPIO, RANGE_PIN);
+    }
+    g_profile_no = profile_no;
+}
+
+unsigned int voc_get_profile(void)
+{
+    return (g_profile_no);
 }
 
 /*================================*//** @cond *//*==  CONFIGURATION ERRORS  ==*/

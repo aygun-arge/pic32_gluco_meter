@@ -63,7 +63,9 @@ enum gui_action {
         GUI_RTC_MONTH_UP,
         GUI_RTC_MONTH_DOWN,
         GUI_RTC_DAY_UP,
-        GUI_RTC_DAY_DOWN
+        GUI_RTC_DAY_DOWN,
+        GUI_BTN_UP,
+        GUI_BTN_DOWN
 };
 
 /*======================================================  GLOBAL VARIABLES  ==*/

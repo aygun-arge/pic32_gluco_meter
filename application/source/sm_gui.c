@@ -17,6 +17,7 @@
 #include "draw_save_page.h"
 #include "draw_ps_apply_page.h"
 #include "draw_calib_page.h"
+#include "draw_init_voc_page.h"
 #include "MDD/FSIO.h"
 #include "main.h"
 #include "app_buzzer.h"
@@ -34,6 +35,7 @@
     entry(state_calib,               TOP)                                       \
     entry(state_set_rtc,             TOP)                                       \
     entry(state_init_log,            TOP)                                       \
+    entry(state_init_voc,            TOP)                                       \
     entry(state_set_voltage,         TOP)                                       \
     entry(state_set_meas_time,       TOP)                                       \
     entry(state_start_meas,          TOP)                                       \
@@ -67,6 +69,8 @@ enum gui_local_evt
     EVENT_GUI_SWITCH_REC,
     EVENT_GUI_BTN_BACK,
     EVENT_GUI_BTN_OK,
+    EVENT_GUI_BTN_UP,
+    EVENT_GUI_BTN_DOWN,
     EVENT_GUI_RTC_HOUR_UP,
     EVENT_GUI_RTC_HOUR_DOWN,
     EVENT_GUI_RTC_MIN_UP,
@@ -98,6 +102,7 @@ static esAction state_init              (void *, const esEvent *);
 static esAction state_main              (void *, const esEvent *);
 static esAction state_set_rtc           (void *, const esEvent *);
 static esAction state_init_log          (void *, const esEvent *);
+static esAction state_init_voc          (void *, const esEvent *);
 static esAction state_calib             (void *, const esEvent *);
 static esAction state_set_voltage       (void *, const esEvent *);
 static esAction state_set_meas_time     (void *, const esEvent *);
@@ -222,11 +227,7 @@ static esAction state_init(void * space, const esEvent * event) {
             gui_init();
             gui_start();
 
-#if defined(ENABLE_VOC_CALIBRATION)
-            return (ES_STATE_TRANSITION(state_calib));
-#else
-            return (ES_STATE_TRANSITION(state_set_rtc));
-#endif
+            return (ES_STATE_TRANSITION(state_init_voc));
         }
         default: {
 
@@ -483,6 +484,7 @@ static esAction state_set_rtc(void * space, const esEvent * event) {
 }
 
 
+
 static esAction state_init_log(void * space, const esEvent * event) {
     struct wspace * wspace = space;
     
@@ -527,6 +529,49 @@ static esAction state_init_log(void * space, const esEvent * event) {
         }
         default: {
 
+            return (ES_STATE_IGNORED());
+        }
+    }
+}
+
+
+
+static esAction state_init_voc(void * space, const esEvent * event) {
+    struct wspace * wspace = space;
+
+    switch (event->id) {
+        case ES_ENTRY: {
+            app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
+            init_voc_draw();
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_TOUCH_POLL: {
+            app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
+            gui_exe();
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_GUI_BTN_UP: {
+            voc_set_profile(1);
+
+#if defined(ENABLE_VOC_CALIBRATION)
+            return (ES_STATE_TRANSITION(state_calib));
+#else
+            return (ES_STATE_TRANSITION(state_set_rtc));
+#endif
+        }
+        case EVENT_GUI_BTN_DOWN: {
+            voc_set_profile(0);
+
+#if defined(ENABLE_VOC_CALIBRATION)
+            return (ES_STATE_TRANSITION(state_calib));
+#else
+            return (ES_STATE_TRANSITION(state_set_rtc));
+#endif
+        }
+        default: {
+            
             return (ES_STATE_IGNORED());
         }
     }
@@ -1067,6 +1112,14 @@ void gui_event(enum gui_action action)
         }
         case GUI_RTC_YEAR_UP: {
             id = EVENT_GUI_RTC_YEAR_UP;
+            break;
+        }
+        case GUI_BTN_UP: {
+            id = EVENT_GUI_BTN_UP;
+            break;
+        }
+        case GUI_BTN_DOWN: {
+            id = EVENT_GUI_BTN_DOWN;
             break;
         }
         default: {
