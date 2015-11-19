@@ -52,9 +52,16 @@
 /*======================================================  GLOBAL VARIABLES  ==*/
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
+static uint64_t                     g_acc;
+static uint32_t                     g_counter;
+
 static void calib_events(tsTouchData_t * tsData)
 {
-    (void)tsData;
+    if ((tsData->xlcd > 0 && tsData->xlcd < 240) &&								/* sensor ON/OFF button */
+        (tsData->ylcd > 0 && tsData->ylcd < 320)) {
+        g_acc     = 0;
+        g_counter = 0;
+    }
 }
 
 /*===================================  GLOBAL PRIVATE FUNCTION DEFINITIONS  ==*/
@@ -71,9 +78,16 @@ void calib_update(struct calib * calib)
 {
     char buff[100];
 
-    snprintf(buff, sizeof(buff), "VOC: %u", calib->voc);
-    drawRectangleFilled(0, 10, 240, 40, COLOR_BLUE);
+    g_acc += calib->voc;
+    g_counter++;
+
+    drawRectangleFilled(0, 10, 240, 140, COLOR_BLUE);
+    snprintf(buff, sizeof(buff), "VOC:  %u", calib->voc);
     drawString(5, 20, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+    snprintf(buff, sizeof(buff), "CNT:  %u", g_counter);
+    drawString(5, 60, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+    snprintf(buff, sizeof(buff), "AVG:  %f", (double)g_acc / (double)g_counter);
+    drawString(5, 100, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
 }
 
 

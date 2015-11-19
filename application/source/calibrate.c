@@ -1,5 +1,5 @@
 
-#include "application/calibrate.h"
+#include "calibrate.h"
 
 static struct cal_coeff g_cal_coeff;
 
