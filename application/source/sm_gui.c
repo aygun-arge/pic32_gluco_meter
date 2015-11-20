@@ -584,8 +584,15 @@ static esAction state_calib(void * space, const esEvent * event) {
 
     switch (event->id) {
         case ES_ENTRY: {
+            app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
             app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
             calib_draw();
+
+            return (ES_STATE_HANDLED());
+        }
+        case EVENT_TOUCH_POLL: {
+            app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
+            gui_exe();
 
             return (ES_STATE_HANDLED());
         }
