@@ -30,6 +30,7 @@
         <itemPath>application/include/flash_log.h</itemPath>
         <itemPath>application/include/draw_ps_apply_page.h</itemPath>
         <itemPath>application/include/draw_calib_page.h</itemPath>
+        <itemPath>application/include/draw_init_voc_page.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
         <itemPath>application/source/dejavusansbold9.c</itemPath>
@@ -56,6 +57,7 @@
         <itemPath>application/source/draw_save_page.c</itemPath>
         <itemPath>application/source/draw_ps_apply_page.c</itemPath>
         <itemPath>application/source/draw_calib_page.c</itemPath>
+        <itemPath>application/source/draw_init_voc.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="driver" displayName="driver" projectFiles="true">
@@ -903,6 +905,8 @@
         <C32-AR>
           <property key="additional-options-chop-files" value="false"/>
         </C32-AR>
+        <C32-AS>
+        </C32-AS>
         <C32-LD>
           <property key="additional-options-use-response-files" value="false"/>
           <property key="enable-check-sections" value="false"/>
