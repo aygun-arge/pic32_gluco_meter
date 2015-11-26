@@ -30,7 +30,6 @@
         <itemPath>application/include/flash_log.h</itemPath>
         <itemPath>application/include/draw_ps_apply_page.h</itemPath>
         <itemPath>application/include/draw_calib_page.h</itemPath>
-        <itemPath>application/include/calibrate.h</itemPath>
         <itemPath>application/include/draw_init_voc_page.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
