@@ -52,7 +52,7 @@ void voc_heater_off(void)
 
 esError voc_heater_set(int voltage)
 {
-    static int                  old_voltage = 1023u;
+    static int                  old_voltage = 0u;
     int                         curr_voltage;
     esError                     err = ES_ERROR_NONE;
 
@@ -63,7 +63,7 @@ esError voc_heater_set(int voltage)
             if (err) {
                 break;
             }
-            Delay10us(100);
+            Delay10us(400);
         }
     } else {
         for (curr_voltage = old_voltage; curr_voltage > voltage; curr_voltage--) {
@@ -72,7 +72,7 @@ esError voc_heater_set(int voltage)
             if (err) {
                 break;
             }
-            Delay10us(100);
+            Delay10us(400);
         }
     }
     old_voltage = voltage;

@@ -506,14 +506,15 @@ esError voc_init(void)
 #define RH 620000.0
 #define RL  51600.0
 #define VREF 0.5
-#define RMAX 100000.0
-#define VIZ_OFFSET (-0.013)
-#define VIZ_MULTI 0.96
+#define IREF 50E-6
+#define RMAX 200000.0
+#define VIZ_OFFSET (0.0)
+#define VIZ_MULTI 1.0
 
 esError voc_env_voltage_set(int voltage)
 {
-    float                       viz;
-    float                       rpot;
+    double                      viz;
+    double                      rpot;
     int                         raw_value;
     esError                     err;
 
@@ -521,22 +522,22 @@ esError voc_env_voltage_set(int voltage)
         voltage = 65;
     }
 
-    if (voltage < 25) {
-        voltage = 25;
+    if (voltage < 0) {
+        voltage = 0;
     }
     viz  = (float)voltage / 10.0;
     viz += VIZ_OFFSET;
     viz *= VIZ_MULTI;
-    rpot = (RH / ((viz / VREF) - 1)) - RL;
+    rpot = viz / IREF;
 
-    if (rpot > 100000.0) {
-        rpot = 100000.0;
+    if (rpot > 200000.0) {
+        rpot = 200000.0;
     }
 
     if (rpot < 1.0) {
         rpot = 1.0;
     }
-    raw_value = (int)((rpot / RMAX) * 1024.0);
+    raw_value = (int)((rpot / RMAX) * 255.0);
 
     if (raw_value > 1023) {
         raw_value = 1023;
