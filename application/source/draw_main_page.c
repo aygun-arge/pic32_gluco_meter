@@ -199,7 +199,7 @@ void main_page_overview(struct main_page_overview * values)
     char current[16];
     char temperature[16];
 
-    if (values->resistance > 100.0) {
+    if (values->resistance < 0.0) {
         snprintf(resistance, sizeof(resistance), "N/A");
     } else {
         snprintf(resistance, sizeof(resistance), "%03.4f", (double)values->resistance);

@@ -49,6 +49,7 @@
 
 #define LCD_REFRESH_RATE_VERY_SLOW      ES_VTMR_TIME_TO_TICK_MS(1000)
 #define LCD_REFRESH_RATE_SLOW           ES_VTMR_TIME_TO_TICK_MS(500)
+#define LCD_REFRESH_RATE_VERY_FAST      ES_VTMR_TIME_TO_TICK_MS(50)
 #define LCD_REFRESH_RATE_FAST           ES_VTMR_TIME_TO_TICK_MS(100)
 #define LCD_GUI_TOUCH_POLL              ES_VTMR_TIME_TO_TICK_MS(100)
 
@@ -585,7 +586,7 @@ static esAction state_calib(void * space, const esEvent * event) {
     switch (event->id) {
         case ES_ENTRY: {
             app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
-            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_VERY_FAST, EVENT_REFRESH_LCD);
             calib_draw();
 
             return (ES_STATE_HANDLED());
@@ -598,7 +599,7 @@ static esAction state_calib(void * space, const esEvent * event) {
         }
         case EVENT_REFRESH_LCD: {
             struct calib calib;
-            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_VERY_FAST, EVENT_REFRESH_LCD);
 
             calib.voc = voc_meas_get_current_raw();
             calib_update(&calib);
