@@ -168,13 +168,16 @@ static void save_logs(void)
 
                 voc_rec_get_time(&time);
 
-                snprintf(buffer, sizeof(buffer), "Date & time: %d-%d-%d %02d:%02d:%02d\n\n",
+                snprintf(buffer, sizeof(buffer), "Date & time: %d-%d-%d %02d:%02d:%02d\n",
                     time.year,
                     time.month,
                     time.day,
                     time.hour,
                     time.minute,
                     time.second);
+                rec_txt_len = strlen(buffer);
+                FSfwrite(buffer, 1, rec_txt_len, data_file);
+                snprintf(buffer, sizeof(buffer), "[ms], [Mohm], [Mohm], [Mohm], [V], [A], [Celsius]\n\n");
                 rec_txt_len = strlen(buffer);
                 FSfwrite(buffer, 1, rec_txt_len, data_file);
                 records = voc_rec_get_current_no();
@@ -1012,15 +1015,15 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
             curr.rRatio    = 0.0;
 
             if (wspace->curr.rmin > 0.0) {
-                curr.rRatio = wspace->curr_r0 / wspace->curr.rmin;
+                curr.rRatio = wspace->curr.rmin / wspace->curr_r0;
             }
             prev.r0        = wspace->prev_r0;
             prev.rmin      = wspace->prev.rmin;
             prev.rmax      = wspace->prev.rmax;
             prev.rRatio    = 0.0;
 
-            if (wspace->prev.rmin > 0.0) {
-                prev.rRatio = wspace->prev_r0 / wspace->prev.rmin;
+            if (wspace->prev_r0 > 0.0) {
+                prev.rRatio =  wspace->prev.rmin / wspace->prev_r0;
             }
             meas_page_draw(&curr, &prev);
 
