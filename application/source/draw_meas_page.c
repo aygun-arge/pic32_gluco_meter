@@ -93,13 +93,13 @@ void meas_page_draw(struct meas_page_data * curr, struct meas_page_data * prev)
 	drawString(139, 60, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Ro:");
 	drawString(120, 80, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Rmax:");
 	drawString(125, 100, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Rmin:");
-	drawString(34, 120, COLOR_WHITE, &dejaVuSansBold9ptFontInfo,"Response Ro/Rmin:");
+	drawString(34, 120, COLOR_WHITE, &dejaVuSansBold9ptFontInfo,"Response Rmin/Ro:");
 
 	drawString(15, 140, COLOR_MAGENTA, &verdanabold14ptFontInfo, "Previous measurement");
 	drawString(139, 165, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Ro:");
 	drawString(120, 185, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Rmax:");
 	drawString(125, 205, COLOR_WHITE, &dejaVuSansBold9ptFontInfo,"Rmin:");         
-	drawString(34, 225, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Response Ro/Rmin:");
+	drawString(34, 225, COLOR_WHITE, &dejaVuSansBold9ptFontInfo, "Response Rmin/Ro:");
 
 	drawButton(20, 260, 90, 40, &dejaVuSansBold9ptFontInfo, 7, COLOR_BLACK, COLOR_RED, COLOR_WHITE, "BACK");
     curr_results(curr);
