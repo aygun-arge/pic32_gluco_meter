@@ -76,18 +76,25 @@ void calib_draw(void)
 
 void calib_update(struct calib * calib)
 {
+    static int counter;
+
     char buff[100];
 
     g_acc += calib->voc;
     g_counter++;
+    
+    if (counter == 0) {
+        counter = 10;
 
-    drawRectangleFilled(0, 10, 240, 140, COLOR_BLUE);
-    snprintf(buff, sizeof(buff), "VOC:  %u", calib->voc);
-    drawString(5, 20, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
-    snprintf(buff, sizeof(buff), "CNT:  %u", g_counter);
-    drawString(5, 60, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
-    snprintf(buff, sizeof(buff), "AVG:  %f", (double)g_acc / (double)g_counter);
-    drawString(5, 100, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+        drawRectangleFilled(0, 10, 240, 140, COLOR_BLUE);
+        snprintf(buff, sizeof(buff), "VOC:  %u", calib->voc);
+        drawString(5, 20, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+        snprintf(buff, sizeof(buff), "CNT:  %u", g_counter);
+        drawString(5, 60, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+        snprintf(buff, sizeof(buff), "AVG:  %f", (double)g_acc / (double)g_counter);
+        drawString(5, 100, COLOR_WHITE, &verdanabold14ptFontInfo, buff);
+    }
+    counter--;
 }
 
 

@@ -133,10 +133,10 @@ esError ad5272_init_driver(struct ad5272_handle * handle, struct i2c_bus * bus, 
     error = ad5272_write(handle, data, 2);
 
     /* NOTE:
-     * Set maximum resistance to get minimum voltage
+     * Set minimum resistance to get minimum voltage
      */
     if (!error) {
-        error = ad5272_set_pot1(handle, 1023u);
+        error = ad5272_set_pot1(handle, 0u);
     }
     
     return (error);

@@ -147,6 +147,8 @@ struct voc_profile
 {
     const struct voc_cal *      cal;
     uint32_t                    gpio_val;
+    float                       min;
+    float                       max;
 };
 
 /*=============================================  LOCAL FUNCTION PROTOTYPES  ==*/
@@ -254,58 +256,58 @@ static struct voc_cal           g_voc_cal[] =
 #else
 static const struct voc_cal     g_higher_voc_cal[] =
 {
-    {431,       23.202 * 1e-6},
-    {812,       24.631 * 1e-6},
-    {1188,      25.253 * 1e-6},
-    {1565,      25.559 * 1e-6},
-    {1943,      25.733 * 1e-6},
-    {2326,      25.795 * 1e-6},
-    {3846,      26.001 * 1e-6},
-    {7610,      26.281 * 1e-6},
-    {11362,     26.404 * 1e-6},
-    {15094,     26.501 * 1e-6},
-    {37020,     27.012 * 1e-6},
-    {73763,     27.114 * 1e-6},
-    {109776,    27.328 * 1e-6},
-    {146033,    27.391 * 1e-6},
-    {363427,    27.516 * 1e-6},
-    {717463,    27.876 * 1e-6},
-    {1065281,   28.162 * 1e-6},
-    {1408229,   28.404 * 1e-6},
-    {1750716,   28.560 * 1e-6},
-    {2094574,   28.645 * 1e-6},
-    {2435269,   28.744 * 1e-6},
-    {2772733,   28.852 * 1e-6},
-    {3106284,   28.974 * 1e-6},
-    {3447482,   29.007 * 1e-6},
-    { UINT32_MAX, 1.0},
+    {447,       22.371 * 1e-6},
+    {843,       23.725 * 1e-6},
+    {1235,      24.291 * 1e-6},
+    {1622,      24.661 * 1e-6},
+    {2011,      24.863 * 1e-6},
+    {2403,      24.969 * 1e-6},
+    {4024,      24.951 * 1e-6},
+    {7911,      24.481 * 1e-6},
+    {11783,     25.360 * 1e-6},
+    {15638,     25.479 * 1e-6},
+    {38584,     25.817 * 1e-6},
+    {76440,     26.164 * 1e-6},
+    {113750,    26.374 * 1e-6},
+    {150795,    26.326 * 1e-6},
+    {378039,    26.252 * 1e-6},
+    {743290,    25.288 * 1e-6},
+    {1102895,   27.201 * 1e-6},
+    {1459450,   27.408 * 1e-6},
+    {1809252,   27.636 * 1e-6},
+    {2155200,   27.840 * 1e-6},
+    {2498833,   28.013 * 1e-6},
+    {2839160,   28.177 * 1e-6},
+    {3182064,   28.284 * 1e-6},
+    {3512112,   28.473 * 1e-6},
+    { UINT32_MAX, 29.0},
 };
 
 static const struct voc_cal     g_lower_voc_cal[] =
 {
-    {448,       2.2321 * 1e-6},
-    {848,       2.3585 * 1e-6},
-    {1246,      2.4077 * 1e-6},
-    {1638,      2.4420 * 1e-6},
-    {2033,      2.4594 * 1e-6},
-    {2423,      2.4763 * 1e-6},
-    {2807,      2.4938 * 1e-6},
-    {3205,      2.4961 * 1e-6},
-    {3934,      2.5419 * 1e-6},
-    {7720,      2.5907 * 1e-6},
-    {11508,     2.6069 * 1e-6},
-    {15625,     2.5600 * 1e-6},
-    {19106,     2.6170 * 1e-6},
-    {22876,     2.6228 * 1e-6},
-    {38954,     2.5671 * 1e-6},
-    {76854,     2.6023 * 1e-6},
-    {114273,    2.6253 * 1e-6},
-    {151927,    2.6328 * 1e-6},
-    {372022,    2.6880 * 1e-6},
-    {731664,    2.7335 * 1e-6},
-    {1087591,   2.7584 * 1e-6},
-    {1437901,   2.7818 * 1e-6},
-    {3534276,   2.8294 * 1e-6},
+    {449,       1.9896 * 1e-6},
+    {851,       2.1068 * 1e-6},
+    {1248,      2.1621 * 1e-6},
+    {1641,      2.1995 * 1e-6},
+    {2038,      2.2211 * 1e-6},
+    {2425,      2.2470 * 1e-6},
+    {2813,      2.2671 * 1e-6},
+    {3207,      2.2799 * 1e-6},
+    {3945,      2.3307 * 1e-6},
+    {7747,      2.4694 * 1e-6},
+    {11536,     2.4710 * 1e-6},
+    {15332,     2.4891 * 1e-6},
+    {19103,     2.5459 * 1e-6},
+    {22936,     2.6054 * 1e-6},
+    {38817,     2.5658 * 1e-6},
+    {76792,     2.5937 * 1e-6},
+    {114397,    2.6116 * 1e-6},
+    {152507,    2.6118 * 1e-6},
+    {372702,    2.6831 * 1e-6},
+    {732213,    2.7314 * 1e-6},
+    {1084751,   2.7584 * 1e-6},
+    {1433973,   2.7818 * 1e-6},
+    {3526517,   2.8294 * 1e-6},
     {6930727,   2.8857 * 1e-6},
     {10279557,  2.9184 * 1e-6},
     {13748820,  2.9093 * 1e-6},
@@ -315,19 +317,25 @@ static const struct voc_cal     g_lower_voc_cal[] =
     {26653142,  3.0015 * 1e-6},
     {29939520,  3.0061 * 1e-6},
     {33237154,  3.0087 * 1e-6},
-    { UINT32_MAX, 1.0},
+    { UINT32_MAX, 3.1},
 };
 #endif
+
+
 
 static struct voc_profile       g_profile[2] =
 {
     [1] = {
-        .cal = &g_higher_voc_cal[0],
-        .gpio_val = 0
+        .cal = &g_lower_voc_cal[0],
+        .gpio_val = 1,
+        .min = 0.001,
+        .max = 10.0,
     },
     [0] = {
-        .cal = &g_lower_voc_cal[0],
-        .gpio_val = 1
+        .cal = &g_higher_voc_cal[0],
+        .gpio_val = 0,
+        .min = 0.01,
+        .max = 100.0,
     }
 };
 
@@ -335,6 +343,8 @@ static struct voc_profile       g_profile[2] =
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
 
 #define g_voc_cal g_profile[g_profile_no].cal
+#define g_voc_max g_profile[g_profile_no].max
+#define g_voc_min g_profile[g_profile_no].min
 
 static float current_value(void)
 {
@@ -345,15 +355,19 @@ static float current_value(void)
     value = g_current_raw_val;
 
     if (value == 0) {
-        return (100.0);
+        return (-1.0);
     }
 #if !defined(ENABLE_VOC_CALIBRATION)
     for (sec_no = 0; g_voc_cal[sec_no].section <= value; sec_no++);
 
     retval = (float)value * g_voc_cal[sec_no].coef;
 
-    if (retval > 100.0) {
-        retval = 100.0;
+    if (retval > g_voc_max) {
+        retval = g_voc_max;
+    }
+
+    if (retval < g_voc_min) {
+        retval = g_voc_min;
     }
 #else
     (void)g_voc_cal;
@@ -505,17 +519,15 @@ esError voc_init(void)
 }
 
 
-#define RH 620000.0
-#define RL  51600.0
-#define VREF 0.5
-#define RMAX 100000.0
-#define VIZ_OFFSET (-0.013)
-#define VIZ_MULTI 0.96
+#define IREF 50E-6
+#define RMAX 200000.0
+#define VIZ_OFFSET (-0.052)
+#define VIZ_MULTI 0.9434
 
 esError voc_env_voltage_set(int voltage)
 {
-    float                       viz;
-    float                       rpot;
+    double                      viz;
+    double                      rpot;
     int                         raw_value;
     esError                     err;
 
@@ -523,25 +535,25 @@ esError voc_env_voltage_set(int voltage)
         voltage = 65;
     }
 
-    if (voltage < 25) {
-        voltage = 25;
+    if (voltage < 0) {
+        voltage = 0;
     }
     viz  = (float)voltage / 10.0;
     viz += VIZ_OFFSET;
     viz *= VIZ_MULTI;
-    rpot = (RH / ((viz / VREF) - 1)) - RL;
+    rpot = viz / IREF;
 
-    if (rpot > 100000.0) {
-        rpot = 100000.0;
+    if (rpot > 200000.0) {
+        rpot = 200000.0;
     }
 
     if (rpot < 1.0) {
         rpot = 1.0;
     }
-    raw_value = (int)((rpot / RMAX) * 1024.0);
+    raw_value = (int)((rpot / RMAX) * 255.0);
 
-    if (raw_value > 1023) {
-        raw_value = 1023;
+    if (raw_value > 255) {
+        raw_value = 255;
     }
     err = voc_heater_set(raw_value);
 

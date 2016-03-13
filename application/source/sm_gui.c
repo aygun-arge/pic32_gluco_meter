@@ -49,6 +49,7 @@
 
 #define LCD_REFRESH_RATE_VERY_SLOW      ES_VTMR_TIME_TO_TICK_MS(1000)
 #define LCD_REFRESH_RATE_SLOW           ES_VTMR_TIME_TO_TICK_MS(500)
+#define LCD_REFRESH_RATE_VERY_FAST      ES_VTMR_TIME_TO_TICK_MS(50)
 #define LCD_REFRESH_RATE_FAST           ES_VTMR_TIME_TO_TICK_MS(100)
 #define LCD_GUI_TOUCH_POLL              ES_VTMR_TIME_TO_TICK_MS(100)
 
@@ -167,13 +168,16 @@ static void save_logs(void)
 
                 voc_rec_get_time(&time);
 
-                snprintf(buffer, sizeof(buffer), "Date & time: %d-%d-%d %02d:%02d:%02d\n\n",
+                snprintf(buffer, sizeof(buffer), "Date & time: %d-%d-%d %02d:%02d:%02d\n",
                     time.year,
                     time.month,
                     time.day,
                     time.hour,
                     time.minute,
                     time.second);
+                rec_txt_len = strlen(buffer);
+                FSfwrite(buffer, 1, rec_txt_len, data_file);
+                snprintf(buffer, sizeof(buffer), "[ms], [Mohm], [Mohm], [Mohm], [V], [A], [Celsius]\n\n");
                 rec_txt_len = strlen(buffer);
                 FSfwrite(buffer, 1, rec_txt_len, data_file);
                 records = voc_rec_get_current_no();
@@ -585,7 +589,7 @@ static esAction state_calib(void * space, const esEvent * event) {
     switch (event->id) {
         case ES_ENTRY: {
             app_timer_start(&wspace->poll, LCD_GUI_TOUCH_POLL, EVENT_TOUCH_POLL);
-            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_VERY_FAST, EVENT_REFRESH_LCD);
             calib_draw();
 
             return (ES_STATE_HANDLED());
@@ -598,7 +602,7 @@ static esAction state_calib(void * space, const esEvent * event) {
         }
         case EVENT_REFRESH_LCD: {
             struct calib calib;
-            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_SLOW, EVENT_REFRESH_LCD);
+            app_timer_start(&wspace->refresh, LCD_REFRESH_RATE_VERY_FAST, EVENT_REFRESH_LCD);
 
             calib.voc = voc_meas_get_current_raw();
             calib_update(&calib);
@@ -1011,15 +1015,15 @@ static esAction state_meas_overview(void * space, const esEvent * event) {
             curr.rRatio    = 0.0;
 
             if (wspace->curr.rmin > 0.0) {
-                curr.rRatio = wspace->curr_r0 / wspace->curr.rmin;
+                curr.rRatio = wspace->curr.rmin / wspace->curr_r0;
             }
             prev.r0        = wspace->prev_r0;
             prev.rmin      = wspace->prev.rmin;
             prev.rmax      = wspace->prev.rmax;
             prev.rRatio    = 0.0;
 
-            if (wspace->prev.rmin > 0.0) {
-                prev.rRatio = wspace->prev_r0 / wspace->prev.rmin;
+            if (wspace->prev_r0 > 0.0) {
+                prev.rRatio =  wspace->prev.rmin / wspace->prev_r0;
             }
             meas_page_draw(&curr, &prev);
 

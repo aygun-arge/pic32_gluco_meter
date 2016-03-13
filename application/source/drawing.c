@@ -922,6 +922,7 @@ void drawRectangleRounded ( uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, 
     x1 = x0;
     x0 = x;
   }
+  
   if (y1 < y0) {
     y = y1;
     y1 = y0;
