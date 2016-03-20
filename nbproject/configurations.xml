@@ -15,7 +15,6 @@
         <itemPath>application/include/dejavusansbold9.h</itemPath>
         <itemPath>application/include/bitmapfonts.h</itemPath>
         <itemPath>application/include/sm_gui.h</itemPath>
-        <itemPath>application/include/app_timer.h</itemPath>
         <itemPath>application/include/HardwareProfile.h</itemPath>
         <itemPath>application/include/FSconfig.h</itemPath>
         <itemPath>application/include/sm_voc.h</itemPath>
@@ -31,6 +30,7 @@
         <itemPath>application/include/draw_ps_apply_page.h</itemPath>
         <itemPath>application/include/draw_calib_page.h</itemPath>
         <itemPath>application/include/draw_init_voc_page.h</itemPath>
+        <itemPath>application/include/neon_eds_app_config.h</itemPath>
       </logicalFolder>
       <logicalFolder name="source" displayName="source" projectFiles="true">
         <itemPath>application/source/dejavusansbold9.c</itemPath>
@@ -42,7 +42,6 @@
         <itemPath>application/source/lcd_adc.c</itemPath>
         <itemPath>application/source/lcd_gpio.c</itemPath>
         <itemPath>application/source/sm_gui.c</itemPath>
-        <itemPath>application/source/app_timer.c</itemPath>
         <itemPath>application/source/usb_config.c</itemPath>
         <itemPath>application/source/sm_voc.c</itemPath>
         <itemPath>application/source/app_voc.c</itemPath>
@@ -105,104 +104,6 @@
         <itemPath>driver/source/ad5272.c</itemPath>
       </logicalFolder>
     </logicalFolder>
-    <logicalFolder name="esolid-base" displayName="esolid-base" projectFiles="true">
-      <logicalFolder name="inc" displayName="inc" projectFiles="true">
-        <logicalFolder name="base" displayName="base" projectFiles="true">
-          <itemPath>esolid-base/inc/base/bitop.h</itemPath>
-          <itemPath>esolid-base/inc/base/debug_config.h</itemPath>
-          <itemPath>esolid-base/inc/base/prio_queue_config.h</itemPath>
-          <itemPath>esolid-base/inc/base/queue.h</itemPath>
-          <itemPath>esolid-base/inc/base/list.h</itemPath>
-          <itemPath>esolid-base/inc/base/debug.h</itemPath>
-          <itemPath>esolid-base/inc/base/base.h</itemPath>
-          <itemPath>esolid-base/inc/base/error.h</itemPath>
-          <itemPath>esolid-base/inc/base/prio_queue.h</itemPath>
-        </logicalFolder>
-      </logicalFolder>
-      <logicalFolder name="port" displayName="port" projectFiles="true">
-        <logicalFolder name="pic32-none-gcc"
-                       displayName="pic32-none-gcc"
-                       projectFiles="true">
-          <logicalFolder name="common" displayName="common" projectFiles="true">
-            <logicalFolder name="plat" displayName="plat" projectFiles="true">
-              <itemPath>esolid-base/port/pic32-none-gcc/common/plat/critical.h</itemPath>
-              <itemPath>esolid-base/port/pic32-none-gcc/common/plat/compiler.h</itemPath>
-            </logicalFolder>
-          </logicalFolder>
-          <logicalFolder name="mips-m4k" displayName="mips-m4k" projectFiles="true">
-            <logicalFolder name="arch" displayName="arch" projectFiles="true">
-              <itemPath>esolid-base/port/pic32-none-gcc/mips-m4k/arch/intr_config.h</itemPath>
-              <itemPath>esolid-base/port/pic32-none-gcc/mips-m4k/arch/cpu.h</itemPath>
-              <itemPath>esolid-base/port/pic32-none-gcc/mips-m4k/arch/systimer.h</itemPath>
-              <itemPath>esolid-base/port/pic32-none-gcc/mips-m4k/arch/intr.h</itemPath>
-              <itemPath>esolid-base/port/pic32-none-gcc/mips-m4k/arch/systimer_config.h</itemPath>
-            </logicalFolder>
-            <itemPath>esolid-base/port/pic32-none-gcc/mips-m4k/intr.c</itemPath>
-            <itemPath>esolid-base/port/pic32-none-gcc/mips-m4k/cpu.c</itemPath>
-            <itemPath>esolid-base/port/pic32-none-gcc/mips-m4k/systimer.c</itemPath>
-          </logicalFolder>
-          <logicalFolder name="pic32mx675f512h"
-                         displayName="pic32mx675f512h"
-                         projectFiles="true">
-            <logicalFolder name="family" displayName="family" projectFiles="true">
-              <itemPath>esolid-base/port/pic32-none-gcc/pic32mx675f512h/family/profile.h</itemPath>
-            </logicalFolder>
-          </logicalFolder>
-        </logicalFolder>
-      </logicalFolder>
-      <logicalFolder name="src" displayName="src" projectFiles="true">
-        <itemPath>esolid-base/src/debug.c</itemPath>
-        <itemPath>esolid-base/src/prio_queue.c</itemPath>
-        <itemPath>esolid-base/src/error.c</itemPath>
-        <itemPath>esolid-base/src/base.c</itemPath>
-      </logicalFolder>
-    </logicalFolder>
-    <logicalFolder name="esolid-eds" displayName="esolid-eds" projectFiles="true">
-      <logicalFolder name="inc" displayName="inc" projectFiles="true">
-        <logicalFolder name="eds" displayName="eds" projectFiles="true">
-          <itemPath>esolid-eds/inc/eds/smp_config.h</itemPath>
-          <itemPath>esolid-eds/inc/eds/smp.h</itemPath>
-          <itemPath>esolid-eds/inc/eds/epa_config.h</itemPath>
-          <itemPath>esolid-eds/inc/eds/epa.h</itemPath>
-          <itemPath>esolid-eds/inc/eds/queue.h</itemPath>
-          <itemPath>esolid-eds/inc/eds/event_config.h</itemPath>
-          <itemPath>esolid-eds/inc/eds/event.h</itemPath>
-        </logicalFolder>
-      </logicalFolder>
-      <logicalFolder name="src" displayName="src" projectFiles="true">
-        <itemPath>esolid-eds/src/epa.c</itemPath>
-        <itemPath>esolid-eds/src/event.c</itemPath>
-        <itemPath>esolid-eds/src/smp.c</itemPath>
-      </logicalFolder>
-    </logicalFolder>
-    <logicalFolder name="esolid-mem" displayName="esolid-mem" projectFiles="true">
-      <logicalFolder name="inc" displayName="inc" projectFiles="true">
-        <logicalFolder name="mem" displayName="mem" projectFiles="true">
-          <itemPath>esolid-mem/inc/mem/pool.h</itemPath>
-          <itemPath>esolid-mem/inc/mem/mem_class.h</itemPath>
-          <itemPath>esolid-mem/inc/mem/static.h</itemPath>
-          <itemPath>esolid-mem/inc/mem/heap.h</itemPath>
-        </logicalFolder>
-      </logicalFolder>
-      <logicalFolder name="src" displayName="src" projectFiles="true">
-        <itemPath>esolid-mem/src/heap.c</itemPath>
-        <itemPath>esolid-mem/src/static.c</itemPath>
-        <itemPath>esolid-mem/src/mem_class.c</itemPath>
-        <itemPath>esolid-mem/src/pool.c</itemPath>
-      </logicalFolder>
-    </logicalFolder>
-    <logicalFolder name="esolid-vtimer"
-                   displayName="esolid-vtimer"
-                   projectFiles="true">
-      <logicalFolder name="inc" displayName="inc" projectFiles="true">
-        <logicalFolder name="vtimer" displayName="vtimer" projectFiles="true">
-          <itemPath>esolid-vtimer/inc/vtimer/vtimer.h</itemPath>
-        </logicalFolder>
-      </logicalFolder>
-      <logicalFolder name="src" displayName="src" projectFiles="true">
-        <itemPath>esolid-vtimer/src/vtimer.c</itemPath>
-      </logicalFolder>
-    </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
@@ -242,6 +143,163 @@
         <itemPath>mla/USB/usb_hal_local.h</itemPath>
         <itemPath>mla/USB/usb_host_local.h</itemPath>
         <itemPath>mla/USB/usb_pic32.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="neon" displayName="neon" projectFiles="true">
+      <logicalFolder name="drivers" displayName="drivers" projectFiles="true">
+        <logicalFolder name="include" displayName="include" projectFiles="true">
+          <logicalFolder name="flash" displayName="flash" projectFiles="true">
+            <itemPath>neon/drivers/include/flash/flash_class.h</itemPath>
+            <itemPath>neon/drivers/include/flash/s25fl.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="fram" displayName="fram" projectFiles="true">
+            <itemPath>neon/drivers/include/fram/fram.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="lcd" displayName="lcd" projectFiles="true">
+            <itemPath>neon/drivers/include/lcd/ili9341.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="mcu" displayName="mcu" projectFiles="true">
+            <itemPath>neon/drivers/include/mcu/config.h</itemPath>
+            <itemPath>neon/drivers/include/mcu/gpio.h</itemPath>
+            <itemPath>neon/drivers/include/mcu/i2c.h</itemPath>
+            <itemPath>neon/drivers/include/mcu/i2c_bus.h</itemPath>
+            <itemPath>neon/drivers/include/mcu/mux.h</itemPath>
+            <itemPath>neon/drivers/include/mcu/peripheral.h</itemPath>
+            <itemPath>neon/drivers/include/mcu/profile.h</itemPath>
+            <itemPath>neon/drivers/include/mcu/spi.h</itemPath>
+            <itemPath>neon/drivers/include/mcu/uart.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="power_sense" displayName="power_sense" projectFiles="true">
+            <itemPath>neon/drivers/include/power_sense/ina219.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="rtc" displayName="rtc" projectFiles="true">
+            <itemPath>neon/drivers/include/rtc/ab_rtcmc_32768_eoz9.h</itemPath>
+            <itemPath>neon/drivers/include/rtc/rtc_class.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="xio" displayName="xio" projectFiles="true">
+            <itemPath>neon/drivers/include/xio/mcp23017.h</itemPath>
+            <itemPath>neon/drivers/include/xio/xio_class.h</itemPath>
+          </logicalFolder>
+        </logicalFolder>
+        <logicalFolder name="port" displayName="port" projectFiles="true">
+          <logicalFolder name="stm32fxxx" displayName="stm32fxxx" projectFiles="true">
+            <logicalFolder name="family" displayName="family" projectFiles="true">
+              <itemPath>neon/drivers/port/stm32fxxx/family/p_gpio.h</itemPath>
+              <itemPath>neon/drivers/port/stm32fxxx/family/p_i2c_bus.h</itemPath>
+              <itemPath>neon/drivers/port/stm32fxxx/family/p_mux.h</itemPath>
+              <itemPath>neon/drivers/port/stm32fxxx/family/p_peripheral.h</itemPath>
+              <itemPath>neon/drivers/port/stm32fxxx/family/p_profile_data.h</itemPath>
+              <itemPath>neon/drivers/port/stm32fxxx/family/p_spi.h</itemPath>
+              <itemPath>neon/drivers/port/stm32fxxx/family/p_stm32f411xe.h</itemPath>
+              <itemPath>neon/drivers/port/stm32fxxx/family/p_stm32f429xx.h</itemPath>
+              <itemPath>neon/drivers/port/stm32fxxx/family/p_uart.h</itemPath>
+            </logicalFolder>
+            <itemPath>neon/drivers/port/stm32fxxx/p_gpio.c</itemPath>
+            <itemPath>neon/drivers/port/stm32fxxx/p_i2c_bus.c</itemPath>
+            <itemPath>neon/drivers/port/stm32fxxx/p_mux.c</itemPath>
+            <itemPath>neon/drivers/port/stm32fxxx/p_peripheral.c</itemPath>
+            <itemPath>neon/drivers/port/stm32fxxx/p_profile.c</itemPath>
+            <itemPath>neon/drivers/port/stm32fxxx/p_uart.c</itemPath>
+          </logicalFolder>
+        </logicalFolder>
+        <logicalFolder name="source" displayName="source" projectFiles="true">
+          <logicalFolder name="fram" displayName="fram" projectFiles="true">
+            <itemPath>neon/drivers/source/fram/fram.c</itemPath>
+          </logicalFolder>
+          <logicalFolder name="mcu" displayName="mcu" projectFiles="true">
+            <itemPath>neon/drivers/source/mcu/i2c.c</itemPath>
+            <itemPath>neon/drivers/source/mcu/peripheral.c</itemPath>
+            <itemPath>neon/drivers/source/mcu/profile.c</itemPath>
+          </logicalFolder>
+          <logicalFolder name="rtc" displayName="rtc" projectFiles="true">
+            <itemPath>neon/drivers/source/rtc/ab_rtcmc_32768_eoz9.c</itemPath>
+          </logicalFolder>
+          <logicalFolder name="xio" displayName="xio" projectFiles="true">
+            <itemPath>neon/drivers/source/xio/mcp23017.c</itemPath>
+          </logicalFolder>
+        </logicalFolder>
+      </logicalFolder>
+      <logicalFolder name="eds" displayName="eds" projectFiles="true">
+        <logicalFolder name="include" displayName="include" projectFiles="true">
+          <logicalFolder name="base" displayName="base" projectFiles="true">
+            <itemPath>neon/eds/include/base/bias_list.h</itemPath>
+            <itemPath>neon/eds/include/base/bitop.h</itemPath>
+            <itemPath>neon/eds/include/base/component.h</itemPath>
+            <itemPath>neon/eds/include/base/config.h</itemPath>
+            <itemPath>neon/eds/include/base/debug.h</itemPath>
+            <itemPath>neon/eds/include/base/error.h</itemPath>
+            <itemPath>neon/eds/include/base/list.h</itemPath>
+            <itemPath>neon/eds/include/base/queue.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="ep" displayName="ep" projectFiles="true">
+            <itemPath>neon/eds/include/ep/epa.h</itemPath>
+            <itemPath>neon/eds/include/ep/equeue.h</itemPath>
+            <itemPath>neon/eds/include/ep/etimer.h</itemPath>
+            <itemPath>neon/eds/include/ep/event.h</itemPath>
+            <itemPath>neon/eds/include/ep/smp.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="mm" displayName="mm" projectFiles="true">
+            <itemPath>neon/eds/include/mm/heap.h</itemPath>
+            <itemPath>neon/eds/include/mm/mem.h</itemPath>
+            <itemPath>neon/eds/include/mm/pool.h</itemPath>
+            <itemPath>neon/eds/include/mm/static.h</itemPath>
+            <itemPath>neon/eds/include/mm/stdheap.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="port" displayName="port" projectFiles="true">
+            <itemPath>neon/eds/include/port/compiler.h</itemPath>
+            <itemPath>neon/eds/include/port/core.h</itemPath>
+            <itemPath>neon/eds/include/port/os.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="sched" displayName="sched" projectFiles="true">
+            <itemPath>neon/eds/include/sched/prio_queue.h</itemPath>
+            <itemPath>neon/eds/include/sched/sched.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="timer" displayName="timer" projectFiles="true">
+            <itemPath>neon/eds/include/timer/timer.h</itemPath>
+          </logicalFolder>
+          <itemPath>neon/eds/include/neon_eds.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="port" displayName="port" projectFiles="true">
+          <logicalFolder name="pic32-none-gcc"
+                         displayName="pic32-none-gcc"
+                         projectFiles="true">
+            <logicalFolder name="arch" displayName="arch" projectFiles="true">
+              <itemPath>neon/eds/port/pic32-none-gcc/arch/p_compiler.h</itemPath>
+              <itemPath>neon/eds/port/pic32-none-gcc/arch/p_core.h</itemPath>
+            </logicalFolder>
+            <itemPath>neon/eds/port/pic32-none-gcc/p_core.c</itemPath>
+          </logicalFolder>
+        </logicalFolder>
+        <logicalFolder name="source" displayName="source" projectFiles="true">
+          <itemPath>neon/eds/source/epa.c</itemPath>
+          <itemPath>neon/eds/source/equeue.c</itemPath>
+          <itemPath>neon/eds/source/etimer.c</itemPath>
+          <itemPath>neon/eds/source/event.c</itemPath>
+          <itemPath>neon/eds/source/heap.c</itemPath>
+          <itemPath>neon/eds/source/mem.c</itemPath>
+          <itemPath>neon/eds/source/pool.c</itemPath>
+          <itemPath>neon/eds/source/sched.c</itemPath>
+          <itemPath>neon/eds/source/smp.c</itemPath>
+          <itemPath>neon/eds/source/static.c</itemPath>
+          <itemPath>neon/eds/source/stdheap.c</itemPath>
+          <itemPath>neon/eds/source/timer.c</itemPath>
+        </logicalFolder>
+      </logicalFolder>
+      <logicalFolder name="lib" displayName="lib" projectFiles="true">
+        <logicalFolder name="include" displayName="include" projectFiles="true">
+          <logicalFolder name="lib" displayName="lib" projectFiles="true">
+            <logicalFolder name="string" displayName="string" projectFiles="true">
+              <itemPath>neon/lib/include/lib/string/num_conv.h</itemPath>
+            </logicalFolder>
+            <itemPath>neon/lib/include/lib/bits.h</itemPath>
+          </logicalFolder>
+        </logicalFolder>
+        <logicalFolder name="source" displayName="source" projectFiles="true">
+          <logicalFolder name="string" displayName="string" projectFiles="true">
+            <itemPath>neon/lib/source/string/num_conv.c</itemPath>
+          </logicalFolder>
+          <itemPath>neon/lib/source/bits.c</itemPath>
+        </logicalFolder>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
@@ -308,7 +366,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="driver/include;application/include;esolid-base/inc;esolid-base/port/pic32-none-gcc/common;esolid-base/port/pic32-none-gcc/mips-m4k;esolid-base/port/pic32-none-gcc/pic32mx675f512h;esolid-eds/inc;esolid-mem/inc;esolid-vtimer/inc;mla/Common;mla/USB;mla"/>
+                  value="driver/include;application/include;mla/Common;mla/USB;mla;neon\eds\include;neon\eds\port\pic32-none-gcc;neon\lib\include;neon\drivers\include"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>
@@ -454,6 +512,7 @@
         <property key="UART4" value="true"/>
         <property key="UART5" value="true"/>
         <property key="UART6" value="true"/>
+        <property key="USB" value="true"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
