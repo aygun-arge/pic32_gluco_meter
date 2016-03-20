@@ -24,10 +24,6 @@
 #include "main.h"
 #include "voc.h"
 
-#include "vtimer/vtimer.h"
-#include "mem/static.h"
-#include "mem/mem_class.h"
-#include "eds/epa.h"
 #include "sm_gui.h"
 #include "sm_voc.h"
 
@@ -36,6 +32,8 @@
 #include "app_buzzer.h"
 #include "TimeDelay.h"
 #include "voc_heater.h"
+
+#include "neon_eds.h"
 
 /*=========================================================  LOCAL MACRO's  ==*/
 /*======================================================  LOCAL DATA TYPES  ==*/
@@ -47,14 +45,14 @@ static void idle_hook(void);
 
 /*=======================================================  LOCAL VARIABLES  ==*/
 
-static const ES_MODULE_INFO_CREATE("main", "Main module", "Nenad Radulovic");
-static uint8_t                  g_static_storage[1024];
-static uint8_t                  g_heap_storage[4096];
-static esMem                    g_static_mem;
-static esMem                    g_heap_mem;
+/*-- Event storage and heap --------------------------------------------------*/
+static struct nheap             g_event_heap;									/* Dinamicka memorija za event-ove */
+static uint8_t                  g_event_heap_storage[4096];						/* Prostor za din. mem. za event-ove */
+static uint8_t                  g_generic_heap_storage[24000];					/* Prostor za din. mem. za opstu upotrebu */
 
 /*======================================================  GLOBAL VARIABLES  ==*/
 
+struct nheap             		g_generic_heap;
 struct i2c_bus                  g_i2c_bus;
 
 /*============================================  LOCAL FUNCTION DEFINITIONS  ==*/
@@ -102,20 +100,53 @@ int main(int argc, char** argv)
     (void)argv;
 
     board_init_early();
-
-    /*-- eSolid --------------------------------------------------------------*/
-    esEdsInit();
-    esEdsSetIdle(idle_hook);
-    esMemInit(&esGlobalStaticMemClass, &g_static_mem, g_static_storage, sizeof(g_static_storage), 0);
-    esMemInit(&esGlobalHeapMemClass, &g_heap_mem, g_heap_storage, sizeof(g_heap_storage), 0);
-
     board_init_late();
-    
-    esEventRegisterMem(&g_heap_mem);
-    esEpaCreate(&g_gui_epa, &g_gui_sm, &g_static_mem, &g_gui);
-    esEpaCreate(&g_voc_epa, &g_voc_sm, &g_static_mem, &g_voc);
 
-    esEdsStart();
+    /* Initialize the portable core. Portable core handles interrupts, timer
+     * and CPU initialization. After initialization the core timer is started
+     * so event timer can be used in this example.
+     */
+    ncore_init();
+    ncore_timer_enable();
+
+    /* Initialize internal scheduler data structures. Event Processing is
+     * relaying on scheduler to provide efficient task switching.
+     */
+    nsched_init();
+
+    /* Initialize a memory for events. Since events are dynamic they require
+     * either a heap memory or a pool memory. Currently only Neon Heap and Pool
+     * memory are supported. In the future a standard malloc/free support will
+     * be added.
+     *
+     * Function nheap_init() requires a pointer to heap memory structure,
+     * pointer to statically allocated storage and it's size.
+     */
+    nheap_init(&g_event_heap, g_event_heap_storage, sizeof(g_event_heap_storage));
+
+    /* Initialize a generic heap memory, used by FLASH programming, USB protocol
+     */
+    nheap_init(&g_generic_heap, g_generic_heap_storage, sizeof(g_generic_heap_storage));
+
+    /* Register the Heap memory for events. New events will allocate memory from
+     * this heap.
+     */
+    nevent_register_mem(&g_event_heap.mem_class);
+
+    /* Register a user implemented IDLE routine. The idle routine is called
+     * when there are no ready EPA for execution. Keep this routine short as
+     * possible because it's execution time may impact system response time.
+     *
+     * When the NULL pointer is given the system will use default ncore_idle()
+     * portable function which usually puts CPU to sleep.
+     */
+    neds_set_idle(idle_hook);
+
+    
+
+    /* Start the scheduler under Event Processing supervision.
+     */
+    neds_run();
 
     return (EXIT_SUCCESS);
 }
