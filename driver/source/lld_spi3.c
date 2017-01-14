@@ -126,11 +126,12 @@ static void lldSpiOpen(
         *ssPort->tris &= ~ssPinMask;
     }
 #elif (((__PIC32_FEATURE_SET__ >= 500) && (__PIC32_FEATURE_SET__ <= 799)))
-    unsigned int data;
+    volatile unsigned int data;
 
     (void)handle;
     SPI3CON             = 0;
     data                = SPI3BUF;                                              /* Clear the receive buffer                                 */
+    (void)data;
     SPI3CON             = config->flags & ~SPI3CON_ON;
     SPI3CONCLR          = SPI3CON_FRMEN;
     SPI3CONSET          = SPI3CON_ENHBUF;

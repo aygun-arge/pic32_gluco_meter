@@ -36,4 +36,10 @@ void _general_exception_handler(void)
     intlev =(_excep_code & 0x0000FF00) >> 10;
 
     while(1);
+    
+    /* NOTE:
+     * Remove compiler warnings
+     */
+    (void)code;
+    (void)intlev;
 }

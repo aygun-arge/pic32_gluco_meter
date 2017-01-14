@@ -23,12 +23,10 @@ esError ina219_init_driver(
     uint8_t             id,
     const struct ina219_config * config)
 {
-    float                       max_possible_i;
     uint16_t                    cal;
     uint8_t                     buff[2];
 
     i2c_slave_open(&handle->comm, &g_ina219_i2c_config, bus, id);
-    max_possible_i = 0.32 / config->shunt_res;
     handle->current_lsb = config->shunt_current / 32768;
     cal = 0.04096 / (handle->current_lsb * config->shunt_res);
     buff[0] = cal >> 8u;
