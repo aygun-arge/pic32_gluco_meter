@@ -75,6 +75,8 @@
 #define MEAS_PERIOD_HZ                  50
 #define MEAS_TMR_VECTOR                 _TIMER_5_VECTOR
 
+#define MEAS_100MS_PERIOD_HZ            10
+
 #if (CONFIG_IC_SELECTION == 1)
 #define IC_VECTOR                       _INPUT_CAPTURE_1_VECTOR
 #define ICxCON                          IC1CON
@@ -581,6 +583,8 @@ void voc_rec_start(int period)
     
     if (period == PERIOD_20MS) {
         MEAS_TMR_A_PR   = GetPeripheralClock() / (256u * MEAS_PERIOD_HZ);
+    } else if (period == PERIOD_100MS) {
+        MEAS_TMR_A_PR   = GetPeripheralClock() / (256u * MEAS_100MS_PERIOD_HZ);
     } else {
         MEAS_TMR_A_PR   = GetPeripheralClock() / (256u * 1u);
     }

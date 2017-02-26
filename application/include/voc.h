@@ -19,6 +19,7 @@
 
 #define PERIOD_20MS             0
 #define PERIOD_1S               1
+#define PERIOD_100MS            2
 #define CONFIG_BUFFER_SIZE              2048
 /*------------------------------------------------------  C++ extern begin  --*/
 #ifdef	__cplusplus
