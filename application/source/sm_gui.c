@@ -705,7 +705,7 @@ static esAction state_main(void * space, const esEvent * event) {
                 main_page_switch_rec(&wspace->main_page_ctx);
                 voc_meas_get_current(&meas);
                 wspace->curr_r0 = meas.rcurr;
-                voc_rec_start(PERIOD_1S);
+                voc_rec_start(PERIOD_100MS);
 
                 return (ES_STATE_HANDLED());
             }
